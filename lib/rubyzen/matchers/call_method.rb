@@ -2,12 +2,15 @@ require_relative 'matcher_helpers'
 
 RSpec::Matchers.define :call_method do |method_name, custom_message=nil|
   include Rubyzen::Matchers::MatcherHelpers
-  
+
   match do |classes_collection|
     @custom_message = custom_message
-    @method_name = method_name
-    called_methods = classes_collection.flat_map { |c| c.called_method_names }
-    @offenders = called_methods.include?(@method_name) ? [@method_name] : []
+    @method_name = method_name.to_s
+
+    @offenders = classes_collection.select do |class_info|
+      class_info.called_method_names.include?(@method_name)
+    end.map(&:name)
+
     !@offenders.empty?
   end
 
