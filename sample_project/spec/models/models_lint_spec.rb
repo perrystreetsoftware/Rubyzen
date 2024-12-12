@@ -10,7 +10,7 @@ RSpec.describe 'Models lint rules' do
 
     it "it has a corresponding spec file" do
       expect(models_files)
-        .to have_corresponding_spec_files_in('unit/src/models', "All model files must have corresponding spec files")
+        .to have_corresponding_spec_files_in('spec/unit/src', "All model files must have corresponding spec files")
     end
   end
 
@@ -19,7 +19,7 @@ RSpec.describe 'Models lint rules' do
     let(:models_classes) { project.classes_in_path('models') }
 
     it "does not have questions in it" do
-      expect(models_classes.methods.names).not_to include(end_with('?'))
+      expect(models_classes.methods.names).not_to include(end_with('?')), "Do not use question mark methods in models. Use ask."
     end
   end
 end
