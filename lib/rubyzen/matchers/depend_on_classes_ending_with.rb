@@ -7,8 +7,10 @@ RSpec::Matchers.define :depend_on_classes_ending_with do |suffix, custom_message
     @custom_message = custom_message
     @suffix = suffix
 
-    all_constants = classes_collection.flat_map { |c| c.constants_referenced || [] }
-    @offenders = all_constants.select { |const| const.end_with?(suffix) }
+    @offenders = classes_collection.select do |class_info|
+      class_info.constants_referenced.any? { |const| const.end_with?(suffix) }
+    end.map(&:name)
+
     !@offenders.empty?
   end
 
