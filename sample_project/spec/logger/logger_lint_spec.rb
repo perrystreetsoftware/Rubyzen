@@ -5,10 +5,10 @@ RSpec.describe 'Logger lint rules' do
   let(:project) { Rubyzen::Project.new }
 
   context "given a class that calls LOGGER.info" do
-    let(:classes) { project.classes }
+    let(:logger_classes) { project.classes_that_call_method('LOGGER', 'info') }
 
     it "includes the details param" do
-      expect(classes)
+      expect(logger_classes)
         .to(require_keyword_argument_in_calls('LOGGER', 'info', :details, "LOGGER.info requires a details keyword argument, otherwise it will fail in the dev environment"))
     end
   end

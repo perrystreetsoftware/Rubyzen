@@ -40,6 +40,16 @@ module Rubyzen
       ClassesCollection.new(classes.select { |c| c.file_path.include?(subpath) })
     end
 
+    def classes_that_call_method(receiver, method_name)
+      receiver = receiver.to_s
+      method_name = method_name.to_s
+      classes.select do |class_info|
+        class_info.call_sites.any? do |call_site|
+          call_site[:receiver] == receiver && call_site[:method_name] == method_name
+        end
+      end
+    end
+
     def files_in_path(subpath)
       @file_paths.select { |f| f.include?(subpath) }
     end

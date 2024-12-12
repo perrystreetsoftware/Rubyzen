@@ -14,7 +14,7 @@ Traditional linters such as [RuboCop](https://github.com/rubocop/rubocop) requir
 
 - **Easy-to-Use API:** Rubyzen provides a friendly, high-level API to access files, classes, methods, dependencies, and more. This way developers do not have to manual access nodes and deal with low-level AST operations manually.
   
-- **Architectural Enforcement & Documentation:** By writing the lint rules as tests, we can use Given-When-Then style and provide documentation for our architecture within the codebase, without having to maintain wiki pages or diagrams.
+- **Architectural Enforcement & Documentation:** By writing the lint rules as tests, we can use the Given-When-Then style and provide documentation for our architecture within the codebase, without having to maintain wiki pages or diagrams.
   
 - **Less Manual Reviews:** With architectural rules automatically enforced by tests, code reviews can focus on more complex issues instead of repeating the same architectural feedback.
 
