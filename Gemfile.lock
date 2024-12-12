@@ -28,6 +28,7 @@ GEM
     rspec-support (3.13.2)
     rubocop-ast (1.36.2)
       parser (>= 3.3.1.0)
+    yaml (0.1.1)
 
 PLATFORMS
   arm64-darwin-23
@@ -38,6 +39,7 @@ DEPENDENCIES
   require_all (~> 3.0)
   rspec (~> 3.12)
   rubocop-ast (~> 1.26)
+  yaml (~> 0.1.0)
 
 BUNDLED WITH
    2.5.18

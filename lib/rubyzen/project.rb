@@ -12,7 +12,7 @@ module Rubyzen
     )
 
     def initialize(path = nil)
-      path ||= File.expand_path('../../../sample_project/src', __FILE__)
+      path ||= Rubyzen.configuration.project_root_path
       @root_path = path
       @file_paths = if File.directory?(path)
                       Dir[File.join(path, '**', '*.rb')]

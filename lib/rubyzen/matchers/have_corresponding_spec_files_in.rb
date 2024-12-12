@@ -29,6 +29,7 @@ RSpec::Matchers.define :have_corresponding_spec_files_in do |spec_root, custom_m
   def corresponding_spec_file(source_file)
     relative_path = source_file.split('src/').last
     spec_filename = relative_path.sub(/\.rb$/, '_spec.rb')
-    File.join(File.expand_path("../../../sample_project", __dir__), @spec_root, spec_filename)
+    project_root = File.dirname(Rubyzen.configuration.project_root_path)
+    File.join(project_root, @spec_root, spec_filename)
   end
 end
