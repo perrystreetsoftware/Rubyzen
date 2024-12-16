@@ -29,6 +29,7 @@ module Rubyzen
     end
 
     def find_top_level_module(ast)
+      return nil
       module_node = ast.children.find { |child| child.is_a?(RuboCop::AST::Node) && child.module_name? }
       return unless module_node
       module_node.const_name

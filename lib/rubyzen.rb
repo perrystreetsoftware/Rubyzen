@@ -1,6 +1,12 @@
 require 'rubocop-ast'
 require 'require_all'
-require_all 'lib/rubyzen'
+# require_all 'lib/rubyzen'
+require_relative './rubyzen/class_analyzer.rb'
+require_relative './rubyzen/project.rb'
+require_relative './rubyzen/methods_collection.rb'
+require_relative './rubyzen/classes_collection.rb'
+require_relative './rubyzen/matchers/matcher_helpers.rb'
+require_relative './rubyzen/matchers/call_method.rb'
 require 'yaml'
 
 module Rubyzen
