@@ -38,5 +38,11 @@ module Rubyzen
       filtered = select { |c| c.name&.end_with?(suffix) }
       ClassesCollection.new(filtered)
     end
+
+    def excluding_classes(class_names)
+      class_names = Array(class_names).map { |cn| cn.to_s.sub(/^:/, '') }
+      filtered = reject { |c| class_names.include?(c.name) }
+      ClassesCollection.new(filtered)
+    end
   end
 end
