@@ -8,6 +8,7 @@ module Rubyzen
       @processed_source.ast.each_node(:class).map do |class_node|
         Rubyzen::Project::ClassInfo.new(
           name: class_node.identifier&.const_name,
+          superclass_name: extract_superclass_name(class_node),
           constants_referenced: constants_referenced_in(class_node),
           file_path: @processed_source.path,
           method_names: extract_method_names(class_node),
@@ -19,6 +20,12 @@ module Rubyzen
     end
 
     private
+
+    def extract_superclass_name(class_node)
+      super_node = class_node.children[1]
+      return nil unless super_node && super_node.type == :const
+      super_node.const_name
+    end
 
     def constants_referenced_in(class_node)
       class_node.each_descendant(:const).map(&:const_name).uniq

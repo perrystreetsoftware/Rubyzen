@@ -2,6 +2,7 @@ module Rubyzen
   class Project
     ClassInfo = Struct.new(
       :name,
+      :superclass_name,
       :constants_referenced,
       :file_path,
       :method_names,
@@ -33,11 +34,15 @@ module Rubyzen
     end
 
     def classes_with_name_ending_with(suffix)
-      ClassesCollection.new(classes.select { |c| c.name&.end_with?(suffix) })
+      classes.classes_with_name_ending_with(suffix)
     end
 
     def classes_in_path(subpath)
-      ClassesCollection.new(classes.select { |c| c.file_path.include?(subpath) })
+      classes.classes_in_path(subpath)
+    end
+
+    def classes_inheriting_from(superclass)
+      classes.classes_inheriting_from(superclass)
     end
 
     def classes_that_call_method(receiver, method_name)
@@ -55,7 +60,7 @@ module Rubyzen
     end
 
     def classes_without_path(subpath)
-      ClassesCollection.new(classes.reject { |c| c.file_path.include?(subpath) })
+      classes.classes_without_path(subpath)
     end
 
     def line_count_for(file_path)

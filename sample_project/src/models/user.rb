@@ -1,4 +1,4 @@
-class User < ActiveRecord::Base
+class User < ActiveRecord::BaseAurora
   def active?
     true
   end
