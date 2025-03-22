@@ -1,3 +1,5 @@
+require_relative 'parsers/ast_parser'
+
 module Rubyzen
   class Project
     ClassInfo = Struct.new(
@@ -20,17 +22,25 @@ module Rubyzen
                     else
                       [path]
                     end
+      @parser = Rubyzen::Parsers::ASTParser.new
     end
 
     def classes
-      class_infos = @file_paths.flat_map do |file_path|
-        source = File.read(file_path)
-        processed_source = RuboCop::AST::ProcessedSource.new(source, RUBY_VERSION.to_f, file_path)
-        next [] unless processed_source.ast
-        analyzer = ClassAnalyzer.new(processed_source)
-        analyzer.analyze
-      end
-      ClassesCollection.new(class_infos)
+      all_classes = file_declarations.flat_map(&:classes)
+      ClassesCollection.new(
+        all_classes.map do |klass|
+          ClassInfo.new(
+            name: klass.name,
+            superclass_name: klass.superclass_name,
+            constants_referenced: klass.constants_referenced,
+            file_path: klass.file_path,
+            method_names: klass.methods.map(&:name),
+            top_level_module: klass.top_level_module,
+            called_method_names: klass.called_method_names,
+            call_sites: klass.call_sites
+          )
+        end
+      )
     end
 
     def classes_with_name_ending_with(suffix)
@@ -77,6 +87,12 @@ module Rubyzen
       else
         raise "File #{relative_path} not found under #{@root_path}"
       end
+    end
+
+    private
+
+    def file_declarations
+      @file_paths.map { |path| @parser.parse_file(path) }.compact
     end
   end
 end
