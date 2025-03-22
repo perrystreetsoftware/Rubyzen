@@ -7,13 +7,12 @@ module Rubyzen
     def initialize(path = nil)
       path ||= Rubyzen.configuration.project_root_path
       @root_path = path
-      @file_paths =
-        if File.directory?(path)
-          Dir[File.join(path, '**', '*.rb')]
-        else
-          [path]
-        end
-      @parser = Rubyzen::Parsers::ASTParser.new
+      @file_paths = if File.directory?(path)
+                       Dir[File.join(path, '**', '*.rb')]
+                     else
+                       [path]
+                     end
+      @parser = Rubyzen::Parsers::ASTParser.instance
     end
 
     def files
