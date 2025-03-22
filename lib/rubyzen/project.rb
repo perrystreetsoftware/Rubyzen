@@ -1,46 +1,29 @@
 require_relative 'parsers/ast_parser'
+require_relative 'file_collection'
+require_relative 'classes_collection'
 
 module Rubyzen
   class Project
-    ClassInfo = Struct.new(
-      :name,
-      :superclass_name,
-      :constants_referenced,
-      :file_path,
-      :method_names,
-      :top_level_module,
-      :called_method_names,
-      :call_sites,
-      keyword_init: true
-    )
-
     def initialize(path = nil)
       path ||= Rubyzen.configuration.project_root_path
       @root_path = path
-      @file_paths = if File.directory?(path)
-                      Dir[File.join(path, '**', '*.rb')]
-                    else
-                      [path]
-                    end
+      @file_paths =
+        if File.directory?(path)
+          Dir[File.join(path, '**', '*.rb')]
+        else
+          [path]
+        end
       @parser = Rubyzen::Parsers::ASTParser.new
+    end
+
+    def files
+      all_files = file_declarations
+      FileCollection.new(all_files)
     end
 
     def classes
       all_classes = file_declarations.flat_map(&:classes)
-      ClassesCollection.new(
-        all_classes.map do |klass|
-          ClassInfo.new(
-            name: klass.name,
-            superclass_name: klass.superclass_name,
-            constants_referenced: klass.constants_referenced,
-            file_path: klass.file_path,
-            method_names: klass.methods.map(&:name),
-            top_level_module: klass.top_level_module,
-            called_method_names: klass.called_method_names,
-            call_sites: klass.call_sites
-          )
-        end
-      )
+      ClassesCollection.new(all_classes)
     end
 
     def classes_with_name_ending_with(suffix)
@@ -56,28 +39,25 @@ module Rubyzen
     end
 
     def classes_that_call_method(receiver, method_name)
-      receiver = receiver.to_s
-      method_name = method_name.to_s
-      classes.select do |class_info|
-        class_info.call_sites.any? do |call_site|
-          call_site[:receiver] == receiver && call_site[:method_name] == method_name
+      classes.select do |class_decl|
+        class_decl.call_sites.any? do |site|
+          site[:receiver] == receiver.to_s && site[:method_name] == method_name.to_s
         end
       end
     end
 
     def files_in_path(subpath)
-      @file_paths.select { |f| f.include?(subpath) }
+      files.files_in_path(subpath).map(&:path)
     end
 
     def classes_without_path(subpath)
       classes.classes_without_path(subpath)
     end
 
-    def line_count_for(file_path)
-      full_path = @file_paths.find { |fp| fp.include?(file_path) }
-      return 0 unless full_path && File.exist?(full_path)
-
-      File.readlines(full_path).size
+    def line_count_for(relative_path)
+      fp = @file_paths.find { |p| p.include?(relative_path) }
+      return 0 unless fp && File.exist?(fp)
+      File.readlines(fp).size
     end
 
     def file_path(relative_path)
@@ -92,7 +72,9 @@ module Rubyzen
     private
 
     def file_declarations
-      @file_paths.map { |path| @parser.parse_file(path) }.compact
+      @file_declarations ||= @file_paths.map do |file_path|
+        @parser.parse_file(file_path)
+      end.compact
     end
   end
 end

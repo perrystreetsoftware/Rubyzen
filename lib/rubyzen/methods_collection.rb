@@ -1,11 +1,11 @@
 module Rubyzen
-  class MethodsCollection
-    def initialize(method_names)
-      @method_names = method_names
+  class MethodsCollection < Array
+    def initialize(method_declarations)
+      super(method_declarations)
     end
 
     def names
-      @method_names
+      map(&:name)
     end
   end
 end
