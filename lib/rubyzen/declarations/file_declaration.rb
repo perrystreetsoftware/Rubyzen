@@ -21,6 +21,12 @@ module Rubyzen
         return unless module_node
         module_node.const_name
       end
+
+      def modules
+        ast.each_node(:module).map do |module_node|
+          Rubyzen::Declarations::ModuleDeclaration.new(module_node, self)
+        end
+      end
     end
   end
 end

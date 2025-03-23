@@ -1,8 +1,12 @@
 require_relative 'method_declaration'
+require_relative '../providers/if_statements_provider'
+require_relative '../providers/blocks_provider'
 
 module Rubyzen
   module Declarations
     class ClassDeclaration
+      include Rubyzen::Providers::IfStatementsProvider
+      include Rubyzen::Providers::BlocksProvider
       attr_reader :node, :file_declaration
 
       def initialize(node, file_declaration)
