@@ -20,6 +20,29 @@ module Rubyzen
       def lines_of_code
         node.loc.expression.source.split("\n").size
       end
+
+      def public_method?
+        node_visibility == :public
+      end
+
+      private
+
+      def node_visibility
+        # Traverse upward to the class or module body
+        class_or_module = node.each_ancestor(:class, :module).first
+        return :public unless class_or_module
+
+        visibility = :public
+        class_or_module.body.each_child_node do |child|
+          if child.send_type? && %i[public protected private].include?(child.method_name)
+            visibility = child.method_name
+          elsif child.def_type? || child.defs_type?
+            return visibility if child == node
+          end
+        end
+
+        :public
+      end
     end
   end
 end

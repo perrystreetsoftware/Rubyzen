@@ -21,8 +21,28 @@ module Rubyzen
     end
 
     def classes
-      all_classes = file_declarations.flat_map(&:classes)
-      ClassesCollection.new(all_classes)
+      @classes ||= begin
+        all_classes = file_declarations.flat_map(&:classes)
+
+        # Create an index of classes by their full name for O(1) lookup
+        class_index = all_classes.each_with_object({}) do |class_decl, index|
+          index[class_decl.name_with_modules] = class_decl
+        end
+
+        # Now we can look up superclasses in constant time
+        all_classes.each do |sub_class_decl|
+          next unless sub_class_decl.superclass_name
+
+          super_class_name = sub_class_decl.superclass_name_with_modules
+          super_class_decl = class_index[super_class_name]
+          next unless super_class_decl
+
+          super_class_decl.subclasses << sub_class_decl
+          sub_class_decl.super_class = super_class_decl
+        end
+
+        ClassesCollection.new(all_classes)
+      end
     end
 
     def classes_with_name_ending_with(suffix)
@@ -33,10 +53,12 @@ module Rubyzen
       classes.classes_in_path(subpath)
     end
 
+    # This does not seem to take modules into concern
     def classes_inheriting_from(superclass)
       classes.classes_inheriting_from(superclass)
     end
 
+    # this does not find subclasses that inherit the called method from superclass
     def classes_that_call_method(receiver, method_name)
       classes.select do |class_decl|
         class_decl.call_sites.any? do |site|

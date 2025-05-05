@@ -9,6 +9,8 @@ module Rubyzen
       include Rubyzen::Providers::BlocksProvider
       attr_reader :node, :file_declaration
 
+      attr_accessor :super_class
+
       def initialize(node, file_declaration)
         @node = node
         @file_declaration = file_declaration
@@ -22,16 +24,46 @@ module Rubyzen
         node.identifier&.const_name
       end
 
-      def superclass_name
-        super_node = node.children[1]
-        return nil unless super_node&.type == :const
-        super_node.const_name
+      def name_with_modules
+        [file_declaration.modules.map(&:name), name].flatten.compact.join('::')
       end
 
-      def methods
+      def subclasses
+        @subclasses ||= []
+      end
+
+      def superclass_name
+        super_class&.name
+      end
+
+      def superclass_name_with_modules
+        super_class&.name_with_modules
+      end
+
+      def methods(visibility = nil)
         node.each_node(:def).map do |def_node|
           MethodDeclaration.new(def_node, self)
+        end.select do |method_decl|
+          case visibility
+          when :public
+            method_decl.public_method?
+          when :private
+            !method_decl.public_method?
+          when nil
+            true
+          else
+            raise ArgumentError, "Invalid visibility: #{visibility}. Use :public, :private, or nil."
+          end
         end
+      end
+
+      def methods_including_inherited(visibility = nil)
+        all_methods = methods(visibility)
+
+        return all_methods if super_class.nil?
+
+        all_methods += super_class.methods_including_inherited(visibility)
+        all_methods.uniq { |m| m.name }
       end
 
       def called_method_names
@@ -71,6 +103,23 @@ module Rubyzen
           end
         end.uniq
       end
+
+      def full_const_name(node)
+        case node.type
+        when :const
+          namespace_node, name = node.children
+          if namespace_node
+            [ full_const_name(namespace_node), name.to_s ].join("::")
+          else
+            name.to_s
+          end
+        when :cbase
+          ""            # handles leading :: if you need it
+        else
+          nil           # not a constant
+        end
+      end
+
     end
   end
 end
