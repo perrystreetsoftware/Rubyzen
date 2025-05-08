@@ -33,11 +33,31 @@ module Rubyzen
       end
 
       def superclass_name
-        super_class&.name
+        super_node = node.children[1]
+        return nil unless super_node&.type == :const
+        super_node.const_name
       end
 
       def superclass_name_with_modules
-        super_class&.name_with_modules
+        super_node = node.children[1]
+        return nil unless super_node&.type == :const
+
+        # If it's a fully qualified constant path (e.g., ::Module::Class)
+        if super_node.type == :const && super_node.namespace&.type == :cbase
+          return super_node.const_name
+        end
+
+        # If it's a relative constant path with explicit modules (e.g., Module::Class)
+        if super_node.type == :const && super_node.namespace&.type == :const
+          return super_node.const_name
+        end
+
+        # If it's just a class name without modules, use the current class's modules
+        modules_prefix = file_declaration.modules.map(&:name).compact.join('::')
+        superclass = superclass_name
+        return nil unless superclass
+
+        modules_prefix.empty? ? superclass : "#{modules_prefix}::#{superclass}"
       end
 
       def methods(visibility = nil)
@@ -103,23 +123,6 @@ module Rubyzen
           end
         end.uniq
       end
-
-      def full_const_name(node)
-        case node.type
-        when :const
-          namespace_node, name = node.children
-          if namespace_node
-            [ full_const_name(namespace_node), name.to_s ].join("::")
-          else
-            name.to_s
-          end
-        when :cbase
-          ""            # handles leading :: if you need it
-        else
-          nil           # not a constant
-        end
-      end
-
     end
   end
 end
