@@ -131,7 +131,7 @@ RSpec::Matchers.define :have_method_signature do |method:, signature: :any, visi
 
     "Method missing in: \n" \
       "#{@offenders_missing_method.map do |cls|
-         "#{cls.name_with_modules}, #{cls.file_path}"
+         "#{cls.file_path}"
        end.join("\n")}\n\n"
   end
 
@@ -140,7 +140,7 @@ RSpec::Matchers.define :have_method_signature do |method:, signature: :any, visi
 
     "Method with wrong signature in: \n" \
     "#{@offenders_wrong_signature.map do |cls|
-        "#{cls.name_with_modules}, #{cls.file_path}"
+        "#{cls.file_path}"
       end.join("\n")}\n\n"
   end
 
@@ -152,7 +152,7 @@ RSpec::Matchers.define :have_method_signature do |method:, signature: :any, visi
 
     "Method with wrong visibility (expected #{expected}, got #{actual}) in: \n" \
     "#{@offenders_wrong_visibility.map do |cls|
-        "#{cls.name_with_modules}, #{cls.file_path}"
+        "#{cls.file_path}"
       end.join("\n")}\n\n"
   end
 end

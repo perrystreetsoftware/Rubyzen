@@ -10,30 +10,17 @@ RSpec.describe 'Actions lint rules' do
         .classes_in_path("/actions/")
     }
 
-    # it "builder classes have only expected methods" do
-    #   expect(action_classes).to match_public_methods(
-    #     method_names: [:initialize, :build]
-    #   )
-    # end
+    it "classes have only expected methods" do
+      expect(action_classes).to match_public_methods(
+        method_names: [:execute],
+        optional_method_names: [:initialize]
+      )
+    end
 
-    # it "builder classes include public build method" do
-    #   expect(action_classes).to include_public_methods(
-    #     method_names: [:initialize, :build]
-    #     )
-    # end
-
-    # it "action classes have public method 'initialize' with any args" do
-    #   expect(action_classes).to(have_method_signature(
-    #     method: :initialize,
-    #     signature: :any,
-    #     visibility: :public
-    #   ))
-    # end
-
-    it "action classes have public method 'execute' with any args" do
+    it "classes have public method 'execute' with no args" do
       expect(action_classes).to(have_method_signature(
         method: :execute,
-        signature: :any,
+        signature: '',
         visibility: :public
       ))
     end

@@ -10,18 +10,12 @@ RSpec.describe 'Builder lint rules' do
         .classes_in_path("/builders/")
     }
 
-    # TODO: BRING THIS BACK AND ALSO ADD OPTION FOR OPTIONAL METHODS LIKE INITIALIZE
-    # it "builder classes have only expected methods" do
-    #   expect(builder_classes).to match_public_methods(
-    #     method_names: [:initialize, :build]
-    #   )
-    # end
-
-    # it "builder classes include public build method" do
-    #   expect(builder_classes).to include_public_methods(
-    #     method_names: [:initialize, :build]
-    #     )
-    # end
+    it "builder classes have only expected methods" do
+      expect(builder_classes).to match_public_methods(
+        method_names: [:build],
+        optional_method_names: [:initialize]
+      )
+    end
 
     it "builder classes have public method 'initialize' with any args" do
       expect(builder_classes).to(have_method_signature(
