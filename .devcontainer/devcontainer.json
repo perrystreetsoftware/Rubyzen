@@ -11,6 +11,11 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
+	// Mount parent directory to access Husband-Redis
+	"mounts": [
+		"source=${localWorkspaceFolder}/../Husband-Redis,target=/workspaces/Rubyzen/Husband-Redis,type=bind,consistency=cached"
+	],
+
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "bundle install",
 	"customizations": {
@@ -18,7 +23,14 @@
 			"extensions": [
 				"Shopify.ruby-lsp",
 				"GitHub.copilot-chat"
-			]
+			],
+			"settings": {
+				"files.exclude": {
+					"**/node_modules": true
+				},
+				"explorer.autoReveal": true,
+				"explorer.expandSingleFolderWorkspaces": true
+			}
 		}
 	}
 
