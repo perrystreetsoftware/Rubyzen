@@ -1,2 +1,1 @@
-project_path: ./sample_project/src
-# project_path: ../Husband-Redis/src #uncomment this to point to Husband-Redis
+project_path: /workspaces/Rubyzen/target-project/src

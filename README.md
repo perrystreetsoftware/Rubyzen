@@ -13,9 +13,9 @@ Traditional linters such as [RuboCop](https://github.com/rubocop/rubocop) requir
 ## Advantages
 
 - **Easy-to-Use API:** Rubyzen provides a friendly, high-level API to access files, classes, methods, dependencies, and more. This way developers do not have to manual access nodes and deal with low-level AST operations manually.
-  
+
 - **Architectural Enforcement & Documentation:** By writing the lint rules as tests, we can use the Given-When-Then style and provide documentation for our architecture within the codebase, without having to maintain wiki pages or diagrams.
-  
+
 - **Less Manual Reviews:** With architectural rules automatically enforced by tests, code reviews can focus on more complex issues instead of repeating the same architectural feedback.
 
 ## How it Works
@@ -24,13 +24,14 @@ Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hoo
 
 ## Project Structure
 
-- **`lib`:** Contains Rubyzen’s source code, including:
-  - `project.rb` and `class_analyzer.rb` to parse and represent the codebase.
-  - Custom matchers that allows us to write the lint rules in an easy and intuitive way.
+- **`lib/rubyzen/`:** Contains Rubyzen's source code, including:
+  - `project.rb` - Main project analyzer
+  - `classes_collection.rb`, `methods_collection.rb`, `file_collection.rb` - Collections for code structures  
+  - `parsers/`, `matchers/`, `providers/`, `declarations/`, `cache/` - Core functionality modules
 
-- **`sample_project/src`:** A sample Ruby project that Rubyzen is currently linting.
+- **`sample_project/src/`:** A sample Ruby project that Rubyzen can lint
 
-- **`sample_project/spec`:** Contains the lint rules, written as unit tests. These tests demonstrate how we can enforce the architectural rules of our team. Additionally, each lint rule has a real GitHub PR comment attached that can be now enforced by that rule.
+- **`sample_project/spec/`:** Contains sample lint rules written as unit tests, demonstrating how to enforce architectural rules
 
 ## Example Lint Rules
 
@@ -44,6 +45,92 @@ Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hoo
 1. Clone the repository.
 2. Install the dependencies: `bundle install`
 3. Run the tests (lint rules): `bundle exec rspec sample_project/spec`
+
+## Dev Container Integration
+
+Rubyzen includes dev container support that automatically mounts external projects for linting. The configuration uses:
+
+- **Environment Variable**: `RUBYZEN_TARGET_PROJECT` specifies which sibling project to lint (defaults to `Husband-Redis`)
+- **Fixed Mount Point**: Target project is mounted to `/workspaces/Rubyzen/target-project`
+- **Static Configuration**: `.rubyzen.yaml` always points to `/workspaces/Rubyzen/target-project/src`
+
+### Quick Start
+
+1. **Set target project** (optional):
+   ```bash
+   export RUBYZEN_TARGET_PROJECT=YourProjectName
+   ```
+
+2. **Open in dev container**:
+   ```bash
+   code .
+   ```
+
+### Project Structure in Container
+
+```
+/workspaces/Rubyzen/
+├── lib/                     (Rubyzen source code)
+├── sample_project/          (Sample project to lint)
+│   ├── src/                 (Sample Ruby source files)
+│   └── spec/                (Sample lint rules)
+└── target-project/          (External project mounted here)
+    ├── src/                 (External Ruby source files)
+    └── spec/rubyzen/        (Project-specific lint rules)
+```
+
+### Usage Examples
+
+```bash
+# Lint Husband-Redis (default)
+code .
+
+# Lint different project  
+RUBYZEN_TARGET_PROJECT=MyClientApp code .
+
+# Lint another project
+RUBYZEN_TARGET_PROJECT=SomeOtherProject code .
+```
+
+### Requirements
+
+- Target project must be a **sibling directory** to RubyZen
+- Target project should have a `src/` subdirectory with Ruby files
+- Directory structure example:
+  ```
+  parent-folder/
+  ├── Rubyzen/           (this project)
+  ├── Husband-Redis/     (target project)
+  └── MyOtherProject/    (another target project)
+  ```
+
+### Running Lint Rules
+
+**For sample project (using Rubyzen's sample code):**
+```bash
+bundle exec rspec sample_project/spec/
+```
+
+**For external target project:**
+```bash
+bundle exec rspec target-project/spec/rubyzen/
+```
+
+### Team Setup
+
+Create a `.env` file for consistent team configuration:
+
+```bash
+# .env
+RUBYZEN_TARGET_PROJECT=OurMainProject
+```
+
+### Troubleshooting
+
+**"Target project path not found" Warning**
+- Check: Is `RUBYZEN_TARGET_PROJECT` set correctly?
+- Check: Does `../$RUBYZEN_TARGET_PROJECT` exist on your host?
+- Try: Rebuilding the dev container
 
 ---
 
