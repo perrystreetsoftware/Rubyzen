@@ -78,13 +78,26 @@ jobs:
       run: bundle install
       working-directory: 'rubyzen'
 
-    - name: Debug - Check RubyZen configuration
+    - name: Debug - Check RubyZen configuration and paths
       run: |
+        echo "=== Current working directory ==="
+        pwd
         echo "=== RubyZen Configuration ==="
-        cat rubyzen/.rubyzen.yaml || echo "No .rubyzen.yaml found"
+        cat .rubyzen.yaml || echo "No .rubyzen.yaml found"
+        echo "=== Target project absolute path ==="
+        ls -la target_project/src/ || echo "target_project/src not found"
+        echo "=== Full target_project structure ==="
+        find target_project/ -type d -maxdepth 3 || echo "target_project not found"
         echo "=== Environment variables ==="
         env | grep RUBYZEN || echo "No RUBYZEN env vars"
-      working-directory: '.'
+        echo "=== Checking if rubyzen.rb can find target ==="
+        ruby -e "
+          require './lib/rubyzen'
+          puts 'Configuration loaded successfully'
+          puts 'Project root: ' + Rubyzen.configuration.project_root_path
+          puts 'Directory exists: ' + Dir.exist?(Rubyzen.configuration.project_root_path).to_s
+        " || echo "Failed to load configuration"
+      working-directory: 'rubyzen'
 
     - name: Run RubyZen analysis on PR code
       id: analysis
