@@ -10,6 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Debug - Show environment info
+      run: |
+        echo "=== Environment Debug Info ==="
+        echo "Runner OS: $RUNNER_OS"
+        echo "GitHub Event: $GITHUB_EVENT_NAME"
+        echo "GitHub Ref: $GITHUB_REF"
+        echo "GitHub SHA: $GITHUB_SHA"
+        echo "Working Directory: $(pwd)"
+        echo "Available space: $(df -h /)"
+        echo "Ruby version: $(ruby --version || echo 'Ruby not installed')"
+        echo "Bundler version: $(bundle --version || echo 'Bundler not installed')"
+
     - name: Checkout RubyZen project
       uses: actions/checkout@v4
       with:
@@ -23,13 +35,37 @@ jobs:
         path: 'temp-checkout'
         ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+    - name: Debug - Verify RubyZen checkout
+      run: |
+        echo "=== RubyZen Project Structure ==="
+        ls -la rubyzen/
+        echo "=== RubyZen key files ==="
+        ls -la rubyzen/lib/ rubyzen/sample_project/ || echo "Missing expected directories"
+
+    - name: Debug - Verify PR code checkout
+      run: |
+        echo "=== Temp checkout contents ==="
+        ls -la temp-checkout/
+        echo "=== Checking for src directory ==="
+        find temp-checkout/ -name "src" -type d || echo "No src directory found"
+
     - name: Move PR code to expected target_project structure
       run: |
+        echo "=== Moving files ==="
         mkdir -p rubyzen/target_project
         # Move all files including hidden ones
         mv temp-checkout/* temp-checkout/.[^.]* rubyzen/target_project/ 2>/dev/null || true
-        # Ensure we have the expected src directory
+        echo "=== Target project structure after move ==="
         ls -la rubyzen/target_project/
+        echo "=== Checking for expected src directory ==="
+        if [ -d "rubyzen/target_project/src" ]; then
+          echo "✅ Found src directory"
+          ls -la rubyzen/target_project/src/
+        else
+          echo "❌ No src directory found - RubyZen may fail"
+          echo "Available directories:"
+          find rubyzen/target_project/ -type d -maxdepth 2
+        fi
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
@@ -42,31 +78,62 @@ jobs:
       run: bundle install
       working-directory: 'rubyzen'
 
+    - name: Debug - Check RubyZen configuration
+      run: |
+        echo "=== RubyZen Configuration ==="
+        cat rubyzen/.rubyzen.yaml || echo "No .rubyzen.yaml found"
+        echo "=== Environment variables ==="
+        env | grep RUBYZEN || echo "No RUBYZEN env vars"
+      working-directory: '.'
+
     - name: Run RubyZen analysis on PR code
       id: analysis
       run: |
+        echo "=== Starting RubyZen Analysis ==="
+        echo "Working directory: $(pwd)"
+        echo "Target project path: $RUBYZEN_TARGET_PROJECT"
         echo "ANALYSIS_OUTPUT<<EOF" >> $GITHUB_OUTPUT
-        bundle exec rspec sample_project/spec/ --format documentation 2>&1 | tee analysis_output.txt
+        bundle exec rspec sample_project/spec/ --format documentation --backtrace 2>&1 | tee analysis_output.txt
         echo "EOF" >> $GITHUB_OUTPUT
+        echo "=== RSpec Exit Code: $? ==="
         echo "analysis_file=analysis_output.txt" >> $GITHUB_OUTPUT
       working-directory: 'rubyzen'
       continue-on-error: true
       env:
         RUBYZEN_TARGET_PROJECT: 'target_project'
 
+    - name: Debug - Show analysis output file
+      run: |
+        echo "=== Analysis Output File Info ==="
+        ls -la analysis_output.txt || echo "No analysis output file found"
+        echo "=== First 50 lines of output ==="
+        head -50 analysis_output.txt || echo "Cannot read output file"
+        echo "=== Last 20 lines of output ==="
+        tail -20 analysis_output.txt || echo "Cannot read output file"
+      working-directory: 'rubyzen'
+      if: always()
+
     - name: Comment PR with analysis results
       uses: actions/github-script@v7
-      if: github.event_name == 'pull_request'
+      if: always() && github.event_name == 'pull_request'
       with:
         script: |
           const fs = require('fs');
-          const analysisOutput = fs.readFileSync('rubyzen/analysis_output.txt', 'utf8');
+          let analysisOutput = 'Analysis file not found';
+          let debugInfo = '';
+
+          try {
+            analysisOutput = fs.readFileSync('rubyzen/analysis_output.txt', 'utf8');
+          } catch (error) {
+            debugInfo = `\n\n**Debug Info:** Failed to read analysis output: ${error.message}`;
+          }
 
           const body = `## 🔍 RubyZen Analysis Results
 
           \`\`\`
           ${analysisOutput}
           \`\`\`
+          ${debugInfo}
 
           ---
           *Analysis completed at ${new Date().toISOString()}*`;
