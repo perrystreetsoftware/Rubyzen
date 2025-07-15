@@ -40,98 +40,60 @@ Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hoo
 - Prohibiting new additions to legacy files.
 - Confirming that model classes do not use question-mark in methods, enforcing us to use the Ask pattern.
 
-## Setup
-
-1. Clone the repository.
-2. Install the dependencies: `bundle install`
-3. Run the tests (lint rules): `bundle exec rspec sample_project/spec`
-
 ## Dev Container Integration
-
-Rubyzen includes dev container support that automatically mounts external projects for linting. The configuration uses:
-
-- **Environment Variable**: `RUBYZEN_TARGET_PROJECT` specifies which sibling project to lint (defaults to `Husband-Redis`)
-- **Fixed Mount Point**: Target project is mounted to `/workspaces/Rubyzen/target_project`
-- **Static Configuration**: `.rubyzen.yaml` always points to `/workspaces/Rubyzen/target_project/src`
 
 ### Quick Start
 
-1. **Set target project** (optional):
+1. **Set target project environment variable** (REQUIRED):
    ```bash
    export RUBYZEN_TARGET_PROJECT=YourProjectName
-   ```
-
-2. **Open in dev container**:
-   ```bash
    code .
    ```
 
-### Project Structure in Container
+**Note:** When changing the `RUBYZEN_TARGET_PROJECT` environment variable, you must rebuild the dev container for the change to take effect. The container will continue to mount the previous target directory until rebuilt.
 
+### Architecture
+
+**Environment-driven setup** - no configuration generation needed:
+- `RUBYZEN_TARGET_PROJECT` environment variable specifies which sibling project to lint
+- Target project mounts to fixed path: `/workspaces/target_project`
+- All configs use static paths pointing to `/workspaces/target_project/src`
+
+#### Directory Structure
 ```
-/workspaces/Rubyzen/
-├── lib/                     (Rubyzen source code)
-├── sample_project/          (Sample project to lint)
-│   ├── src/                 (Sample Ruby source files)
-│   └── spec/                (Sample lint rules)
-└── target_project/          (External project mounted here)
-    ├── src/                 (External Ruby source files)
-    └── spec/rubyzen/        (Project-specific lint rules)
+parent-folder/
+├── Rubyzen/           (this linter project)
+├── YourProject/       (target project - set via env var)
+└── OtherProject/      (another potential target)
+```
+
+#### Container Structure
+```
+/workspaces/
+├── Rubyzen/           (this project)
+└── target_project/    (mounted from $RUBYZEN_TARGET_PROJECT)
+    └── src/           (Ruby files to lint)
 ```
 
 ### Usage Examples
 
 ```bash
-# Lint Husband-Redis (default)
-code .
+# Different projects
+export RUBYZEN_TARGET_PROJECT=Husband-Redis && code .
+export RUBYZEN_TARGET_PROJECT=MyClientApp && code .
 
-# Lint different project
-RUBYZEN_TARGET_PROJECT=MyClientApp code .
-
-# Lint another project
-RUBYZEN_TARGET_PROJECT=SomeOtherProject code .
-```
-
-### Requirements
-
-- Target project must be a **sibling directory** to RubyZen
-- Target project should have a `src/` subdirectory with Ruby files
-- Directory structure example:
-  ```
-  parent-folder/
-  ├── Rubyzen/           (this project)
-  ├── Husband-Redis/     (target project)
-  └── MyOtherProject/    (another target project)
-  ```
-
-### Running Lint Rules
-
-**For sample project (using Rubyzen's sample code):**
-```bash
-bundle exec rspec sample_project/spec/
-```
-
-**For external target project:**
-```bash
-bundle exec rspec target_project/spec/rubyzen/
-```
-
-### Team Setup
-
-Create a `.env` file for consistent team configuration:
-
-```bash
-# .env
-RUBYZEN_TARGET_PROJECT=OurMainProject
+# Team setup with .env file
+echo "RUBYZEN_TARGET_PROJECT=OurMainProject" > .env
 ```
 
 ### Troubleshooting
 
-**"Target project path not found" Warning**
-- Check: Is `RUBYZEN_TARGET_PROJECT` set correctly?
-- Check: Does `../$RUBYZEN_TARGET_PROJECT` exist on your host?
-- Try: Rebuilding the dev container
+| Issue | Solution |
+|-------|----------|
+| "Environment variable not set" error | `export RUBYZEN_TARGET_PROJECT=YourProject` before `code .` |
+| "Target project not found" | Verify `../$RUBYZEN_TARGET_PROJECT` exists and rebuild container |
+| Mount errors on startup | Check env var is set, target exists, then rebuild container |
+| Changed env var but still seeing old project | Rebuild dev container to update mount path |
 
----
 
 This project is an early prototype. The intent is to explore the technical feasibility and effort to build a modern architectural linter for Ruby.
