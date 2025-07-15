@@ -10,17 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Debug - Show environment info
+    - name: Show environment info
       run: |
-        echo "=== Environment Debug Info ==="
-        echo "Runner OS: $RUNNER_OS"
-        echo "GitHub Event: $GITHUB_EVENT_NAME"
-        echo "GitHub Ref: $GITHUB_REF"
-        echo "GitHub SHA: $GITHUB_SHA"
-        echo "Working Directory: $(pwd)"
-        echo "Available space: $(df -h /)"
-        echo "Ruby version: $(ruby --version || echo 'Ruby not installed')"
-        echo "Bundler version: $(bundle --version || echo 'Bundler not installed')"
+        echo "Event: $GITHUB_EVENT_NAME | Repository: ${{ github.repository }}"
+        echo "Ruby: $(ruby --version || echo 'Not installed')"
 
     - name: Checkout RubyZen project
       uses: actions/checkout@v4
@@ -35,43 +28,32 @@ jobs:
         path: 'temp-checkout'
         ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-    - name: Debug - Verify RubyZen checkout
+    - name: Verify RubyZen checkout
       run: |
-        echo "=== RubyZen Project Structure ==="
-        ls -la rubyzen/
-        echo "=== RubyZen key files ==="
+        echo "RubyZen project structure verified"
         ls -la rubyzen/lib/ rubyzen/sample_project/ || echo "Missing expected directories"
 
-    - name: Debug - Verify PR code checkout
+    - name: Verify PR code checkout
       run: |
-        echo "=== Temp checkout contents ==="
-        ls -la temp-checkout/
-        echo "=== Checking for src directory ==="
+        echo "Checking for src directory in PR code..."
         find temp-checkout/ -name "src" -type d || echo "No src directory found"
 
-    - name: Move PR code to expected target_project structure
+    - name: Move PR code to target_project structure
       run: |
-        echo "=== Moving files ==="
         mkdir -p rubyzen/target_project
         # Move all files including hidden ones
         mv temp-checkout/* temp-checkout/.[^.]* rubyzen/target_project/ 2>/dev/null || true
-        echo "=== Target project structure after move ==="
-        ls -la rubyzen/target_project/
-        echo "=== Checking for expected src directory ==="
+
         if [ -d "rubyzen/target_project/src" ]; then
           echo "✅ Found src directory"
-          ls -la rubyzen/target_project/src/
         else
           echo "❌ No src directory found"
-          echo "Available directories:"
-          find rubyzen/target_project/ -type d -maxdepth 2
           # Only create src for RubyZen self-testing (check if this is the RubyZen repo)
           if [ "${{ github.repository }}" = "perrystreetsoftware/Rubyzen" ]; then
             echo "🔧 Detected RubyZen repository - creating src structure for self-test"
             mkdir -p rubyzen/target_project/src
             cp -r rubyzen/target_project/sample_project/src/* rubyzen/target_project/src/
             echo "✅ Created src directory with sample project content"
-            ls -la rubyzen/target_project/src/
           else
             echo "⚠️ Not a RubyZen repository - src directory is required but missing"
             echo "This repository needs a 'src' directory for RubyZen analysis to work"
@@ -90,51 +72,27 @@ jobs:
       run: bundle install
       working-directory: 'rubyzen'
 
-    - name: Debug - Check RubyZen configuration and paths
+    - name: Verify RubyZen configuration
       run: |
-        echo "=== Current working directory ==="
-        pwd
-        echo "=== RubyZen Configuration ==="
+        echo "Checking RubyZen configuration..."
         cat .rubyzen.yaml || echo "No .rubyzen.yaml found"
-        echo "=== Target project absolute path ==="
         ls -la target_project/src/ || echo "target_project/src not found"
-        echo "=== Full target_project structure ==="
-        find target_project/ -type d -maxdepth 3 || echo "target_project not found"
-        echo "=== Environment variables ==="
-        env | grep RUBYZEN || echo "No RUBYZEN env vars"
-        echo "=== RubyZen library files ==="
-        ls -la lib/rubyzen/ || echo "RubyZen lib not found"
         echo "✅ Ready to run RubyZen analysis"
       working-directory: 'rubyzen'
       env:
         RUBYZEN_TARGET_PROJECT: 'target_project'
 
-    - name: Run RubyZen analysis on PR code
+    - name: Run RubyZen analysis
       id: analysis
       run: |
-        echo "=== Starting RubyZen Analysis ==="
-        echo "Working directory: $(pwd)"
-        echo "Target project path: $RUBYZEN_TARGET_PROJECT"
-        echo "ANALYSIS_OUTPUT<<EOF" >> $GITHUB_OUTPUT
+        echo "Starting RubyZen analysis..."
         bundle exec rspec sample_project/spec/ --format documentation 2>&1 | tee analysis_output.txt
-        echo "EOF" >> $GITHUB_OUTPUT
-        echo "=== RSpec Exit Code: $? ==="
-        echo "analysis_file=analysis_output.txt" >> $GITHUB_OUTPUT
+        echo "RSpec exit code: $?"
       working-directory: 'rubyzen'
       continue-on-error: true
       env:
         RUBYZEN_TARGET_PROJECT: 'target_project'
 
-    - name: Debug - Show analysis output file
-      run: |
-        echo "=== Analysis Output File Info ==="
-        ls -la analysis_output.txt || echo "No analysis output file found"
-        echo "=== First 50 lines of output ==="
-        head -50 analysis_output.txt || echo "Cannot read output file"
-        echo "=== Last 20 lines of output ==="
-        tail -20 analysis_output.txt || echo "Cannot read output file"
-      working-directory: 'rubyzen'
-      if: always()
 
     - name: Update PR comment with analysis results
       uses: actions/github-script@v7
