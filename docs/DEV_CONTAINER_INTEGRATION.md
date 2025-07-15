@@ -23,7 +23,7 @@
 ### Purely Environment-Driven Architecture
 
 - **Environment Variable**: `RUBYZEN_TARGET_PROJECT` specifies which sibling project to lint (REQUIRED)
-- **Fixed Mount**: Target project is always mounted to `/workspaces/target-project`
+- **Fixed Mount**: Target project is always mounted to `/workspaces/target_project`
 - **Static Configuration**: All config files use the same fixed path
 - **No Hardcoded Fallbacks**: Explicit environment variable required
 
@@ -32,7 +32,7 @@
 ```
 /workspaces/
 ├── Rubyzen/           (this linter project)
-└── target-project/    (mounted external project)
+└── target_project/    (mounted external project)
     └── src/           (source code to lint)
 ```
 
@@ -40,7 +40,7 @@
 
 All configuration is **static** - no generation needed:
 
-- **`.rubyzen.yaml`**: Always points to `/workspaces/target-project/src`
+- **`.rubyzen.yaml`**: Always points to `/workspaces/target_project/src`
 - **`rubyzen.code-workspace`**: Always shows "Target Project" folder
 - **`devcontainer.json`**: Mounts `$RUBYZEN_TARGET_PROJECT` to fixed location
 

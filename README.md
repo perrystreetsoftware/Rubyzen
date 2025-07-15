@@ -26,7 +26,7 @@ Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hoo
 
 - **`lib/rubyzen/`:** Contains Rubyzen's source code, including:
   - `project.rb` - Main project analyzer
-  - `classes_collection.rb`, `methods_collection.rb`, `file_collection.rb` - Collections for code structures  
+  - `classes_collection.rb`, `methods_collection.rb`, `file_collection.rb` - Collections for code structures
   - `parsers/`, `matchers/`, `providers/`, `declarations/`, `cache/` - Core functionality modules
 
 - **`sample_project/src/`:** A sample Ruby project that Rubyzen can lint
@@ -51,8 +51,8 @@ Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hoo
 Rubyzen includes dev container support that automatically mounts external projects for linting. The configuration uses:
 
 - **Environment Variable**: `RUBYZEN_TARGET_PROJECT` specifies which sibling project to lint (defaults to `Husband-Redis`)
-- **Fixed Mount Point**: Target project is mounted to `/workspaces/Rubyzen/target-project`
-- **Static Configuration**: `.rubyzen.yaml` always points to `/workspaces/Rubyzen/target-project/src`
+- **Fixed Mount Point**: Target project is mounted to `/workspaces/Rubyzen/target_project`
+- **Static Configuration**: `.rubyzen.yaml` always points to `/workspaces/Rubyzen/target_project/src`
 
 ### Quick Start
 
@@ -74,7 +74,7 @@ Rubyzen includes dev container support that automatically mounts external projec
 ├── sample_project/          (Sample project to lint)
 │   ├── src/                 (Sample Ruby source files)
 │   └── spec/                (Sample lint rules)
-└── target-project/          (External project mounted here)
+└── target_project/          (External project mounted here)
     ├── src/                 (External Ruby source files)
     └── spec/rubyzen/        (Project-specific lint rules)
 ```
@@ -85,7 +85,7 @@ Rubyzen includes dev container support that automatically mounts external projec
 # Lint Husband-Redis (default)
 code .
 
-# Lint different project  
+# Lint different project
 RUBYZEN_TARGET_PROJECT=MyClientApp code .
 
 # Lint another project
@@ -113,7 +113,7 @@ bundle exec rspec sample_project/spec/
 
 **For external target project:**
 ```bash
-bundle exec rspec target-project/spec/rubyzen/
+bundle exec rspec target_project/spec/rubyzen/
 ```
 
 ### Team Setup

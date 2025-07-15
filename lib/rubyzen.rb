@@ -9,7 +9,7 @@ module Rubyzen
   end
 
   class Configuration
-    attr_reader :project_root_path, :rules
+    attr_reader :project_root_path
 
     def initialize
       load_configuration
@@ -27,7 +27,6 @@ module Rubyzen
       yaml_config = YAML.load_file(config_file)
 
       @project_root_path = yaml_config['project_path'] || './sample_project/src'
-      @rules = yaml_config['rules'] || {}
 
       # Handle case where target project might not be mounted
       unless Dir.exist?(@project_root_path)
