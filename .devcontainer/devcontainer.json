@@ -3,22 +3,22 @@
     "image": "mcr.microsoft.com/devcontainers/ruby:1-3.3-bullseye",
 
     "mounts": [
-        "source=${localWorkspaceFolder}/../${localEnv:RUBYZEN_TARGET_PROJECT},target=/workspaces/Rubyzen/target_project,type=bind,consistency=cached"
+        "source=${localWorkspaceFolder}/../${localEnv:RUBYZEN_TARGET_PROJECT},target=${containerWorkspaceFolder}/target_project,type=bind,consistency=cached"
     ],
 
     "containerEnv": {
         "RUBYZEN_TARGET_PROJECT": "${localEnv:RUBYZEN_TARGET_PROJECT}"
     },
 
-	"postCreateCommand": "git config --global --add safe.directory /workspaces/Rubyzen && git config --global --add safe.directory /workspaces/Rubyzen/target_project && bundle install",
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"Shopify.ruby-lsp",
-				"GitHub.copilot-chat"
-			]
-		}
-	},
+    "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && git config --global --add safe.directory ${containerWorkspaceFolder}/target_project && bundle install",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "Shopify.ruby-lsp",
+                "GitHub.copilot-chat"
+            ]
+        }
+    },
 
     "remoteUser": "vscode"
 }
