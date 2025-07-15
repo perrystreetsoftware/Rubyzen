@@ -102,13 +102,9 @@ jobs:
         find target_project/ -type d -maxdepth 3 || echo "target_project not found"
         echo "=== Environment variables ==="
         env | grep RUBYZEN || echo "No RUBYZEN env vars"
-        echo "=== Checking if rubyzen.rb can find target ==="
-        bundle exec ruby -e "
-          require './lib/rubyzen'
-          puts 'Configuration loaded successfully'
-          puts 'Project root: ' + Rubyzen.configuration.project_root_path
-          puts 'Directory exists: ' + Dir.exist?(Rubyzen.configuration.project_root_path).to_s
-        " || echo "Failed to load configuration"
+        echo "=== RubyZen library files ==="
+        ls -la lib/rubyzen/ || echo "RubyZen lib not found"
+        echo "✅ Ready to run RubyZen analysis"
       working-directory: 'rubyzen'
       env:
         RUBYZEN_TARGET_PROJECT: 'target_project'
@@ -120,7 +116,7 @@ jobs:
         echo "Working directory: $(pwd)"
         echo "Target project path: $RUBYZEN_TARGET_PROJECT"
         echo "ANALYSIS_OUTPUT<<EOF" >> $GITHUB_OUTPUT
-        bundle exec rspec sample_project/spec/ --format documentation --backtrace 2>&1 | tee analysis_output.txt
+        bundle exec rspec sample_project/spec/ --format documentation 2>&1 | tee analysis_output.txt
         echo "EOF" >> $GITHUB_OUTPUT
         echo "=== RSpec Exit Code: $? ==="
         echo "analysis_file=analysis_output.txt" >> $GITHUB_OUTPUT
