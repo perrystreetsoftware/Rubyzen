@@ -2,7 +2,7 @@ name: RubyZen Analysis
 
 on:
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, develop ]
   workflow_dispatch:
 
 jobs:
@@ -26,14 +26,15 @@ jobs:
     - name: Move PR code to expected target_project structure
       run: |
         mkdir -p rubyzen/target_project
-        mv temp-checkout/* rubyzen/target_project/
+        # Move all files including hidden ones
+        mv temp-checkout/* temp-checkout/.[^.]* rubyzen/target_project/ 2>/dev/null || true
         # Ensure we have the expected src directory
         ls -la rubyzen/target_project/
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.1'
+        ruby-version: '3.3'
         working-directory: 'rubyzen'
         bundler-cache: true
 
