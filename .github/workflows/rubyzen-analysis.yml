@@ -173,21 +173,20 @@ jobs:
           );
 
           if (existingComment) {
-            // Update existing comment
-            await github.rest.issues.updateComment({
+            // Delete old comment and create new one for fresh timestamp
+            await github.rest.issues.deleteComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              comment_id: existingComment.id,
-              body: body
+              comment_id: existingComment.id
             });
-            console.log('Updated existing RubyZen comment');
-          } else {
-            // Create new comment
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: body
-            });
-            console.log('Created new RubyZen comment');
+            console.log('Deleted existing RubyZen comment');
           }
+
+          // Create new comment (always, whether replacing or first time)
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: body
+          });
+          console.log('Created new RubyZen comment');
