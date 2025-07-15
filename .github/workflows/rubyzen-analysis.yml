@@ -62,9 +62,21 @@ jobs:
           echo "✅ Found src directory"
           ls -la rubyzen/target_project/src/
         else
-          echo "❌ No src directory found - RubyZen may fail"
+          echo "❌ No src directory found"
           echo "Available directories:"
           find rubyzen/target_project/ -type d -maxdepth 2
+          # Only create src for RubyZen self-testing (check if this is the RubyZen repo)
+          if [ "${{ github.repository }}" = "perrystreetsoftware/Rubyzen" ]; then
+            echo "🔧 Detected RubyZen repository - creating src structure for self-test"
+            mkdir -p rubyzen/target_project/src
+            cp -r rubyzen/target_project/sample_project/src/* rubyzen/target_project/src/
+            echo "✅ Created src directory with sample project content"
+            ls -la rubyzen/target_project/src/
+          else
+            echo "⚠️ Not a RubyZen repository - src directory is required but missing"
+            echo "This repository needs a 'src' directory for RubyZen analysis to work"
+            exit 1
+          fi
         fi
 
     - name: Set up Ruby
@@ -91,13 +103,15 @@ jobs:
         echo "=== Environment variables ==="
         env | grep RUBYZEN || echo "No RUBYZEN env vars"
         echo "=== Checking if rubyzen.rb can find target ==="
-        ruby -e "
+        bundle exec ruby -e "
           require './lib/rubyzen'
           puts 'Configuration loaded successfully'
           puts 'Project root: ' + Rubyzen.configuration.project_root_path
           puts 'Directory exists: ' + Dir.exist?(Rubyzen.configuration.project_root_path).to_s
         " || echo "Failed to load configuration"
       working-directory: 'rubyzen'
+      env:
+        RUBYZEN_TARGET_PROJECT: 'target_project'
 
     - name: Run RubyZen analysis on PR code
       id: analysis
