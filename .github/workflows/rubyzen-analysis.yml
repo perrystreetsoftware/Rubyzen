@@ -1,0 +1,78 @@
+name: RubyZen Analysis
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout RubyZen project
+      uses: actions/checkout@v4
+      with:
+        repository: 'perrystreetsoftware/Rubyzen'
+        path: 'rubyzen'
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Checkout PR code into temporary directory
+      uses: actions/checkout@v4
+      with:
+        path: 'temp-checkout'
+        ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+    - name: Move PR code to expected target_project structure
+      run: |
+        mkdir -p rubyzen/target_project
+        mv temp-checkout/* rubyzen/target_project/
+        # Ensure we have the expected src directory
+        ls -la rubyzen/target_project/
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1'
+        working-directory: 'rubyzen'
+        bundler-cache: true
+
+    - name: Install RubyZen dependencies
+      run: bundle install
+      working-directory: 'rubyzen'
+
+    - name: Run RubyZen analysis on PR code
+      id: analysis
+      run: |
+        echo "ANALYSIS_OUTPUT<<EOF" >> $GITHUB_OUTPUT
+        bundle exec rspec sample_project/spec/ --format documentation 2>&1 | tee analysis_output.txt
+        echo "EOF" >> $GITHUB_OUTPUT
+        echo "analysis_file=analysis_output.txt" >> $GITHUB_OUTPUT
+      working-directory: 'rubyzen'
+      continue-on-error: true
+      env:
+        RUBYZEN_TARGET_PROJECT: 'target_project'
+
+    - name: Comment PR with analysis results
+      uses: actions/github-script@v7
+      if: github.event_name == 'pull_request'
+      with:
+        script: |
+          const fs = require('fs');
+          const analysisOutput = fs.readFileSync('rubyzen/analysis_output.txt', 'utf8');
+
+          const body = `## 🔍 RubyZen Analysis Results
+
+          \`\`\`
+          ${analysisOutput}
+          \`\`\`
+
+          ---
+          *Analysis completed at ${new Date().toISOString()}*`;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: body
+          });
