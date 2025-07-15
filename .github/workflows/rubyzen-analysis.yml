@@ -136,7 +136,7 @@ jobs:
       working-directory: 'rubyzen'
       if: always()
 
-    - name: Comment PR with analysis results
+    - name: Update PR comment with analysis results
       uses: actions/github-script@v7
       if: always() && github.event_name == 'pull_request'
       with:
@@ -161,9 +161,33 @@ jobs:
           ---
           *Analysis completed at ${new Date().toISOString()}*`;
 
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
+          // Look for existing RubyZen comment
+          const comments = await github.rest.issues.listComments({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: body
+            issue_number: context.issue.number,
           });
+
+          const existingComment = comments.data.find(comment =>
+            comment.body.includes('🔍 RubyZen Analysis Results')
+          );
+
+          if (existingComment) {
+            // Update existing comment
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existingComment.id,
+              body: body
+            });
+            console.log('Updated existing RubyZen comment');
+          } else {
+            // Create new comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+            console.log('Created new RubyZen comment');
+          }
