@@ -32,6 +32,14 @@ runs:
         ruby-version: ${{ inputs.ruby-version }}
         bundler-cache: true
 
+    - name: Debug - Show github.action_path and files
+      shell: bash
+      run: |
+        echo "github.action_path: ${{ github.action_path }}"
+        pwd
+        ls -la
+      working-directory: ${{ github.action_path }}
+
     - name: Install RubyZen dependencies
       shell: bash
       run: bundle install
