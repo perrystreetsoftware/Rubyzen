@@ -36,17 +36,16 @@ module Rubyzen
           puts "Error: RUBYZEN_TARGET_PROJECT environment variable not set."
           puts "Please set it to specify which project to lint:"
           puts "  export RUBYZEN_TARGET_PROJECT=YourProjectName"
-          puts ""
-          puts "Falling back to sample project..."
         else
           puts "Warning: Target project '#{target_project}' not found at #{@project_root_path}"
           puts "Make sure:"
           puts "  1. The project exists at: ../#{target_project}"
           puts "  2. The dev container has been rebuilt after setting RUBYZEN_TARGET_PROJECT"
           puts "  3. The project has a 'src' directory"
-          puts ""
-          puts "Falling back to sample project..."
         end
+
+        puts ""
+        puts "Falling back to sample project..."
 
         # Fallback to sample project
         fallback_path = './sample_project/src'
