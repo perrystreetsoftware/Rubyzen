@@ -30,7 +30,7 @@ runs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ inputs.ruby-version }}
-        bundler-cache: true
+        bundler-cache: false
 
     - name: Debug - Show github.action_path and files
       shell: bash
