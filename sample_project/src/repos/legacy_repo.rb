@@ -2,7 +2,10 @@ require 'logger'
 
 module Repositories
   class LegacyRepo
-    ProfilePhoto.where(removed_at: nil)
-    LOGGER.info('Sending an email', details: { params: args})
+
+    def photos_not_removed
+      ProfilePhoto.where(removed_at: nil)
+      LOGGER.info('Sending an email', details: { params: { user_id: 123 } })
+    end
   end
 end
