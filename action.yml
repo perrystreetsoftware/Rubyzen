@@ -78,7 +78,7 @@ runs:
         echo "Starting RubyZen analysis..."
 
         # Run analysis and capture output
-        if bundle exec rspec sample_project/spec/ --format documentation 2>&1 | tee analysis_output.txt; then
+        if bundle exec rspec -Ilib sample_project/spec/ --format documentation 2>&1 | tee analysis_output.txt; then
           echo "violations-found=false" >> $GITHUB_OUTPUT
         else
           echo "violations-found=true" >> $GITHUB_OUTPUT
