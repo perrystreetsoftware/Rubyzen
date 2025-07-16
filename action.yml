@@ -30,7 +30,6 @@ runs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ inputs.ruby-version }}
-        working-directory: ${{ github.action_path }}
         bundler-cache: true
 
     - name: Install RubyZen dependencies
@@ -93,27 +92,33 @@ runs:
       with:
         github-token: ${{ inputs.token }}
         script: |
-          const analysisOutput = `${{ steps.run-analysis.outputs.result }}`;
-          const violationsFound = '${{ steps.run-analysis.outputs.violations-found }}' === 'true';
+          const fs = require('fs');
+          let analysisOutput = 'Analysis file not found';
+          try {
+            analysisOutput = fs.readFileSync('analysis_output.txt', 'utf8');
+          } catch (e) {}
 
+          const violationsFound = '${{ steps.run-analysis.outputs.violations-found }}' === 'true';
           const statusIcon = violationsFound ? '❌' : '✅';
           const statusText = violationsFound ? 'Violations found' : 'No violations found';
 
-          const body = `## 🔍 RubyZen Analysis Results
-
-          ${statusIcon} **${statusText}**
-
-          <details>
-          <summary>📋 Full Analysis Report</summary>
-
-          \`\`\`
-          ${analysisOutput}
-          \`\`\`
-
-          </details>
-
-          ---
-          *Analysis completed at ${new Date().toISOString()}*`;
+          const body = [
+            '## 🔍 RubyZen Analysis Results',
+            '',
+            `${statusIcon} **${statusText}**`,
+            '',
+            '<details open>',
+            '<summary>📋 Full Analysis Report</summary>',
+            '',
+            '```',
+            analysisOutput,
+            '```',
+            '',
+            '</details>',
+            '',
+            '---',
+            `*Analysis completed at ${new Date().toISOString()}*`
+          ].join('\n');
 
           // Look for existing RubyZen comment
           const comments = await github.rest.issues.listComments({
@@ -144,6 +149,7 @@ runs:
             body: body
           });
           console.log('Created new RubyZen comment');
+      # No working-directory here; not supported for uses steps
 
 branding:
   icon: 'check-circle'
