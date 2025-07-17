@@ -128,28 +128,32 @@ runs:
             `*Analysis completed at ${new Date().toISOString()}*`
           ].join('\n');
 
-          // Look for existing RubyZen comment
+          // Look for existing RubyZen comments
           const comments = await github.rest.issues.listComments({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: context.issue.number,
           });
 
-          const existingComment = comments.data.find(comment =>
+          const existingComments = comments.data.filter(comment =>
             comment.body.includes('🔍 RubyZen Analysis Results')
           );
 
-          if (existingComment) {
-            // Delete old comment and create new one for fresh timestamp
-            await github.rest.issues.deleteComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: existingComment.id
-            });
-            console.log('Deleted existing RubyZen comment');
+          // Update existing comments to close their details sections
+          for (const comment of existingComments) {
+            const updatedBody = comment.body.replace('<details open>', '<details>');
+            if (updatedBody !== comment.body) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id,
+                body: updatedBody
+              });
+              console.log(`Closed details in comment ${comment.id}`);
+            }
           }
 
-          // Create new comment
+          // Create new comment with current results
           await github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
