@@ -26,12 +26,13 @@ RSpec::Matchers.define :have_if_statements do |custom_message=nil|
   end
 
   failure_message_when_negated do |_|
-    message_for_failure("Expected no if-statements, but found them in: #{@offenders.join(', ')}")
+    message_for_failure("Expected no if-statements, but found them in:\n#{@offenders.join("\n")}")
   end
 
   def offender_info(item, if_statements)
     lines = if_statements.map(&:line).join(', ')
     name = (item.respond_to?(:name) ? item.name : 'UnknownDeclaration')
-    "#{name} (if-statements at lines #{lines})"
+    file_path = (item.respond_to?(:file_path) ? item.file_path : 'Unknown file')
+    "  - #{name} in #{file_path} (if-statements at lines #{lines})"
   end
 end
