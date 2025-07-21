@@ -34,6 +34,28 @@ module Rubyzen
         end
       end
 
+      def class_methods
+        class_method_declarations = []
+
+        # Pattern 1: def self.method_name
+        node.each_node(:defs) do |defs_node|
+          if defs_node.receiver&.type == :self
+            class_method_declarations << MethodDeclaration.new(defs_node, self)
+          end
+        end
+
+        # Pattern 2: class << self; def method_name; end; end
+        node.each_node(:sclass) do |sclass_node|
+          if sclass_node.receiver&.type == :self
+            sclass_node.each_node(:def).each do |def_node|
+              class_method_declarations << MethodDeclaration.new(def_node, self)
+            end
+          end
+        end
+
+        class_method_declarations
+      end
+
       def called_method_names
         node.each_descendant(:send).map { |send_node| send_node.method_name.to_s }.uniq
       end
