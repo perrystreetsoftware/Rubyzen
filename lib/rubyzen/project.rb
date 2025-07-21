@@ -49,6 +49,18 @@ module Rubyzen
       files.files_in_path(subpath).map(&:path)
     end
 
+    def rspec_files
+      file_declarations.select(&:is_rspec_file?)
+    end
+
+    def rspec_declarations
+      rspec_files.map(&:rspec_declaration).compact
+    end
+
+    def rspec_declarations_for_files_ending_with(suffix)
+      files.files_with_name_ending_with(suffix).map(&:rspec_declaration).compact
+    end
+
     def classes_without_path(subpath)
       classes.classes_without_path(subpath)
     end
