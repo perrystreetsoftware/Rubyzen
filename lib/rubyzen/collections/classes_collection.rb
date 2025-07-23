@@ -3,6 +3,8 @@ require_relative './methods_collection'
 module Rubyzen
   module Collections
     class ClassesCollection < Array
+      undef_method(:methods)
+
       def initialize(class_declarations)
         super(class_declarations)
       end

@@ -6,6 +6,7 @@ module Controllers
     service Test
 
     def should_enqueue?
+      LOGGER.info 'test'
       true
     end
 

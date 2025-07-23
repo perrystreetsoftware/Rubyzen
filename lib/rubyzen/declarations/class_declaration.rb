@@ -49,32 +49,6 @@ module Rubyzen
       def top_level_module
         file_declaration.top_level_module_name
       end
-
-      def call_sites
-        node.each_descendant(:send).map do |send_node|
-          {
-            receiver: send_node.receiver&.type == :const ? send_node.receiver.const_name : nil,
-            method_name: send_node.method_name.to_s,
-            keyword_args: extract_keyword_args(send_node),
-            line: send_node.loc.expression.line
-          }
-        end
-      end
-
-      private
-
-      def extract_keyword_args(send_node)
-        send_node.arguments.flat_map do |arg|
-          if arg.hash_type?
-            arg.each_pair.map do |pair|
-              key_node = pair.key
-              key_node.type == :sym ? key_node.value : nil
-            end.compact
-          else
-            []
-          end
-        end.uniq
-      end
     end
   end
 end

@@ -2,6 +2,7 @@ require_relative '../providers/if_statements_provider'
 require_relative '../providers/blocks_provider'
 require_relative '../providers/line_number_provider'
 require_relative '../providers/constants_provider'
+require_relative '../providers/call_site_provider'
 
 module Rubyzen
   module Declarations
@@ -13,6 +14,7 @@ module Rubyzen
       include Rubyzen::Providers::LineNumberProvider
       include Rubyzen::Providers::ConstantsProvider
       include Rubyzen::Providers::IfStatementsProvider
+      include Rubyzen::Providers::CallSiteProvider
 
       attr_reader :node, :parent_class
       alias :parent :parent_class
