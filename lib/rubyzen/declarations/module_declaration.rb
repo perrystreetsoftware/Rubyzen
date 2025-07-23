@@ -1,8 +1,11 @@
+require_relative '../providers/file_path_provider'
 require_relative 'class_declaration'
 
 module Rubyzen
   module Declarations
     class ModuleDeclaration
+      include Rubyzen::Providers::FilePathProvider
+
       attr_reader :node, :file_declaration
 
       def initialize(node, file_declaration)
@@ -12,10 +15,6 @@ module Rubyzen
 
       def name
         node.identifier&.const_name
-      end
-
-      def file_path
-        file_declaration.path
       end
 
       def modules

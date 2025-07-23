@@ -1,21 +1,20 @@
 require_relative 'method_declaration'
 require_relative '../providers/if_statements_provider'
 require_relative '../providers/blocks_provider'
+require_relative '../providers/file_path_provider'
 
 module Rubyzen
   module Declarations
     class ClassDeclaration
       include Rubyzen::Providers::IfStatementsProvider
       include Rubyzen::Providers::BlocksProvider
+      include Rubyzen::Providers::FilePathProvider
+
       attr_reader :node, :file_declaration
 
       def initialize(node, file_declaration)
         @node = node
         @file_declaration = file_declaration
-      end
-
-      def file_path
-        file_declaration.path
       end
 
       def name
@@ -28,7 +27,11 @@ module Rubyzen
         super_node.const_name
       end
 
-      def methods
+      def name_with_modules
+        [file_declaration.modules.map(&:name), name].flatten.compact.join('::')
+      end
+
+      def instance_methods
         node.each_node(:def).map do |def_node|
           MethodDeclaration.new(def_node, self)
         end

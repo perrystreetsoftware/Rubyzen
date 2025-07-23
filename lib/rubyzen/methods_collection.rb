@@ -7,5 +7,11 @@ module Rubyzen
     def names
       map(&:name)
     end
+
+    def if_statements
+      flat_map do |method|
+        method.if_statements
+      end
+    end
   end
 end

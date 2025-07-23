@@ -6,13 +6,15 @@ module Rubyzen
       super(class_declarations)
     end
 
-    def methods
-      all_methods = flat_map(&:methods)
-      MethodsCollection.new(all_methods)
+    def all_methods
+      instance_plus_class_methods = flat_map(&:instance_methods) #+ flat_map(&:class_methods)
+      MethodsCollection.new(instance_plus_class_methods)
     end
 
     def classes_in_path(subpath)
-      filtered = select { |cd| cd.file_path.include?(subpath) }
+      filtered = select { |cd|
+       cd.file_path&.include?(subpath)
+      }
       ClassesCollection.new(filtered)
     end
 
@@ -42,6 +44,16 @@ module Rubyzen
     def excluding_classes(class_names)
       class_names = Array(class_names).map { |cn| cn.to_s.sub(/^:/, '') }
       filtered = reject { |cd| class_names.include?(cd.name) }
+      ClassesCollection.new(filtered)
+    end
+
+    def excluding_classes_by_path(path_names)
+      filtered = reject do |cd|
+        path_names.any? do |path_name|
+          cd.file_path.to_s.end_with?(path_name)
+        end
+      end
+
       ClassesCollection.new(filtered)
     end
   end

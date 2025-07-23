@@ -7,6 +7,7 @@ module Rubyzen
       include Rubyzen::Providers::IfStatementsProvider
       include Rubyzen::Providers::BlocksProvider
       attr_reader :node, :parent_class
+      alias :parent :parent_class
 
       def initialize(node, parent_class)
         @node = node
