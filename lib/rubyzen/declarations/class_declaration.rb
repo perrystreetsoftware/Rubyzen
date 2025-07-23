@@ -3,6 +3,7 @@ require_relative '../providers/if_statements_provider'
 require_relative '../providers/blocks_provider'
 require_relative '../providers/file_path_provider'
 require_relative '../providers/line_number_provider'
+require_relative '../providers/constants_provider'
 
 module Rubyzen
   module Declarations
@@ -11,6 +12,8 @@ module Rubyzen
       include Rubyzen::Providers::BlocksProvider
       include Rubyzen::Providers::FilePathProvider
       include Rubyzen::Providers::LineNumberProvider
+      include Rubyzen::Providers::ClassNameProvider
+      include Rubyzen::Providers::ConstantsProvider
 
       attr_reader :node, :file_declaration
 
@@ -41,10 +44,6 @@ module Rubyzen
 
       def called_method_names
         node.each_descendant(:send).map { |send_node| send_node.method_name.to_s }.uniq
-      end
-
-      def constants_referenced
-        node.each_descendant(:const).map(&:const_name).uniq
       end
 
       def top_level_module

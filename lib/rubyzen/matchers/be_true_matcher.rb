@@ -1,7 +1,7 @@
 require_relative 'matcher_helpers'
 
 
-RSpec::Matchers.define :be_zen_true do |custom_message=nil|
+RSpec::Matchers.define :be_true do |custom_message=nil|
   include Rubyzen::Matchers::MatcherHelpers
 
   match do |subject_collection|
@@ -12,7 +12,7 @@ RSpec::Matchers.define :be_zen_true do |custom_message=nil|
       items = Array(subject_collection) # to handle one or multiple subjects
 
       items.each do |item|
-        @offenders << offender_info(item) unless block_arg.call(item)
+        @offenders << element_name(item) unless block_arg.call(item)
       end
 
       @offenders.empty?
@@ -28,11 +28,5 @@ RSpec::Matchers.define :be_zen_true do |custom_message=nil|
 
   failure_message_when_negated do |_|
     message_for_failure("Expected not to be empty, but had no elements:\n#{@offenders.join("\n")}")
-  end
-
-  def offender_info(item)
-    name = (item.respond_to?(:class_name) ? item.class_name : 'UnknownDeclaration')
-    file_path = (item.respond_to?(:file_path) ? item.file_path : 'Unknown file')
-    "  - #{name} in #{file_path}:#{item.line}"
   end
 end

@@ -19,6 +19,10 @@ module Rubyzen
       def condition_source
         node.condition&.source
       end
+
+      def name
+        parent.name
+      end
     end
   end
 end

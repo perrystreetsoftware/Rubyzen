@@ -12,20 +12,19 @@ RSpec.describe 'No if statements in controllers' do
 
   context "given controller classes" do
     it "has no if statements in methods" do
-      expect(target_classes.all_methods.if_statements).to be_zen_empty
+      expect(target_classes.all_methods.if_statements).to be_empty
     end
 
-    it "has no if statements in methods, using zen_true with a block" do
-      expect(target_classes.all_methods).to be_zen_true { |m|
+    it "has no if statements in methods, using true with a block" do
+      expect(target_classes.all_methods).to be_true { |m|
         m.if_statements.count.zero?
       }
     end
 
-    it "has no if statements in methods, using zen_false with a block" do
-      expect(target_classes.all_methods).to be_zen_false { |m|
+    it "has no if statements in methods, using false with a block" do
+      expect(target_classes.all_methods).to be_false { |m|
         !m.if_statements.count.zero?
       }
     end
-
   end
 end
