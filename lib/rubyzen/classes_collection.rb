@@ -47,7 +47,7 @@ module Rubyzen
       ClassesCollection.new(filtered)
     end
 
-    def excluding_classes_by_path(path_names)
+    def without_pathname(path_names)
       filtered = reject do |cd|
         path_names.any? do |path_name|
           cd.file_path.to_s.end_with?(path_name)
@@ -55,6 +55,11 @@ module Rubyzen
       end
 
       ClassesCollection.new(filtered)
+    end
+
+    def +(other)
+      merged = super(other)
+      self.class.new(merged)
     end
   end
 end
