@@ -1,10 +1,12 @@
 require_relative '../providers/file_path_provider'
+require_relative '../providers/line_number_provider'
 require_relative 'class_declaration'
 
 module Rubyzen
   module Declarations
     class ModuleDeclaration
       include Rubyzen::Providers::FilePathProvider
+      include Rubyzen::Providers::LineNumberProvider
 
       attr_reader :node, :file_declaration
 

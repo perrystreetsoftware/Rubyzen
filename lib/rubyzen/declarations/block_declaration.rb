@@ -1,6 +1,10 @@
+require_relative '../providers/line_number_provider'
+
 module Rubyzen
   module Declarations
     class BlockDeclaration
+      include Rubyzen::Providers::LineNumberProvider
+
       attr_reader :node, :parent
 
       def initialize(node, parent)
@@ -10,10 +14,6 @@ module Rubyzen
 
       def lines_of_code
         node.loc.expression.source.split("\n").size
-      end
-
-      def line
-        node.loc.expression.line
       end
     end
   end

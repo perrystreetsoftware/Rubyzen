@@ -1,11 +1,16 @@
 require_relative '../providers/if_statements_provider'
 require_relative '../providers/blocks_provider'
+require_relative '../providers/line_number_provider'
 
 module Rubyzen
   module Declarations
     class MethodDeclaration
       include Rubyzen::Providers::IfStatementsProvider
       include Rubyzen::Providers::BlocksProvider
+      include Rubyzen::Providers::FilePathProvider
+      include Rubyzen::Providers::ClassNameProvider
+      include Rubyzen::Providers::LineNumberProvider
+
       attr_reader :node, :parent_class
       alias :parent :parent_class
 
