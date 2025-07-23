@@ -1,5 +1,7 @@
 class UserPresenter
   def show
+    Message.where(id: 1)
+
     user_repo = UserRepository.new
     if user_repo.nil?
       LOGGER.info('No user repo found', details: { params: args})

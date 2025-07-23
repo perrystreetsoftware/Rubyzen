@@ -25,32 +25,16 @@ module Rubyzen
       Collections::ClassesCollection.new(all_classes)
     end
 
-    def classes_with_name_ending_with(suffix)
-      classes.classes_with_name_ending_with(suffix)
-    end
+    # def classes_with_name_ending_with(suffix)
+    #   classes.classes_with_name_ending_with(suffix)
+    # end
 
-    def classes_in_path(subpath)
-      classes.classes_in_path(subpath)
-    end
-
-    def classes_inheriting_from(superclass)
-      classes.classes_inheriting_from(superclass)
-    end
-
-    def classes_that_call_method(receiver, method_name)
-      classes.select do |class_decl|
-        class_decl.call_sites.any? do |site|
-          site[:receiver] == receiver.to_s && site[:method_name] == method_name.to_s
-        end
-      end
-    end
+    # def inheriting_from(superclass)
+    #   classes.inheriting_from(superclass)
+    # end
 
     def files_in_path(subpath)
       files.files_in_path(subpath).map(&:path)
-    end
-
-    def classes_without_path(subpath)
-      classes.classes_without_path(subpath)
     end
 
     def line_count_for(relative_path)

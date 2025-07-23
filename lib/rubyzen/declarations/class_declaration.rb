@@ -36,6 +36,10 @@ module Rubyzen
         [file_declaration.modules.map(&:name), name].flatten.compact.join('::')
       end
 
+      def parent_start_with?(prefix)
+        superclass_name.start_with?(prefix)
+      end
+
       def instance_methods
         node.each_node(:def).map do |def_node|
           MethodDeclaration.new(def_node, self)

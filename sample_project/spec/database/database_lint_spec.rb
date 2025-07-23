@@ -1,35 +1,38 @@
 require 'rspec'
 require 'rubyzen'
+require_relative '../spec_helper'
 
-RSpec.describe 'Database lint rules' do
-  let(:project) { Rubyzen::Project.new }
-  let(:non_repo_classes) { project.classes_without_path("/repos/") } # or project.classes_without_module("Repos")
-  let(:active_record_models) { 
-    project
-      .classes_in_path("/models/")
-      .classes_inheriting_from(->(name) { name&.start_with?("ActiveRecord::BaseAurora") })
-      .excluding_classes(ACTIVE_RECORD_MODEL_ALLOWLIST)
-  }
+RSpec.describe 'Do not call ActiveRecord methods on non-repo classes' do
+  let(:baseline) { [] }
+  let(:active_record_models) do
+    models.parent_start_with?('ActiveRecord::BaseAurora')
+      .excluding_classes(baseline)
+  end
 
   context "given a class that is not a repo" do
+    # remove the active record models from these as well
+    let(:non_repo_classes) { project.classes.without_path_include('/repos/', '/models/') } # or project.classes_without_module("Repos")
+    # let(:non_repo_classes) { project.classes.with_path_include("user_presenter") } # or project.classes_without_module("Repos")
+
     it "does not call any ActiveRecord methods on ActiveRecord models" do
-      expect(non_repo_classes)
-        .not_to(call_method(
-          ACTIVE_RECORD_METHODS,
-          on_receivers: active_record_models,
-          message: "Do not query the database outside of repositories"
-        ))
+      expect(non_repo_classes.all_methods.call_sites.filter { |cs|
+        if ACTIVE_RECORD_METHODS.include?(cs.method_name.to_sym)
+          active_record_models.map(&:name).include?(cs.receiver)
+        else
+          false
+        end
+      }).to be_empty
     end
   end
 end
 
-ACTIVE_RECORD_METHODS = %w[
-  :all :average :calculate :count :create :create! :delete_all :destroy_all :distinct
-  :eager_load :find :find_by :find_by_sql :find_each :find_in_batches :find_or_create_by
-  :find_or_create_by! :find_or_initialize_by :first :group :having :ids :includes :joins :last
-  :left_outer_joins :lock :maximum :minimum :order :pick :pluck :preload :reorder :select :sum
-  :update :update_all :where :first_or_create :first_or_create! :first_or_initialize
-].freeze
+ACTIVE_RECORD_METHODS = %i[
+  all average calculate count create create! delete_all destroy_all distinct
+  eager_load find find_by find_by_sql find_each find_in_batches find_or_create_by
+  find_or_create_by! find_or_initialize_by first group having ids includes joins last
+  left_outer_joins lock maximum minimum order pick pluck preload reorder select sum
+  update update_all where first_or_create first_or_create! first_or_initialize
+]
 
 ACTIVE_RECORD_MODEL_ALLOWLIST = %w[
   :ProfilePhoto

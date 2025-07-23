@@ -2,11 +2,7 @@ require_relative 'classes_collection'
 
 module Rubyzen
   module Collections
-    class FileCollection < Array
-      def initialize(file_declarations)
-        super(file_declarations)
-      end
-
+    class FileCollection < BaseCollection
       def files_in_path(subpath)
         filtered = select { |file_declaration| file_declaration.path.include?(subpath) }
         FileCollection.new(filtered)

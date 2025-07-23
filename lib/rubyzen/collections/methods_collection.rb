@@ -1,10 +1,6 @@
 module Rubyzen
   module Collections
-    class MethodsCollection < Array
-      def initialize(method_declarations)
-        super(method_declarations)
-      end
-
+    class MethodsCollection < BaseCollection
       def names
         map(&:name)
       end

@@ -2,12 +2,8 @@ require_relative './methods_collection'
 
 module Rubyzen
   module Collections
-    class ClassesCollection < Array
+    class ClassesCollection < BaseCollection
       undef_method(:methods)
-
-      def initialize(class_declarations)
-        super(class_declarations)
-      end
 
       def all_methods
         instance_plus_class_methods = flat_map(&:instance_methods) #+ flat_map(&:class_methods)
@@ -26,7 +22,11 @@ module Rubyzen
         ClassesCollection.new(filtered)
       end
 
-      def classes_inheriting_from(superclass)
+      def parent_start_with?(prefix)
+        filter { |klass| klass.parent_start_with?(prefix) }
+      end
+
+      def inheriting_from(superclass)
         filtered = case superclass
                   when Proc
                     select { |cd| superclass.call(cd.superclass_name) }
@@ -44,16 +44,36 @@ module Rubyzen
         ClassesCollection.new(filtered)
       end
 
-      def excluding_classes(class_names)
-        class_names = Array(class_names).map { |cn| cn.to_s.sub(/^:/, '') }
+      def excluding_classes(*class_names)
+        class_names = class_names.map { |cn| cn.to_s.sub(/^:/, '') }
         filtered = reject { |cd| class_names.include?(cd.name) }
         ClassesCollection.new(filtered)
       end
 
-      def without_pathname(path_names)
+      def without_path_end_with(*path_names)
         filtered = reject do |cd|
           path_names.any? do |path_name|
             cd.file_path.to_s.end_with?(path_name)
+          end
+        end
+
+        ClassesCollection.new(filtered)
+      end
+
+      def without_path_include(*path_names)
+        filtered = reject do |cd|
+          path_names.any? do |path_name|
+            cd.file_path.to_s.include?(path_name)
+          end
+        end
+
+        ClassesCollection.new(filtered)
+      end
+
+      def with_path_include(*path_names)
+        filtered = select do |cd|
+          path_names.any? do |path_name|
+            cd.file_path.to_s.include?(path_name)
           end
         end
 

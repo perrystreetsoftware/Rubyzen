@@ -7,7 +7,7 @@ RSpec.describe 'No if statements in controllers' do
 	let(:baseline) { [] }
 
 	let(:target_classes) do
-    (controller_classes + presenters).without_pathname(baseline)
+    (controller_classes + presenters).without_path_include(baseline)
   end
 
   context "given controller classes" do
