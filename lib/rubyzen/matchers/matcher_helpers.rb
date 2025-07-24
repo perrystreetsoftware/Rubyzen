@@ -2,16 +2,19 @@ module Rubyzen
   module Matchers
     module MatcherHelpers
       def element_name(item)
-        element_name = if item.respond_to?(:name)
-          item.name
-        elsif item.respond_to?(:class_name)
-          item.class_name
-        else
-          'UnknownDeclaration'
-        end
+        name = item.respond_to?(:name) ? item.name : nil
+        class_name = item.respond_to?(:class_name) ? item.class_name : nil
+        file_path = item.respond_to?(:file_path) ? item.file_path : 'Unknown file'
+        location = "#{file_path}:#{item.line}"
 
-        file_path = (item.respond_to?(:file_path) ? item.file_path : 'Unknown file')
-        "  - `#{element_name}` in #{file_path}:#{item.line}"
+        case
+        when name && class_name
+          "  - element: #{name}\n  - class: #{class_name}\n  - file: #{location}"
+        when class_name
+          "  - class: #{class_name}\n  - file: #{location}"
+        else
+          "  - unknown element in #{location}"
+        end
       end
 
       def self.included(base)

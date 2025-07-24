@@ -19,8 +19,7 @@ module Rubyzen
       end
 
       def without_name(*class_names)
-        class_names = class_names.map { |cn| cn.to_s.sub(/^:/, '') }
-        filter { |cd| !class_names.include?(cd.name) }
+        filter { |cd| !class_names.include?(cd.name_with_modules) }
       end
 
       def +(other)
