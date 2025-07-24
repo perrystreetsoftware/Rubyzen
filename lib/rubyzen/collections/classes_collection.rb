@@ -10,74 +10,17 @@ module Rubyzen
         MethodsCollection.new(instance_plus_class_methods)
       end
 
-      def classes_in_path(subpath)
-        filtered = select { |cd|
-        cd.file_path&.include?(subpath)
-        }
-        ClassesCollection.new(filtered)
+      def with_parent_prefix(prefix)
+        filter { |klass| klass.parent_prefix?(prefix) }
       end
 
-      def classes_without_path(subpath)
-        filtered = reject { |cd| cd.file_path.include?(subpath) }
-        ClassesCollection.new(filtered)
+      def with_name_ending_with(suffix)
+        filter { |cd| cd.name&.end_with?(suffix) }
       end
 
-      def parent_start_with?(prefix)
-        filter { |klass| klass.parent_start_with?(prefix) }
-      end
-
-      def inheriting_from(superclass)
-        filtered = case superclass
-                  when Proc
-                    select { |cd| superclass.call(cd.superclass_name) }
-                  when String
-                    select { |cd| cd.superclass_name == superclass }
-                  else
-                    raise ArgumentError, "Expected a String or Proc, got #{superclass.class}"
-                  end
-
-        ClassesCollection.new(filtered)
-      end
-
-      def classes_with_name_ending_with(suffix)
-        filtered = select { |cd| cd.name&.end_with?(suffix) }
-        ClassesCollection.new(filtered)
-      end
-
-      def excluding_classes(*class_names)
+      def without_name(*class_names)
         class_names = class_names.map { |cn| cn.to_s.sub(/^:/, '') }
-        filtered = reject { |cd| class_names.include?(cd.name) }
-        ClassesCollection.new(filtered)
-      end
-
-      def without_path_end_with(*path_names)
-        filtered = reject do |cd|
-          path_names.any? do |path_name|
-            cd.file_path.to_s.end_with?(path_name)
-          end
-        end
-
-        ClassesCollection.new(filtered)
-      end
-
-      def without_path_include(*path_names)
-        filtered = reject do |cd|
-          path_names.any? do |path_name|
-            cd.file_path.to_s.include?(path_name)
-          end
-        end
-
-        ClassesCollection.new(filtered)
-      end
-
-      def with_path_include(*path_names)
-        filtered = select do |cd|
-          path_names.any? do |path_name|
-            cd.file_path.to_s.include?(path_name)
-          end
-        end
-
-        ClassesCollection.new(filtered)
+        filter { |cd| !class_names.include?(cd.name) }
       end
 
       def +(other)

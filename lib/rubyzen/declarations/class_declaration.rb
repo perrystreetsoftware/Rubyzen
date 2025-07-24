@@ -38,7 +38,7 @@ module Rubyzen
         [file_declaration.modules.map(&:name), name].flatten.compact.join('::')
       end
 
-      def parent_start_with?(prefix)
+      def parent_prefix?(prefix)
         superclass_name.start_with?(prefix)
       end
 

@@ -5,14 +5,12 @@ require_relative '../spec_helper'
 RSpec.describe 'Do not call ActiveRecord methods on non-repo classes' do
   let(:baseline) { [] }
   let(:active_record_models) do
-    models.parent_start_with?('ActiveRecord::BaseAurora')
-      .excluding_classes(baseline)
+    models.with_parent_prefix('ActiveRecord::BaseAurora')
+      .without_name(baseline)
   end
 
   context "given a class that is not a repo" do
-    # remove the active record models from these as well
-    let(:non_repo_classes) { project.classes.without_path_include('/repos/', '/models/') } # or project.classes_without_module("Repos")
-    # let(:non_repo_classes) { project.classes.with_path_include("user_presenter") } # or project.classes_without_module("Repos")
+    let(:non_repo_classes) { project.files.excluding_files('/repos/', '/models/').classes }
 
     it "does not call any ActiveRecord methods on ActiveRecord models" do
       expect(non_repo_classes.all_methods.call_sites.filter { |cs|
