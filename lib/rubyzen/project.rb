@@ -25,23 +25,6 @@ module Rubyzen
       Collections::ClassesCollection.new(all_classes)
     end
 
-    # def classes_with_name_ending_with(suffix)
-    #   classes.classes_with_name_ending_with(suffix)
-    # end
-
-    # def inheriting_from(superclass)
-    #   classes.inheriting_from(superclass)
-    # end
-
-    # def file_path(relative_path)
-    #   full_path = File.join(@root_path, relative_path)
-    #   if File.exist?(full_path)
-    #     full_path
-    #   else
-    #     raise "File #{relative_path} not found under #{@root_path}"
-    #   end
-    # end
-
     private
 
     def file_declarations
