@@ -1,5 +1,4 @@
 require_relative 'matcher_helpers'
-require 'pry'
 
 RSpec::Matchers.define :be_false do |custom_message=nil|
   include Rubyzen::Matchers::MatcherHelpers

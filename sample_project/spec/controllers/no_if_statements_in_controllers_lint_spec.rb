@@ -1,6 +1,5 @@
 require 'rspec'
 require 'rubyzen'
-require 'pry'
 require_relative '../spec_helper'
 
 RSpec.describe 'No if statements in controllers' do
