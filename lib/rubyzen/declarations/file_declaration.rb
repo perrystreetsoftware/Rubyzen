@@ -1,13 +1,20 @@
 require_relative 'class_declaration'
+require_relative '../providers/lines_of_code_provider'
 
 module Rubyzen
   module Declarations
     class FileDeclaration
+      include Rubyzen::Providers::LinesOfCodeProvider
+
       attr_reader :path, :ast
 
       def initialize(path, ast)
         @path = path
         @ast = ast
+      end
+
+      def name
+        File.basename(path)
       end
 
       def classes
@@ -17,13 +24,17 @@ module Rubyzen
       end
 
       def top_level_module_name
+        # If the entire file is a module, return its name
         if ast.type == :module
-          return ast.children[0].const_name if ast.children[0]&.respond_to?(:const_name)
+          return ast.identifier&.const_name
         end
 
-        module_node = ast.children.find { |child| child.is_a?(RuboCop::AST::Node) && child.type == :module }
-        return unless module_node
-        module_node.const_name
+        # Otherwise, find the first top-level module and return its name
+        module_node = ast.children.find do |child|
+          child.is_a?(RuboCop::AST::Node) && child.type == :module
+        end
+
+        module_node&.identifier&.const_name
       end
 
       def modules
