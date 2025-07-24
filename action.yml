@@ -77,11 +77,19 @@ runs:
       run: |
         echo "Starting RubyZen analysis..."
 
-        # Run analysis and capture output
-        if bundle exec rspec -Ilib sample_project/spec/ --format documentation 2>&1 | tee $GITHUB_WORKSPACE/analysis_output.txt; then
-              echo "violations-found=false" >> $GITHUB_OUTPUT
+        # Run analysis and capture both output and exit code
+        set +e  # Don't exit on command failure
+        bundle exec rspec -Ilib sample_project/spec/ --format documentation 2>&1 | tee $GITHUB_WORKSPACE/analysis_output.txt
+        ANALYSIS_EXIT_CODE=$?
+        set -e  # Re-enable exit on error
+
+        # Set outputs based on exit code
+        if [ $ANALYSIS_EXIT_CODE -eq 0 ]; then
+          echo "violations-found=false" >> $GITHUB_OUTPUT
+          echo "✅ Analysis passed - no violations found"
         else
           echo "violations-found=true" >> $GITHUB_OUTPUT
+          echo "❌ Analysis failed - violations found"
         fi
 
         # Set the full result as output
@@ -90,6 +98,9 @@ runs:
         echo "EOF" >> $GITHUB_OUTPUT
 
         echo "Analysis complete"
+
+        # Exit with the original analysis exit code to fail the action if violations found
+        exit $ANALYSIS_EXIT_CODE
       working-directory: ${{ github.action_path }}
       env:
         RUBYZEN_TARGET_PROJECT: 'target_project'
