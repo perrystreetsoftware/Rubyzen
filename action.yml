@@ -81,9 +81,30 @@ runs:
       run: |
         echo "Starting RubyZen analysis..."
 
+        # Determine the correct RSpec directory path
+        if [ "${{ inputs.target-rspec-directory }}" = "sample_project/spec/" ]; then
+          # Default case - use relative to action path
+          RSPEC_DIR="${{ inputs.target-rspec-directory }}"
+          echo "Using default RSpec directory: $RSPEC_DIR"
+        else
+          # User-provided case - use relative to workspace
+          RSPEC_DIR="${{ github.workspace }}/${{ inputs.target-rspec-directory }}"
+          echo "Using custom RSpec directory: $RSPEC_DIR"
+        fi
+
+        # Validate RSpec directory exists
+        if [ ! -d "$RSPEC_DIR" ]; then
+          echo "❌ RSpec directory not found: $RSPEC_DIR"
+          echo "Available directories in workspace:"
+          find ${{ github.workspace }} -type d -name "*spec*" 2>/dev/null || echo "No spec directories found"
+          exit 1
+        fi
+
+        echo "✅ Found RSpec directory: $RSPEC_DIR"
+
         # Run analysis and capture both output and exit code
         set +e  # Don't exit on command failure
-        bundle exec rspec -Ilib ${{ inputs.target-rspec-directory }} --format documentation 2>&1 | tee $GITHUB_WORKSPACE/analysis_output.txt
+        bundle exec rspec -Ilib "$RSPEC_DIR" --format documentation 2>&1 | tee $GITHUB_WORKSPACE/analysis_output.txt
         ANALYSIS_EXIT_CODE=$?
         set -e  # Re-enable exit on error
 
