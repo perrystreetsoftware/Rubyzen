@@ -14,6 +14,10 @@ inputs:
     description: 'Directory containing the Ruby source code to analyze'
     required: false
     default: 'src'
+  target-rspec-directory:
+    description: 'Directory containing the RSpec test files'
+    required: false
+    default: 'sample_project/spec/'
 
 outputs:
   violations-found:
@@ -79,7 +83,7 @@ runs:
 
         # Run analysis and capture both output and exit code
         set +e  # Don't exit on command failure
-        bundle exec rspec -Ilib sample_project/spec/ --format documentation 2>&1 | tee $GITHUB_WORKSPACE/analysis_output.txt
+        bundle exec rspec -Ilib ${{ inputs.target-rspec-directory }} --format documentation 2>&1 | tee $GITHUB_WORKSPACE/analysis_output.txt
         ANALYSIS_EXIT_CODE=$?
         set -e  # Re-enable exit on error
 
