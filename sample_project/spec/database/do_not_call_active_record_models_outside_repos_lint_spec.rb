@@ -10,7 +10,7 @@ RSpec.describe 'Do not call ActiveRecord methods on non-repo classes' do
   end
 
   context "given a class that is not a repo" do
-    let(:non_repo_classes) { project.files.excluding_files('/repos/', '/models/').classes }
+    let(:non_repo_classes) { project.files.without_paths('/repos/', '/models/').classes }
 
     it "does not call any ActiveRecord methods on ActiveRecord models" do
       expect(non_repo_classes.all_methods.call_sites.filter { |cs|

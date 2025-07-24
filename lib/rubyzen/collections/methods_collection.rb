@@ -1,10 +1,6 @@
 module Rubyzen
   module Collections
     class MethodsCollection < BaseCollection
-      def names
-        map(&:name)
-      end
-
       def if_statements
         DeclarationCollection.new(
           flat_map do |method|
