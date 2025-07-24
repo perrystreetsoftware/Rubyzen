@@ -3,6 +3,7 @@ require_relative '../providers/if_statements_provider'
 require_relative '../providers/blocks_provider'
 require_relative '../providers/file_path_provider'
 require_relative '../providers/line_number_provider'
+require_relative '../providers/lines_of_code_provider'
 require_relative '../providers/constants_provider'
 
 module Rubyzen
@@ -12,6 +13,7 @@ module Rubyzen
       include Rubyzen::Providers::BlocksProvider
       include Rubyzen::Providers::FilePathProvider
       include Rubyzen::Providers::LineNumberProvider
+      include Rubyzen::Providers::LinesOfCodeProvider
       include Rubyzen::Providers::ClassNameProvider
       include Rubyzen::Providers::ConstantsProvider
 

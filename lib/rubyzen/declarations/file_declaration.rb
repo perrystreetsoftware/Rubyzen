@@ -1,9 +1,11 @@
 require_relative 'class_declaration'
-# require_relative 'rspec_declaration'
+require_relative '../providers/lines_of_code_provider'
 
 module Rubyzen
   module Declarations
     class FileDeclaration
+      include Rubyzen::Providers::LinesOfCodeProvider
+
       attr_reader :path, :ast
 
       def initialize(path, ast)
