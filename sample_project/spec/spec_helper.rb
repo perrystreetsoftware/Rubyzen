@@ -10,7 +10,7 @@ RSpec.configure do |config|
 		let(:services) { project.files.with_paths('src/services/').classes }
 
 		let(:models) { project.files.with_paths('src/models/').classes }
-		let(:repos) { project.files.with_paths('src/repos/').classes }
+		let(:repos) { project.files.with_paths('src/repos/').without_paths('/spec/').classes }
 		let(:test_files) { project.files.with_paths('spec/') }
 		let(:controller_test_files) { test_files.with_paths('/controllers/') }
 	end

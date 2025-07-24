@@ -11,7 +11,7 @@ module Rubyzen
       end
 
       def with_parent_prefix(prefix)
-        filter { |klass| klass.parent_prefix?(prefix) }
+        filter { |klass| klass.superclass_prefix?(prefix) }
       end
 
       def with_name_ending_with(suffix)

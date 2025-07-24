@@ -38,8 +38,8 @@ module Rubyzen
         [file_declaration.modules.map(&:name), name].flatten.compact.join('::')
       end
 
-      def parent_prefix?(prefix)
-        superclass_name.start_with?(prefix)
+      def superclass_prefix?(prefix)
+        superclass_name&.start_with?(prefix)
       end
 
       def instance_methods
