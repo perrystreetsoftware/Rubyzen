@@ -6,7 +6,7 @@ module Rubyzen
       undef_method(:methods)
 
       def all_methods
-        instance_plus_class_methods = flat_map(&:instance_methods) #+ flat_map(&:class_methods)
+        instance_plus_class_methods = flat_map(&:instance_methods)
         MethodsCollection.new(instance_plus_class_methods)
       end
 

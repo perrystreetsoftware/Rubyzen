@@ -42,26 +42,6 @@ module Rubyzen
           Rubyzen::Declarations::ModuleDeclaration.new(module_node, self)
         end
       end
-
-      def rspec_declaration
-        return nil unless is_rspec_file?
-
-        RspecDeclaration.new(ast, self)
-      end
-
-      def is_rspec_file?
-        has_rspec_describes?
-      end
-
-      private
-
-      def has_rspec_describes?
-        ast.each_node(:send).any? { |node| rspec_describe_node?(node) }
-      end
-
-      def rspec_describe_node?(node)
-        node.method_name == :describe && node.receiver.nil?
-      end
     end
   end
 end
