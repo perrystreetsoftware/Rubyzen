@@ -17,7 +17,7 @@ module Rubyzen
 
     def files
       all_files = file_declarations
-      FileCollection.new(all_files)
+      Collections::FileCollection.new(all_files)
     end
 
     def classes
@@ -33,24 +33,14 @@ module Rubyzen
     #   classes.inheriting_from(superclass)
     # end
 
-    def files_in_path(subpath)
-      files.files_in_path(subpath).map(&:path)
-    end
-
-    def line_count_for(relative_path)
-      fp = @file_paths.find { |p| p.include?(relative_path) }
-      return 0 unless fp && File.exist?(fp)
-      File.readlines(fp).size
-    end
-
-    def file_path(relative_path)
-      full_path = File.join(@root_path, relative_path)
-      if File.exist?(full_path)
-        full_path
-      else
-        raise "File #{relative_path} not found under #{@root_path}"
-      end
-    end
+    # def file_path(relative_path)
+    #   full_path = File.join(@root_path, relative_path)
+    #   if File.exist?(full_path)
+    #     full_path
+    #   else
+    #     raise "File #{relative_path} not found under #{@root_path}"
+    #   end
+    # end
 
     private
 

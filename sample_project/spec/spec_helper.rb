@@ -10,6 +10,8 @@ RSpec.configure do |config|
 		let(:services) { project.classes.with_path_include('src/services/') }
 
 		let(:models) { project.classes.with_path_include('src/models/') }
+		let(:test_files) { project.files.files_in_path('spec/') }
+		let(:controller_tests) { test_files.files_in_path('/controllers/') }
 	end
 
 	config.include_context 'project_config'
