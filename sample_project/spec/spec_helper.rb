@@ -7,6 +7,7 @@ RSpec.configure do |config|
 		let(:all_classes) { project.files.with_paths('src/').classes }
 		let(:controllers) { project.files.with_paths('src/controllers/').classes }
 		let(:presenters) { project.files.with_paths('src/presenters/').classes }
+		let(:actions) { project.files.with_paths('src/actions/').classes }
 		let(:services) { project.files.with_paths('src/services/').classes }
 
 		let(:models) { project.files.with_paths('src/models/').classes }

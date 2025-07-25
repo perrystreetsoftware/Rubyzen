@@ -1,0 +1,107 @@
+require 'rspec'
+require 'rubyzen'
+require_relative '../spec_helper'
+
+RSpec.describe 'Actions expose a single public method' do
+  context 'given an action' do
+    it 'has a single public method called execute' do
+      expect(actions.without_name(*baseline)).to be_true { |action|
+        public_methods = action.instance_methods.filter do |method|
+          #  Ignore initialize method
+           method.public? && method.name != "initialize"
+        end
+
+
+        name = public_methods&.first&.name
+
+        public_methods.count == 1 && name == "execute"
+      }
+    end
+  end
+
+  let(:baseline) do 
+    %w[
+      Actions::AdminAlerts::UpdateRequiredMean
+      Actions::AdminAlerts::UpdateRequiredNice
+      Actions::Apple::Attestation::UnpackAuthData
+      Actions::BetaProfileIds::BetaProfilesLimitExceeded
+      Actions::BoostAttributions::AlbumUnlock
+      Actions::BoostAttributions::Chat
+      Actions::BoostAttributions::View
+      Actions::BoostAttributions::Woof
+      Actions::CodeGenerators::Action
+      Actions::CodeGenerators::ActionSpec
+      Actions::CodeGenerators::Controller
+      Actions::CodeGenerators::ControllerSpec
+      Actions::CodeGenerators::Job
+      Actions::CodeGenerators::JobSpec
+      Actions::CodeGenerators::Presenter
+      Actions::CodeGenerators::PresenterSpec
+      Actions::CodeGenerators::Prompts
+      Actions::CodeGenerators::Question
+      Actions::CodeGenerators::QuestionSpec
+      Actions::CodeGenerators::Repo
+      Actions::CodeGenerators::RepoSpec
+      Actions::CodeGenerators::Request
+      Actions::CodeGenerators::RequestSpec
+      Actions::CodeGenerators::Response
+      Actions::CodeGenerators::ResponseSpec
+      Actions::CodeGenerators::ScalableJob
+      Actions::CodeGenerators::ScalableJobSpec
+      Actions::CodeGenerators::Service
+      Actions::CodeGenerators::ServiceSpec
+      Actions::DataProtection::Purge
+      Actions::Flags::CalculatePoints
+      Actions::Maintenance::NotifyOnError
+      Actions::Maintenance::PublishEcsContainerInstanceMetrics
+      Actions::Maintenance::PublishEcsMetrics
+      Actions::Maintenance::PublishEcsServiceMetrics
+      Actions::MediaSubscriptions::Notify
+      Actions::ModeratedPhotos::Create
+      Actions::Moderation::RefreshProfileFlagCount
+      Actions::Moderation::Resolve
+      Actions::ProfilePhotos::Rearrange
+      Actions::Profiles::Base
+      Actions::PushNotifications::Album
+      Actions::PushNotifications::Alert
+      Actions::PushNotifications::Android::Base
+      Actions::PushNotifications::Android::MutualMatch
+      Actions::PushNotifications::Base
+      Actions::PushNotifications::Chat
+      Actions::PushNotifications::Ios::Base
+      Actions::PushNotifications::Ios::MutualMatch
+      Actions::PushNotifications::Match
+      Actions::PushNotifications::Moment
+      Actions::PushNotifications::MutualMatch
+      Actions::PushNotifications::Pong
+      Actions::PushNotifications::SupportRequestUpdate
+      Actions::PushNotifications::VideoChat
+      Actions::PushNotifications::VideoChatRoom
+      Actions::PushNotifications::Woof
+      Actions::Queries::Adapters::Location
+      Actions::Queries::Adapters::Viewers::Base
+      Actions::Queries::Adapters::Viewers::Incoming
+      Actions::Queries::Adapters::Viewers::Outgoing
+      Actions::Queries::Adapters::Woofs::Base
+      Actions::Queries::Adapters::Woofs::Incoming
+      Actions::Queries::Adapters::Woofs::Outgoing
+      Actions::Queries::Filters::Base
+      Actions::Queries::Filters::IgnoreBlocks
+      Actions::Queries::Filters::Inbox
+      Actions::Queries::Filters::Location
+      Actions::Queries::Filters::NoFilter
+      Actions::Queries::Filters::Rsvps
+      Actions::Queries::Filters::Stream
+      Actions::Queries::Filters::Trips
+      Actions::Queries::Filters::Viewers
+      Actions::Queries::Results::Woofs
+      Actions::Queries::SortStrategies::Base
+      Actions::Queries::SortStrategies::Distance
+      Actions::Queries::SortStrategies::Online
+      Actions::Queries::SortStrategies::Time
+      Actions::SpamIps::NotifySupport
+      Actions::Tickets::CreateZohoDeskTicket
+      Actions::Tickets::RefreshStatusFromZohoDesk
+    ]
+  end
+end
