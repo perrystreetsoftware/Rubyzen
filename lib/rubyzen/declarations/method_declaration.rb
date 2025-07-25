@@ -4,7 +4,6 @@ require_relative '../providers/line_number_provider'
 require_relative '../providers/constants_provider'
 require_relative '../providers/call_site_provider'
 require_relative '../providers/lines_of_code_provider'
-require_relative '../providers/method_visibility_provider'
 
 module Rubyzen
   module Declarations
@@ -18,7 +17,6 @@ module Rubyzen
       include Rubyzen::Providers::IfStatementsProvider
       include Rubyzen::Providers::CallSiteProvider
       include Rubyzen::Providers::LinesOfCodeProvider
-      include Rubyzen::Providers::MethodVisibilityProvider
 
       attr_reader :node, :parent_class
       alias :parent :parent_class
@@ -62,7 +60,7 @@ module Rubyzen
 
         # Find the last visibility modifier that appears before this method
         method_line = node.loc.expression.line
-        
+
         applicable_visibility = visibility_nodes
           .select { |v_node| v_node.loc.expression.line < method_line }
           .max_by { |v_node| v_node.loc.expression.line }
