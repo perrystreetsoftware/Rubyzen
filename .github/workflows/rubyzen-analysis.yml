@@ -17,4 +17,5 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         ruby-version: '3.3'
-        target-directory: 'src'
+        target-directory: 'sample_project/src'
+        target-rspec-directory: 'sample_project/spec'
