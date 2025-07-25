@@ -43,9 +43,19 @@ module Rubyzen
       end
 
       def instance_methods
-        node.each_node(:def).map do |def_node|
-          MethodDeclaration.new(def_node, self)
-        end
+        Collections::MethodsCollection.new(
+          node.each_node(:def).map do |def_node|
+            MethodDeclaration.new(def_node, self)
+          end
+        )
+      end
+
+      def class_methods
+        Collections::MethodsCollection.new(
+          node.each_node(:defs).map do |defs_node|
+            MethodDeclaration.new(defs_node, self)
+          end
+        )
       end
 
       def called_method_names

@@ -6,7 +6,7 @@ module Rubyzen
       undef_method(:methods)
 
       def all_methods
-        instance_plus_class_methods = flat_map(&:instance_methods)
+        instance_plus_class_methods = flat_map { |klass| klass.instance_methods + klass.class_methods }
         MethodsCollection.new(instance_plus_class_methods)
       end
 
@@ -16,6 +16,10 @@ module Rubyzen
 
       def with_name_ending_with(suffix)
         filter { |cd| cd.name&.end_with?(suffix) }
+      end
+
+      def without_name_ending_with(suffix)
+        filter { |cd| !cd.name&.end_with?(suffix) }
       end
 
       def without_name(*class_names)
