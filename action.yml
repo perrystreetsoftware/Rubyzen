@@ -17,7 +17,7 @@ inputs:
   target-rspec-directory:
     description: 'Directory containing the RSpec test files'
     required: false
-    default: 'sample_project/spec/'
+    default: 'spec'
 
 outputs:
   violations-found:
@@ -49,48 +49,28 @@ runs:
       run: bundle install
       working-directory: ${{ github.action_path }}
 
-    - name: Prepare target project structure
-      shell: bash
-      run: |
-        echo "Preparing target project structure..."
-        mkdir -p target_project
-
-        # Check if target directory exists in the workspace
-        if [ -d "${{ github.workspace }}/${{ inputs.target-directory }}" ]; then
-          echo "✅ Found ${{ inputs.target-directory }} directory"
-          cp -r "${{ github.workspace }}/${{ inputs.target-directory }}" target_project/src
-        else
-          echo "❌ No ${{ inputs.target-directory }} directory found"
-          # For RubyZen self-testing, use sample project
-          if [ "${{ github.repository }}" = "perrystreetsoftware/Rubyzen" ]; then
-            echo "🔧 Using sample project for RubyZen self-test"
-            cp -r sample_project/src target_project/src
-          else
-            echo "⚠️ Repository needs a '${{ inputs.target-directory }}' directory for analysis"
-            exit 1
-          fi
-        fi
-
-        echo "Target project structure ready:"
-        ls -la target_project/src/ || echo "No src files found"
-      working-directory: ${{ github.action_path }}
-
     - name: Run RubyZen analysis
       id: run-analysis
       shell: bash
       run: |
         echo "Starting RubyZen analysis..."
 
-        # Determine the correct RSpec directory path
-        if [ "${{ inputs.target-rspec-directory }}" = "sample_project/spec/" ]; then
-          # Default case - use relative to action path
-          RSPEC_DIR="${{ inputs.target-rspec-directory }}"
-          echo "Using default RSpec directory: $RSPEC_DIR"
-        else
-          # User-provided case - use relative to workspace
-          RSPEC_DIR="${{ github.workspace }}/${{ inputs.target-rspec-directory }}"
-          echo "Using custom RSpec directory: $RSPEC_DIR"
+        # Simple, direct path resolution
+        TARGET_DIR="${{ github.workspace }}/${{ inputs.target-directory }}"
+        RSPEC_DIR="${{ github.workspace }}/${{ inputs.target-rspec-directory }}"
+        
+        echo "Target directory: $TARGET_DIR"
+        echo "RSpec directory: $RSPEC_DIR"
+
+        # Validate target directory exists
+        if [ ! -d "$TARGET_DIR" ]; then
+          echo "❌ Target directory not found: $TARGET_DIR"
+          echo "Available directories in workspace:"
+          find ${{ github.workspace }} -maxdepth 2 -type d 2>/dev/null || echo "No directories found"
+          exit 1
         fi
+
+        echo "✅ Found target directory: $TARGET_DIR"
 
         # Validate RSpec directory exists
         if [ ! -d "$RSPEC_DIR" ]; then
@@ -128,7 +108,7 @@ runs:
         exit $ANALYSIS_EXIT_CODE
       working-directory: ${{ github.action_path }}
       env:
-        RUBYZEN_TARGET_PROJECT: 'target_project'
+        RUBYZEN_PROJECT_PATH: "${{ github.workspace }}/${{ inputs.target-directory }}"
 branding:
   icon: 'check-circle'
   color: 'green'

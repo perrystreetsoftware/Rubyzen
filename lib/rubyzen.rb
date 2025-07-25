@@ -1,7 +1,6 @@
 require 'rubocop-ast'
 require 'require_all'
 require_all 'lib/rubyzen'
-require 'yaml'
 
 module Rubyzen
   def self.configuration
@@ -18,43 +17,17 @@ module Rubyzen
     private
 
     def load_configuration
-      config_file = '.rubyzen.yaml'
+      project_path = ENV['RUBYZEN_PROJECT_PATH']
 
-      unless File.exist?(config_file)
-        raise "Configuration file #{config_file} not found"
+      if project_path.nil? || project_path.empty?
+        raise "RUBYZEN_PROJECT_PATH environment variable is required. Please set it to the absolute path of the directory to analyze."
       end
 
-      yaml_config = YAML.load_file(config_file)
-
-      @project_root_path = yaml_config['project_path'] || './sample_project/src'
-
-      # Handle case where target project might not be mounted
-      unless Dir.exist?(@project_root_path)
-        target_project = ENV['RUBYZEN_TARGET_PROJECT']
-
-        if target_project.nil? || target_project.empty?
-          puts "Error: RUBYZEN_TARGET_PROJECT environment variable not set."
-          puts "Please set it to specify which project to lint:"
-          puts "  export RUBYZEN_TARGET_PROJECT=YourProjectName"
-        else
-          puts "Warning: Target project '#{target_project}' not found at #{@project_root_path}"
-          puts "Make sure:"
-          puts "  1. The project exists at: ../#{target_project}"
-          puts "  2. The dev container has been rebuilt after setting RUBYZEN_TARGET_PROJECT"
-          puts "  3. The project has a 'src' directory"
-        end
-
-        puts ""
-        puts "Falling back to sample project..."
-
-        # Fallback to sample project
-        fallback_path = './sample_project/src'
-        if Dir.exist?(fallback_path)
-          @project_root_path = fallback_path
-        else
-          raise "Neither target project nor sample project found! Please check your configuration."
-        end
+      unless Dir.exist?(project_path)
+        raise "Directory not found: #{project_path}. Please ensure RUBYZEN_PROJECT_PATH points to a valid directory."
       end
+
+      @project_root_path = project_path
     end
   end
 end
