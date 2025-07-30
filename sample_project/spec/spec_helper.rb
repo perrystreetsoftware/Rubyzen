@@ -9,6 +9,7 @@ RSpec.configure do |config|
 		let(:presenters) { project.files.with_paths('src/presenters/').classes }
 		let(:actions) { project.files.with_paths('src/actions/').classes }
 		let(:services) { project.files.with_paths('src/services/').classes }
+		let(:jobs) { project.files.with_paths('src/jobs/').classes }
 
 		let(:models) { project.files.with_paths('src/models/').classes }
 		let(:repos) { project.files.with_paths('src/repos/').without_paths('/spec/').classes }
