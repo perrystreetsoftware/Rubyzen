@@ -1,9 +1,12 @@
 require_relative 'classes_collection'
 require_relative 'constants_collection'
+require_relative '../providers/collection_filter_provider'
 
 module Rubyzen
   module Collections
     class FileCollection < BaseCollection
+      include Rubyzen::Providers::CollectionFilterProvider
+      
       def with_paths(*paths)
         filter do |file_declaration|
           paths.any? { |p| file_declaration.path.include?(p) }
