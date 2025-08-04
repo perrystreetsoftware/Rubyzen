@@ -1,10 +1,12 @@
 require_relative 'class_declaration'
 require_relative '../providers/lines_of_code_provider'
+require_relative '../providers/constants_provider'
 
 module Rubyzen
   module Declarations
     class FileDeclaration
       include Rubyzen::Providers::LinesOfCodeProvider
+      include Rubyzen::Providers::ConstantsProvider
 
       attr_reader :path, :ast
 

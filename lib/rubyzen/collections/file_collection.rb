@@ -1,4 +1,5 @@
 require_relative 'classes_collection'
+require_relative 'constants_collection'
 
 module Rubyzen
   module Collections
@@ -18,6 +19,11 @@ module Rubyzen
       def classes
         all_classes = flat_map(&:classes)
         ClassesCollection.new(all_classes)
+      end
+
+      def constants
+        all_constants = flat_map(&:constants)
+        ConstantsCollection.new(all_constants)
       end
     end
   end
