@@ -1,4 +1,5 @@
 require_relative 'classes_collection'
+require_relative 'modules_collection'
 require_relative 'constants_collection'
 require_relative '../providers/collection_filter_provider'
 
@@ -22,6 +23,11 @@ module Rubyzen
       def classes
         all_classes = flat_map(&:classes)
         ClassesCollection.new(all_classes)
+      end
+
+      def modules
+        all_modules = flat_map(&:modules)
+        ModulesCollection.new(all_modules)
       end
 
       def constants
