@@ -26,6 +26,10 @@ module Rubyzen
       end
 
       def name
+        [file_declaration.modules.map(&:name), name_without_modules].flatten.compact.join('::')
+      end
+
+      def name_without_modules
         node.identifier&.const_name
       end
 
@@ -33,10 +37,6 @@ module Rubyzen
         super_node = node.children[1]
         return nil unless super_node&.type == :const
         super_node.const_name
-      end
-
-      def name_with_modules
-        [file_declaration.modules.map(&:name), name].flatten.compact.join('::')
       end
 
       def superclass_prefix?(prefix)
