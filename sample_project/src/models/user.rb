@@ -1,4 +1,12 @@
 class User < ActiveRecord::BaseAurora
+  attr_reader :name, :email
+  
+  private
+  
+  attr_writer :password
+  
+  public
+  
   def active?
     true
   end

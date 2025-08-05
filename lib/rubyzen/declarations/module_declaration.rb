@@ -3,6 +3,7 @@ require_relative '../providers/line_number_provider'
 require_relative '../providers/class_name_provider'
 require_relative '../providers/constants_provider'
 require_relative '../providers/lines_of_code_provider'
+require_relative '../providers/attributes_provider'
 require_relative 'class_declaration'
 
 module Rubyzen
@@ -13,6 +14,7 @@ module Rubyzen
       include Rubyzen::Providers::ClassNameProvider
       include Rubyzen::Providers::ConstantsProvider
       include Rubyzen::Providers::LinesOfCodeProvider
+      include Rubyzen::Providers::AttributesProvider
 
       attr_reader :node, :file_declaration
 
