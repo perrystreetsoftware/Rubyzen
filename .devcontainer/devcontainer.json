@@ -7,7 +7,8 @@
     ],
 
     "containerEnv": {
-        "RUBYZEN_TARGET_PROJECT": "${localEnv:RUBYZEN_TARGET_PROJECT}"
+        "RUBYZEN_TARGET_PROJECT": "${localEnv:RUBYZEN_TARGET_PROJECT}",
+        "RUBYZEN_PROJECT_PATH": "${localEnv:RUBYZEN_PROJECT_PATH}"
     },
 
     "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && git config --global --add safe.directory ${containerWorkspaceFolder}/target_project && bundle install",
