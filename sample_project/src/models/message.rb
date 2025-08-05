@@ -1,3 +1,6 @@
+require 'json'
+require_relative '../services/message_service'
+
 class Message < ActiveRecord::BaseAurora
   attr_reader :id, :created_at
   attr_accessor :content, :author_id

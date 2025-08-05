@@ -3,6 +3,7 @@ require_relative '../providers/file_path_provider'
 require_relative '../providers/line_number_provider'
 require_relative '../providers/lines_of_code_provider'
 require_relative '../providers/constants_provider'
+require_relative '../providers/requires_provider'
 
 module Rubyzen
   module Declarations
@@ -11,6 +12,7 @@ module Rubyzen
       include Rubyzen::Providers::LineNumberProvider
       include Rubyzen::Providers::LinesOfCodeProvider
       include Rubyzen::Providers::ConstantsProvider
+      include Rubyzen::Providers::RequiresProvider
 
       attr_reader :path, :node
       alias :ast :node
