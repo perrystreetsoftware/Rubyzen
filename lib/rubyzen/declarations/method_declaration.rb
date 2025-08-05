@@ -14,7 +14,6 @@ module Rubyzen
       include Rubyzen::Providers::ClassNameProvider
       include Rubyzen::Providers::LineNumberProvider
       include Rubyzen::Providers::ConstantsProvider
-      include Rubyzen::Providers::IfStatementsProvider
       include Rubyzen::Providers::CallSiteProvider
       include Rubyzen::Providers::LinesOfCodeProvider
 

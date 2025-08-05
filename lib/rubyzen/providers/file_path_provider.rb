@@ -1,5 +1,3 @@
-require_relative '../declarations/block_declaration'
-
 module Rubyzen
   module Providers
     module FilePathProvider

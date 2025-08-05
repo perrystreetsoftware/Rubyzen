@@ -4,7 +4,8 @@ require 'pry'
 RSpec.configure do |config|
 	RSpec.shared_context 'project_config' do
 		let(:project) { Rubyzen::Project.new }
-		let(:all_classes) { project.files.with_paths('src/').classes }
+		let(:files) { project.files.with_paths('src/') }
+		let(:all_classes) { files.classes }
 		let(:controllers) { project.files.with_paths('src/controllers/').classes }
 		let(:presenters) { project.files.with_paths('src/presenters/').classes }
 		let(:actions) { project.files.with_paths('src/actions/').classes }
