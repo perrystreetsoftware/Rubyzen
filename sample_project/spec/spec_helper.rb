@@ -6,6 +6,7 @@ RSpec.configure do |config|
 		let(:project) { Rubyzen::Project.new }
 		let(:files) { project.files.with_paths('src/') }
 		let(:all_classes) { files.classes }
+		let(:all_modules) { files.modules }
 		let(:controllers) { project.files.with_paths('src/controllers/').classes }
 		let(:presenters) { project.files.with_paths('src/presenters/').classes }
 		let(:actions) { project.files.with_paths('src/actions/').classes }
