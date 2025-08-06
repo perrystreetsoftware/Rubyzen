@@ -20,10 +20,8 @@ module Rubyzen
       # Support both new multi-path and legacy single-path formats
       if ENV['RUBYZEN_PROJECT_PATHS']
         @project_paths = ENV['RUBYZEN_PROJECT_PATHS'].split(':').map(&:strip).reject(&:empty?)
-      elsif ENV['RUBYZEN_PROJECT_PATH'] # Fallback to old format for backward compatibility
-        @project_paths = [ENV['RUBYZEN_PROJECT_PATH']]
       else
-        raise 'RUBYZEN_PROJECT_PATHS or RUBYZEN_PROJECT_PATH environment variable is required. Please set it to the absolute path(s) of the director(ies) to analyze.'
+        raise 'RUBYZEN_PROJECT_PATHS environment variable is required.'
       end
 
       @project_paths.each do |path|
