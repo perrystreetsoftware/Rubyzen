@@ -10,8 +10,8 @@ inputs:
     description: 'Ruby version to use'
     required: false
     default: '3.3'
-  target-directory:
-    description: 'Directory containing the Ruby source code to analyze'
+  target-directories:
+    description: 'Colon-separated directories containing Ruby source code to analyze (e.g., "src:spec")'
     required: false
     default: 'src'
   target-rspec-directory:
@@ -54,33 +54,63 @@ runs:
       shell: bash
       run: |
         echo "Starting RubyZen analysis..."
+        echo ""
 
-        # Simple, direct path resolution
-        TARGET_DIR="${{ github.workspace }}/${{ inputs.target-directory }}"
-        RSPEC_DIR="${{ github.workspace }}/${{ inputs.target-rspec-directory }}"
-        
-        echo "Target directory: $TARGET_DIR"
-        echo "RSpec directory: $RSPEC_DIR"
+        # Echo all input parameters for debugging
+        echo "📋 Input Parameters:"
+        echo "  target-directories: '${{ inputs.target-directories }}'"
+        echo "  target-rspec-directory: '${{ inputs.target-rspec-directory }}'"
+        echo ""
 
-        # Validate target directory exists
-        if [ ! -d "$TARGET_DIR" ]; then
-          echo "❌ Target directory not found: $TARGET_DIR"
-          echo "Available directories in workspace:"
-          find ${{ github.workspace }} -maxdepth 2 -type d 2>/dev/null || echo "No directories found"
-          exit 1
-        fi
+        # Use target-directories input (colon-separated format)
+        RAW_PATHS="${{ inputs.target-directories }}"
 
-        echo "✅ Found target directory: $TARGET_DIR"
+        # Build absolute paths (assuming colon-separated format)
+        WORKSPACE="${{ github.workspace }}"
+        RUBYZEN_PATHS="${RAW_PATHS//:/:$WORKSPACE/}"
+        RUBYZEN_PATHS="$WORKSPACE/$RUBYZEN_PATHS"
 
-        # Validate RSpec directory exists
+        # Export as environment variable for the Ruby process
+        export RUBYZEN_PROJECT_PATHS="$RUBYZEN_PATHS"
+
+        echo ""
+        echo "📁 Resolved Paths:"
+        echo "  Workspace: $WORKSPACE"
+        echo "  Raw paths: $RAW_PATHS"
+        echo "  Full paths: $RUBYZEN_PATHS"
+        echo ""
+
+        # Validate target directories
+        echo "🔍 Validating target directories..."
+        IFS=':' read -ra PATHS <<< "$RUBYZEN_PATHS"
+        for path in "${PATHS[@]}"; do
+          if [ ! -d "$path" ]; then
+            echo "❌ Target directory not found: $path"
+            echo "Available directories in workspace:"
+            find $WORKSPACE -maxdepth 2 -type d 2>/dev/null || echo "No directories found"
+            exit 1
+          fi
+          echo "✅ Found: $path"
+        done
+
+        # Validate RSpec directory
+        RSPEC_DIR="$WORKSPACE/${{ inputs.target-rspec-directory }}"
+        echo ""
+        echo "🧪 Validating RSpec directory..."
+        echo "  RSpec directory: $RSPEC_DIR"
         if [ ! -d "$RSPEC_DIR" ]; then
           echo "❌ RSpec directory not found: $RSPEC_DIR"
-          echo "Available directories in workspace:"
-          find ${{ github.workspace }} -type d -name "*spec*" 2>/dev/null || echo "No spec directories found"
+          echo "Available spec directories:"
+          find $WORKSPACE -type d -name "*spec*" 2>/dev/null || echo "No spec directories found"
           exit 1
         fi
-
         echo "✅ Found RSpec directory: $RSPEC_DIR"
+
+        echo ""
+        echo "🚀 Starting analysis..."
+        echo "  Analyzing paths: $RUBYZEN_PATHS"
+        echo "  Running tests from: $RSPEC_DIR"
+        echo ""
 
         # Run analysis and capture both output and exit code
         set +e  # Don't exit on command failure
@@ -107,8 +137,6 @@ runs:
         # Exit with the original analysis exit code to fail the action if violations found
         exit $ANALYSIS_EXIT_CODE
       working-directory: ${{ github.action_path }}
-      env:
-        RUBYZEN_PROJECT_PATH: "${{ github.workspace }}/${{ inputs.target-directory }}"
 branding:
   icon: 'check-circle'
   color: 'green'

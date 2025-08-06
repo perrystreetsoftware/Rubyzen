@@ -17,7 +17,8 @@ bundle exec rspec sample_project/spec/controllers/controllers_must_have_tests_li
 ```
 
 ### Environment Setup
-- Set `RUBYZEN_PROJECT_PATH` environment variable to the absolute path of the directory to analyze
+- Set `RUBYZEN_PROJECT_PATHS` environment variable to colon-separated absolute paths of directories to analyze (e.g., "/path/to/src:/path/to/spec")
+- Alternatively, set `RUBYZEN_PROJECT_PATH` for single directory (legacy support)
 - For dev container usage, set `RUBYZEN_TARGET_PROJECT` to specify which sibling project to mount
 
 ## Architecture
@@ -86,4 +87,4 @@ Collections support path-based filtering:
 - `.without_paths('/spec/')` - Exclude files matching pattern
 
 ### Environment Configuration
-The system requires `RUBYZEN_PROJECT_PATH` to be set to the absolute path of the project to analyze. This allows the same Rubyzen installation to analyze different target projects.
+The system requires `RUBYZEN_PROJECT_PATHS` (or `RUBYZEN_PROJECT_PATH` for single directory) to be set to the absolute path(s) of the project(s) to analyze. Multiple paths are colon-separated like the PATH environment variable. This allows the same Rubyzen installation to analyze different target projects and multiple directories within a project.

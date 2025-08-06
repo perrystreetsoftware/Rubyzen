@@ -68,14 +68,14 @@ name: RubyZen Analysis
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ruby-version: '3.3'
-          target-directory: 'src'
+          target-directories: 'src:spec'
 ```
 
 **Note:** `RUBYZEN_ACCESS_TOKEN` must be a Personal Access Token with access to this repository.
 
 ### Advanced Configuration
 
-You can override the Ruby version and target directory:
+You can override the Ruby version and target directories:
 
 ```yaml
       - name: Run RubyZen Analysis
@@ -83,8 +83,13 @@ You can override the Ruby version and target directory:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ruby-version: '3.2'
-          target-directory: 'app'
+          target-directories: 'src:spec:lib'
 ```
+
+**Multi-directory support:**
+- Use `target-directories` for analyzing multiple directories (colon-separated, e.g., "src:spec")
+- Use `target-directory` for backward compatibility (single directory)
+- Directories are analyzed together, allowing cross-directory lint rules
 
 ## Development
 

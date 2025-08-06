@@ -4,14 +4,18 @@ require_relative 'collections/classes_collection'
 
 module Rubyzen
   class Project
-    def initialize(path = nil)
-      path ||= Rubyzen.configuration.project_root_path
-      @root_path = path
-      @file_paths = if File.directory?(path)
-                       Dir[File.join(path, '**', '*.rb')]
-                     else
-                       [path]
-                     end
+    def initialize(paths = nil)
+      paths ||= Rubyzen.configuration.project_paths
+      @root_paths = Array(paths)
+
+      @file_paths = @root_paths.flat_map do |path|
+        if File.directory?(path)
+          Dir[File.join(path, '**', '*.rb')]
+        else
+          [path]
+        end
+      end.uniq
+
       @parser = Rubyzen::Parsers::ASTParser.instance
     end
 
