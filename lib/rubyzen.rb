@@ -8,7 +8,7 @@ module Rubyzen
   end
 
   class Configuration
-    attr_reader :project_root_path
+    attr_reader :project_paths
 
     def initialize
       load_configuration
@@ -17,17 +17,17 @@ module Rubyzen
     private
 
     def load_configuration
-      project_path = ENV['RUBYZEN_PROJECT_PATH']
-
-      if project_path.nil? || project_path.empty?
-        raise "RUBYZEN_PROJECT_PATH environment variable is required. Please set it to the absolute path of the directory to analyze."
+      unless ENV['RUBYZEN_PROJECT_PATHS']
+        raise 'RUBYZEN_PROJECT_PATHS environment variable is required.'
       end
 
-      unless Dir.exist?(project_path)
-        raise "Directory not found: #{project_path}. Please ensure RUBYZEN_PROJECT_PATH points to a valid directory."
-      end
+      @project_paths = ENV['RUBYZEN_PROJECT_PATHS'].split(':').map(&:strip).reject(&:empty?)
 
-      @project_root_path = project_path
+      @project_paths.each do |path|
+        unless Dir.exist?(path)
+          raise "Directory not found: #{path}. Please ensure all paths in RUBYZEN_PROJECT_PATHS exist."
+        end
+      end
     end
   end
 end
