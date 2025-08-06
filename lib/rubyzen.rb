@@ -17,12 +17,11 @@ module Rubyzen
     private
 
     def load_configuration
-      # Support both new multi-path and legacy single-path formats
-      if ENV['RUBYZEN_PROJECT_PATHS']
-        @project_paths = ENV['RUBYZEN_PROJECT_PATHS'].split(':').map(&:strip).reject(&:empty?)
-      else
+      unless ENV['RUBYZEN_PROJECT_PATHS']
         raise 'RUBYZEN_PROJECT_PATHS environment variable is required.'
       end
+
+      @project_paths = ENV['RUBYZEN_PROJECT_PATHS'].split(':').map(&:strip).reject(&:empty?)
 
       @project_paths.each do |path|
         unless Dir.exist?(path)
