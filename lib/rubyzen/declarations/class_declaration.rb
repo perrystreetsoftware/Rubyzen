@@ -1,13 +1,3 @@
-require_relative 'method_declaration'
-require_relative '../providers/if_statements_provider'
-require_relative '../providers/blocks_provider'
-require_relative '../providers/file_path_provider'
-require_relative '../providers/line_number_provider'
-require_relative '../providers/lines_of_code_provider'
-require_relative '../providers/constants_provider'
-require_relative '../providers/attributes_provider'
-require_relative '../collections/methods_collection'
-
 module Rubyzen
   module Declarations
     class ClassDeclaration
@@ -30,14 +20,14 @@ module Rubyzen
       def name
         parent_module_names = []
         current_node = node.parent
-        
+
         while current_node
           if current_node.type == :module
             parent_module_names.unshift(current_node.identifier&.const_name)
           end
           current_node = current_node.parent
         end
-        
+
         [parent_module_names, name_without_modules].flatten.compact.join('::')
       end
 

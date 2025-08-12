@@ -1,12 +1,9 @@
-require_relative './methods_collection'
-require_relative './attributes_collection'
-require_relative '../providers/collection_filter_provider'
 
 module Rubyzen
   module Collections
     class ClassesCollection < BaseCollection
       include Rubyzen::Providers::CollectionFilterProvider
-      
+
       undef_method(:methods)
 
       def all_methods

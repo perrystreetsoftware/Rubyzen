@@ -1,8 +1,3 @@
-require_relative '../providers/file_path_provider'
-require_relative '../providers/line_number_provider'
-require_relative '../providers/class_name_provider'
-require_relative '../providers/lines_of_code_provider'
-
 module Rubyzen
   module Declarations
     class BlockDeclaration

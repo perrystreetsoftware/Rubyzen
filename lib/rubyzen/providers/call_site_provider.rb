@@ -1,6 +1,3 @@
-require_relative '../collections/call_site_collection'
-require_relative '../declarations/call_site_declaration'
-
 module Rubyzen
   module Providers
     module CallSiteProvider

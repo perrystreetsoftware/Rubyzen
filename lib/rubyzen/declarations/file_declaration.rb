@@ -1,10 +1,3 @@
-require_relative 'class_declaration'
-require_relative '../providers/file_path_provider'
-require_relative '../providers/line_number_provider'
-require_relative '../providers/lines_of_code_provider'
-require_relative '../providers/constants_provider'
-require_relative '../providers/requires_provider'
-
 module Rubyzen
   module Declarations
     class FileDeclaration

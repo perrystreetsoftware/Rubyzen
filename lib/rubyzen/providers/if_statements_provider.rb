@@ -1,6 +1,3 @@
-require_relative '../declarations/if_statement_declaration'
-require_relative '../collections/declaration_collection'
-
 module Rubyzen
   module Providers
     module IfStatementsProvider
