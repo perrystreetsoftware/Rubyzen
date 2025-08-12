@@ -28,7 +28,17 @@ module Rubyzen
       end
 
       def name
-        [file_declaration.modules.map(&:name), name_without_modules].flatten.compact.join('::')
+        parent_module_names = []
+        current_node = node.parent
+        
+        while current_node
+          if current_node.type == :module
+            parent_module_names.unshift(current_node.identifier&.const_name)
+          end
+          current_node = current_node.parent
+        end
+        
+        [parent_module_names, name_without_modules].flatten.compact.join('::')
       end
 
       def name_without_modules
