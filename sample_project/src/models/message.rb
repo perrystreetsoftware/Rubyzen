@@ -1,5 +1,6 @@
 require 'json'
 require_relative '../services/message_service'
+load 'config/settings.rb'
 
 class Message < ActiveRecord::BaseAurora
   attr_reader :id, :created_at
