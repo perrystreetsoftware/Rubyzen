@@ -1,7 +1,3 @@
-require 'rspec'
-require 'rubyzen'
-require_relative '../spec_helper'
-
 RSpec.describe 'Controllers must have tests' do
   let(:controller_test_files_set) { controller_test_files.map(&:path).to_set }
 

@@ -1,7 +1,3 @@
-require 'rspec'
-require 'rubyzen'
-require_relative '../spec_helper'
-
 RSpec.describe 'Repositories lint rules' do
   context "given a repository" do
 

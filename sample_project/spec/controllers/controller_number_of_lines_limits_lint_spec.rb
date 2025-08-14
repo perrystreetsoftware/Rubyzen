@@ -1,7 +1,3 @@
-require 'rspec'
-require 'rubyzen'
-require_relative '../spec_helper'
-
 RSpec.describe 'Limit the maximum number of lines in a controller' do
   let(:maximum_number_of_lines) { 19 }
 
