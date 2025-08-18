@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+require_relative '../spec_helper'
 RSpec.describe 'Do not call ActiveRecord methods on non-repo classes' do
   let(:baseline) { [] }
   let(:active_record_models) do

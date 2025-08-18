@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../spec_helper'
+
 RSpec.describe 'Presenters should not depend on repositories' do
   context 'given a presenter' do
     it 'does not directly access repositories' do

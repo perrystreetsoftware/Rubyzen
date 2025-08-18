@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require_relative '../spec_helper'
+
 RSpec.describe 'Make sure to include remote_addr: as a param to Relay.deliver' do
   context "given a service" do
     let(:target_call_sites) do

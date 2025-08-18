@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rubyzen'
 require 'pry'
 
@@ -20,5 +22,5 @@ RSpec.configure do |config|
 		let(:controller_test_files) { test_files.with_paths('/controllers/') }
 	end
 
-	config.include_context 'project_config'
+	 config.include_context 'project_config'
 end
