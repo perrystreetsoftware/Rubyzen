@@ -5,6 +5,7 @@ require_relative '../providers/file_path_provider'
 require_relative '../providers/line_number_provider'
 require_relative '../providers/lines_of_code_provider'
 require_relative '../providers/constants_provider'
+require_relative '../providers/attributes_provider'
 require_relative '../collections/methods_collection'
 
 module Rubyzen
@@ -17,6 +18,7 @@ module Rubyzen
       include Rubyzen::Providers::LinesOfCodeProvider
       include Rubyzen::Providers::ClassNameProvider
       include Rubyzen::Providers::ConstantsProvider
+      include Rubyzen::Providers::AttributesProvider
 
       attr_reader :node, :file_declaration
 
@@ -26,6 +28,20 @@ module Rubyzen
       end
 
       def name
+        parent_module_names = []
+        current_node = node.parent
+        
+        while current_node
+          if current_node.type == :module
+            parent_module_names.unshift(current_node.identifier&.const_name)
+          end
+          current_node = current_node.parent
+        end
+        
+        [parent_module_names, name_without_modules].flatten.compact.join('::')
+      end
+
+      def name_without_modules
         node.identifier&.const_name
       end
 
@@ -33,10 +49,6 @@ module Rubyzen
         super_node = node.children[1]
         return nil unless super_node&.type == :const
         super_node.const_name
-      end
-
-      def name_with_modules
-        [file_declaration.modules.map(&:name), name].flatten.compact.join('::')
       end
 
       def superclass_prefix?(prefix)

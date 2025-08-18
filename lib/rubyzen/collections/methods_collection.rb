@@ -1,6 +1,11 @@
+require_relative 'base_collection'
+require_relative '../providers/collection_filter_provider'
+
 module Rubyzen
   module Collections
     class MethodsCollection < BaseCollection
+      include Rubyzen::Providers::CollectionFilterProvider
+
       def if_statements
         DeclarationCollection.new(
           flat_map do |method|

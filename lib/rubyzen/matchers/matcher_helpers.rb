@@ -10,6 +10,8 @@ module Rubyzen
         case
         when name && class_name
           "  - element: #{name}\n  - class: #{class_name}\n  - file: #{location}"
+        when name
+          "  - element: #{name}\n  - file: #{location}"
         when class_name
           "  - class: #{class_name}\n  - file: #{location}"
         else

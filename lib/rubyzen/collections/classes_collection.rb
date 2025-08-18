@@ -1,8 +1,12 @@
 require_relative './methods_collection'
+require_relative './attributes_collection'
+require_relative '../providers/collection_filter_provider'
 
 module Rubyzen
   module Collections
     class ClassesCollection < BaseCollection
+      include Rubyzen::Providers::CollectionFilterProvider
+      
       undef_method(:methods)
 
       def all_methods
@@ -10,20 +14,13 @@ module Rubyzen
         MethodsCollection.new(instance_plus_class_methods)
       end
 
+      def attributes
+        all_attributes = flat_map(&:attributes)
+        AttributesCollection.new(all_attributes)
+      end
+
       def with_parent_prefix(prefix)
         filter { |klass| klass.superclass_prefix?(prefix) }
-      end
-
-      def with_name_ending_with(suffix)
-        filter { |cd| cd.name&.end_with?(suffix) }
-      end
-
-      def without_name_ending_with(suffix)
-        filter { |cd| !cd.name&.end_with?(suffix) }
-      end
-
-      def without_name(*class_names)
-        filter { |cd| !class_names.include?(cd.name_with_modules) }
       end
 
       def +(other)

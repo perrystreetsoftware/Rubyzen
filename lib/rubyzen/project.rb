@@ -1,6 +1,7 @@
 require_relative 'parsers/ast_parser'
 require_relative 'collections/file_collection'
 require_relative 'collections/classes_collection'
+require_relative 'collections/modules_collection'
 
 module Rubyzen
   class Project
@@ -27,6 +28,11 @@ module Rubyzen
     def classes
       all_classes = file_declarations.flat_map(&:classes)
       Collections::ClassesCollection.new(all_classes)
+    end
+
+    def modules
+      all_modules = file_declarations.flat_map(&:modules)
+      Collections::ModulesCollection.new(all_modules)
     end
 
     private

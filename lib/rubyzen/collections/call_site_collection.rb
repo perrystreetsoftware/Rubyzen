@@ -1,8 +1,11 @@
-require_relative './base_collection'
+require_relative 'base_collection'
+require_relative '../providers/collection_filter_provider'
 
 module Rubyzen
   module Collections
     class CallSiteCollection < BaseCollection
+      include Rubyzen::Providers::CollectionFilterProvider
+
       def with_receiver(receiver)
         filter { |call_site| call_site.receiver == receiver }
       end
