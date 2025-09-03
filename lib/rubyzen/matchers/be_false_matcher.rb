@@ -1,4 +1,3 @@
-require_relative 'matcher_helpers'
 
 RSpec::Matchers.define :be_false do |custom_message=nil|
   include Rubyzen::Matchers::MatcherHelpers

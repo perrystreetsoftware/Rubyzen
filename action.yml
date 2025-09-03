@@ -115,6 +115,7 @@ runs:
         # Run analysis and capture both output and exit code
         set +e  # Don't exit on command failure
         bundle exec rspec -Ilib "$RSPEC_DIR" --format documentation 2>&1 | tee $GITHUB_WORKSPACE/analysis_output.txt
+
         ANALYSIS_EXIT_CODE=$?
         set -e  # Re-enable exit on error
 

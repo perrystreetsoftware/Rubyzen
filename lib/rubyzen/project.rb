@@ -1,7 +1,3 @@
-require_relative 'parsers/ast_parser'
-require_relative 'collections/file_collection'
-require_relative 'collections/classes_collection'
-require_relative 'collections/modules_collection'
 
 module Rubyzen
   class Project

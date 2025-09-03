@@ -1,6 +1,13 @@
 require 'rubocop-ast'
-require 'require_all'
-require_all 'lib/rubyzen'
+require 'zeitwerk'
+
+loader = Zeitwerk::Loader.for_gem
+loader.setup
+
+# Load RSpec matchers manually since they don't follow class/module naming conventions
+require_relative 'rubyzen/matchers/be_empty_matcher'
+require_relative 'rubyzen/matchers/be_true_matcher'
+require_relative 'rubyzen/matchers/be_false_matcher'
 
 module Rubyzen
   def self.configuration

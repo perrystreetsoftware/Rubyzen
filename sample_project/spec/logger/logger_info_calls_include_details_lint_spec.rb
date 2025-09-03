@@ -1,7 +1,6 @@
-require 'rspec'
-require 'rubyzen'
-require_relative '../spec_helper'
+# frozen_string_literal: true
 
+require_relative '../spec_helper'
 RSpec.describe 'Logger info calls include the details keyword arg' do
   let(:project) { Rubyzen::Project.new }
 

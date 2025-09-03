@@ -1,6 +1,4 @@
 require 'rubocop-ast'
-require_relative '../declarations/file_declaration'
-require_relative '../cache/parse_cache'
 
 module Rubyzen
   module Parsers

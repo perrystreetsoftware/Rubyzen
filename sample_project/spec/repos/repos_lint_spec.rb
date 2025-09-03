@@ -1,5 +1,5 @@
-require 'rspec'
-require 'rubyzen'
+# frozen_string_literal: true
+
 require_relative '../spec_helper'
 
 RSpec.describe 'Repositories lint rules' do
