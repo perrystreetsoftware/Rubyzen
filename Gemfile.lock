@@ -13,6 +13,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     racc (1.8.1)
+    require_all (3.0.0)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -29,7 +30,6 @@ GEM
     rubocop-ast (1.36.2)
       parser (>= 3.3.1.0)
     yaml (0.1.1)
-    zeitwerk (2.7.2)
 
 PLATFORMS
   arm64-darwin-23
@@ -38,10 +38,10 @@ PLATFORMS
 DEPENDENCIES
   ostruct (~> 0.6.2)
   pry (~> 0.14.1)
+  require_all (~> 3.0)
   rspec (~> 3.12)
   rubocop-ast (~> 1.26)
   yaml (~> 0.1.0)
-  zeitwerk (~> 2.6)
 
 BUNDLED WITH
    2.5.18
