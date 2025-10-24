@@ -9,6 +9,7 @@ module Rubyzen
       include Rubyzen::Providers::ClassNameProvider
       include Rubyzen::Providers::ConstantsProvider
       include Rubyzen::Providers::AttributesProvider
+      include Rubyzen::Providers::MacrosProvider
 
       attr_reader :node, :file_declaration
 
