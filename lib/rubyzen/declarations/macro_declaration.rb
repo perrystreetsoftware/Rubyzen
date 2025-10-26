@@ -17,8 +17,35 @@ module Rubyzen
         node.method_name.to_s
       end
 
-      def arguments
-        node.arguments
+      def symbols
+        node.arguments.select { |arg| arg.type == :sym }.map(&:value)
+      end
+
+      def strings
+        node.arguments.select { |arg| arg.type == :str }.map(&:value)
+      end
+
+      def keyword_args
+        extract_keyword_args(node)
+      end
+
+      def receiver
+        node.receiver&.type == :const ? node.receiver.const_name : nil
+      end
+
+      private
+
+      def extract_keyword_args(send_node)
+        send_node.arguments.flat_map do |arg|
+          if arg.hash_type?
+            arg.each_pair.map do |pair|
+              key_node = pair.key
+              key_node.type == :sym ? key_node.value : nil
+            end.compact
+          else
+            []
+          end
+        end.uniq
       end
     end
   end
