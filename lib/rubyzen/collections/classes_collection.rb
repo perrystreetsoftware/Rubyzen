@@ -1,10 +1,7 @@
-
 module Rubyzen
   module Collections
     class ClassesCollection < BaseCollection
       include Rubyzen::Providers::CollectionFilterProvider
-
-      undef_method(:methods)
 
       def all_methods
         instance_plus_class_methods = flat_map { |klass| klass.instance_methods + klass.class_methods }
