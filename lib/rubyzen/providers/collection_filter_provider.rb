@@ -13,6 +13,14 @@ module Rubyzen
         filter { |item| item.name&.start_with?(prefix) }
       end
 
+      def with_name_including(substring, case_sensitive: true)
+        if case_sensitive
+          filter { |item| item.name&.include?(substring) }
+        else
+          filter { |item| item.name&.downcase&.include?(substring.downcase) }
+        end
+      end
+
       def without_name(*names)
         filter { |item| !names.include?(item.name) }
       end
@@ -23,6 +31,14 @@ module Rubyzen
 
       def without_name_starting_with(prefix)
         filter { |item| !item.name&.start_with?(prefix) }
+      end
+
+      def without_name_including(substring, case_sensitive: true)
+        if case_sensitive
+          filter { |item| !item.name&.include?(substring) }
+        else
+          filter { |item| !item.name&.downcase&.include?(substring.downcase) }
+        end
       end
     end
   end
