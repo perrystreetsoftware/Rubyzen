@@ -17,5 +17,9 @@ module Services
         request_guid:,
       )
     end
+
+    def profile
+      raise 'Profile not found'
+    end
   end
 end

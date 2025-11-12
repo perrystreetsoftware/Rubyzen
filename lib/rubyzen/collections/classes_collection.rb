@@ -18,6 +18,16 @@ module Rubyzen
         MacrosCollection.new(all_macros)
       end
 
+      def rescues
+        all_rescues = flat_map(&:rescues)
+        RescuesCollection.new(all_rescues)
+      end
+
+      def raises
+        all_raises = flat_map(&:raises)
+        RaisesCollection.new(all_raises)
+      end
+
       def with_parent_prefix(prefix)
         filter { |klass| klass.superclass_prefix?(prefix) }
       end

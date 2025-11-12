@@ -21,6 +21,22 @@ module Rubyzen
           end
         )
       end
+
+      def rescues
+        RescuesCollection.new(
+          flat_map do |method|
+            method.rescues
+          end
+        )
+      end
+
+      def raises
+        RaisesCollection.new(
+          flat_map do |method|
+            method.raises
+          end
+        )
+      end
     end
   end
 end
