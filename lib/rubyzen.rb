@@ -28,7 +28,7 @@ module Rubyzen
         raise 'RUBYZEN_PROJECT_PATHS environment variable is required.'
       end
 
-      @project_paths = ENV['RUBYZEN_PROJECT_PATHS'].split(':').map(&:strip).reject(&:empty?)
+      @project_paths = ENV['RUBYZEN_PROJECT_PATHS'].split(',').map(&:strip).reject(&:empty?)
 
       @project_paths.each do |path|
         unless Dir.exist?(path)

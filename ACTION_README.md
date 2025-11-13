@@ -87,7 +87,7 @@ You can override the Ruby version and target directories:
 ```
 
 **Multi-directory support:**
-- Use `target-directories` for analyzing multiple directories (colon-separated, e.g., "src:spec")
+- Use `target-directories` for analyzing multiple directories (comma-separated, e.g., "src:spec")
 - Directories are analyzed together, allowing cross-directory lint rules
 
 ## Development

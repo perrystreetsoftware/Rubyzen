@@ -11,7 +11,7 @@ inputs:
     required: false
     default: '3.3'
   target-directories:
-    description: 'Colon-separated directories containing Ruby source code to analyze (e.g., "src:spec")'
+    description: 'Comma-separated directories containing Ruby source code to analyze (e.g., "src,spec")'
     required: false
     default: 'src'
   target-rspec-directory:
@@ -62,12 +62,12 @@ runs:
         echo "  target-rspec-directory: '${{ inputs.target-rspec-directory }}'"
         echo ""
 
-        # Use target-directories input (colon-separated format)
+        # Use target-directories input (comma-separated format)
         RAW_PATHS="${{ inputs.target-directories }}"
 
-        # Build absolute paths (assuming colon-separated format)
+        # Build absolute paths (assuming comma-separated format)
         WORKSPACE="${{ github.workspace }}"
-        RUBYZEN_PATHS="${RAW_PATHS//:/:$WORKSPACE/}"
+        RUBYZEN_PATHS="${RAW_PATHS//,/,$WORKSPACE/}"
         RUBYZEN_PATHS="$WORKSPACE/$RUBYZEN_PATHS"
 
         # Export as environment variable for the Ruby process
@@ -82,7 +82,7 @@ runs:
 
         # Validate target directories
         echo "🔍 Validating target directories..."
-        IFS=':' read -ra PATHS <<< "$RUBYZEN_PATHS"
+        IFS=',' read -ra PATHS <<< "$RUBYZEN_PATHS"
         for path in "${PATHS[@]}"; do
           if [ ! -d "$path" ]; then
             echo "❌ Target directory not found: $path"

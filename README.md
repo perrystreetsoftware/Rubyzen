@@ -70,7 +70,7 @@ The lint rules are project-agnostic - you can apply any rule set to any target p
 **Environment-driven setup** - no configuration generation needed:
 - `RUBYZEN_TARGET_PROJECT` environment variable specifies which sibling project to lint
 - Target project mounts to fixed path: `/workspaces/target_project`
-- All configs use static paths pointing to multiple directories: `/workspaces/target_project/src:/workspaces/target_project/spec`
+- All configs use static paths pointing to multiple directories: `/workspaces/target_project/src,/workspaces/target_project/spec`
 
 #### Directory Structure
 ```
