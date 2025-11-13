@@ -17,7 +17,7 @@ bundle exec rspec sample_project/spec/controllers/controllers_must_have_tests_li
 ```
 
 ### Environment Setup
-- Set `RUBYZEN_PROJECT_PATHS` environment variable to comma-separated absolute paths of directories to analyze (e.g., "/path/to/src:/path/to/spec")
+- Set `RUBYZEN_PROJECT_PATHS` environment variable to comma-separated absolute paths of directories to analyze (e.g., "/path/to/src,/path/to/spec")
 - Alternatively, set `RUBYZEN_PROJECT_PATH` for single directory (legacy support)
 - For dev container usage, set `RUBYZEN_TARGET_PROJECT` to specify which sibling project to mount
 

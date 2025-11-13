@@ -67,7 +67,7 @@ runs:
 
         # Build absolute paths (assuming comma-separated format)
         WORKSPACE="${{ github.workspace }}"
-        RUBYZEN_PATHS="${RAW_PATHS//,/:$WORKSPACE/}"
+        RUBYZEN_PATHS="${RAW_PATHS//,/,$WORKSPACE/}"
         RUBYZEN_PATHS="$WORKSPACE/$RUBYZEN_PATHS"
 
         # Export as environment variable for the Ruby process
@@ -82,7 +82,7 @@ runs:
 
         # Validate target directories
         echo "🔍 Validating target directories..."
-        IFS=':' read -ra PATHS <<< "$RUBYZEN_PATHS"
+        IFS=',' read -ra PATHS <<< "$RUBYZEN_PATHS"
         for path in "${PATHS[@]}"; do
           if [ ! -d "$path" ]; then
             echo "❌ Target directory not found: $path"
