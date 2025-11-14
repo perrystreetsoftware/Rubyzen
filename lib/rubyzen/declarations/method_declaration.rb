@@ -10,6 +10,8 @@ module Rubyzen
       include Rubyzen::Providers::CallSiteProvider
       include Rubyzen::Providers::LinesOfCodeProvider
       include Rubyzen::Providers::VisibilityProvider
+      include Rubyzen::Providers::RescuesProvider
+      include Rubyzen::Providers::RaisesProvider
 
       attr_reader :node, :parent_class
       alias :parent :parent_class

@@ -5,6 +5,8 @@ module Rubyzen
       include Rubyzen::Providers::LineNumberProvider
       include Rubyzen::Providers::ClassNameProvider
       include Rubyzen::Providers::LinesOfCodeProvider
+      include Rubyzen::Providers::RescuesProvider
+      include Rubyzen::Providers::RaisesProvider
 
       attr_reader :node, :parent
 

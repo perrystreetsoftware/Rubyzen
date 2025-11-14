@@ -20,5 +20,17 @@ module Controllers
 
     def self.some_class_method
     end
+
+    def runtime_error_example
+      do_something
+    rescue RuntimeError
+      handle_error
+    end
+
+    def standard_error_example
+      do_something
+    rescue
+      handle_error
+    end
   end
 end
