@@ -6,6 +6,8 @@ module Rubyzen
       include Rubyzen::Providers::LinesOfCodeProvider
       include Rubyzen::Providers::ConstantsProvider
       include Rubyzen::Providers::RequiresProvider
+      include Rubyzen::Providers::CallSiteProvider
+      include Rubyzen::Providers::BlocksProvider
 
       attr_reader :path, :node
       alias :ast :node

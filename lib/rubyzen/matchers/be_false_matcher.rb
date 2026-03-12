@@ -21,10 +21,10 @@ RSpec::Matchers.define :be_false do |custom_message=nil|
   end
 
   failure_message do |_|
-    message_for_failure("Expected to be empty, but had elements.\n#{@offenders.join("\n")}")
+    message_for_failure("Expected to return false for all elements, but returned true for:\n#{@offenders.join("\n")}")
   end
 
   failure_message_when_negated do |_|
-    message_for_failure("Expected not to be empty, but had no elements:\n#{@offenders.join("\n")}")
+    message_for_failure("Expected to return true for at least one element, but returned false for:\n#{@offenders.join("\n")}")
   end
 end

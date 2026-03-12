@@ -7,6 +7,8 @@ module Rubyzen
       include Rubyzen::Providers::LinesOfCodeProvider
       include Rubyzen::Providers::RescuesProvider
       include Rubyzen::Providers::RaisesProvider
+      include Rubyzen::Providers::SourceCodeProvider
+      include Rubyzen::Providers::CallSiteProvider
 
       attr_reader :node, :parent
 
@@ -16,7 +18,11 @@ module Rubyzen
       end
 
       def name
-        parent.name
+        method_name
+      end
+
+      def method_name
+        node.method_name.to_s
       end
     end
   end

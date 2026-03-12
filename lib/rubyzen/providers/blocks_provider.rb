@@ -2,9 +2,11 @@ module Rubyzen
   module Providers
     module BlocksProvider
       def blocks
-        node.each_node(:block).map do |block_node|
-          Rubyzen::Declarations::BlockDeclaration.new(block_node, self)
-        end
+        Collections::BlocksCollection.new(
+          node.each_descendant(:block).map do |block_node|
+            Declarations::BlockDeclaration.new(block_node, self)
+          end
+        )
       end
     end
   end
