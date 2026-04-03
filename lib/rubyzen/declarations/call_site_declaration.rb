@@ -27,22 +27,36 @@ module Rubyzen
       end
 
       def keyword_args
-         extract_keyword_args(node)
-      end
+        node.arguments.flat_map do |arg|
+          next [] unless arg.hash_type?
 
-      private
-
-      def extract_keyword_args(send_node)
-        send_node.arguments.flat_map do |arg|
-          if arg.hash_type?
-            arg.each_pair.map do |pair|
-              key_node = pair.key
-              key_node.type == :sym ? key_node.value : nil
-            end.compact
-          else
-            []
+          arg.pairs.filter_map do |pair|
+            pair.key.value if pair.key.type == :sym
           end
         end.uniq
+      end
+
+      def keyword_arg_value_pairs
+        result = {}
+        node.arguments.each do |arg|
+          next unless arg.hash_type?
+
+          arg.pairs.each do |pair|
+            next unless pair.key.type == :sym
+
+            value_node = pair.value
+            result[pair.key.value] = value_node.respond_to?(:value) ? value_node.value : nil
+          end
+        end
+        result
+      end
+
+      def symbols
+        node.arguments.select { |arg| arg.type == :sym }.map(&:value)
+      end
+
+      def strings
+        node.arguments.select { |arg| arg.type == :str }.map(&:value)
       end
 
     end

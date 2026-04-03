@@ -35,6 +35,16 @@ module Rubyzen
         all_requires = flat_map(&:requires)
         RequiresCollection.new(all_requires)
       end
+
+      def call_sites
+        all_call_sites = flat_map(&:call_sites)
+        CallSiteCollection.new(all_call_sites)
+      end
+
+      def blocks
+        all_blocks = flat_map(&:blocks)
+        BlocksCollection.new(all_blocks)
+      end
     end
   end
 end
