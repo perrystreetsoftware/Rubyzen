@@ -18,9 +18,7 @@ module Rubyzen
         details = item_details(item)
         identifiers = [details[:name], details[:class_name], details[:file_path]]
 
-        if details[:line]
-          identifiers << "#{details[:file_path]}:#{details[:line]}"
-        end
+        identifiers << "#{details[:file_path]}:#{details[:line]}" if details[:line]
 
         identifiers.compact.uniq
       end
@@ -81,12 +79,11 @@ module Rubyzen
         details = item_details(item)
         location = [details[:file_path], details[:line]].compact.join(':')
 
-        case
-        when details[:name] && details[:class_name]
+        if details[:name] && details[:class_name]
           "  - element: #{details[:name]}\n  - class: #{details[:class_name]}\n  - file: #{location}"
-        when details[:name]
+        elsif details[:name]
           "  - element: #{details[:name]}\n  - file: #{location}"
-        when details[:class_name]
+        elsif details[:class_name]
           "  - class: #{details[:class_name]}\n  - file: #{location}"
         else
           "  - unknown element in #{location}"
