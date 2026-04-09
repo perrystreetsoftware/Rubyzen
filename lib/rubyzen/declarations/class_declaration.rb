@@ -41,6 +41,7 @@ module Rubyzen
       def superclass_name
         super_node = node.children[1]
         return nil unless super_node&.type == :const
+
         super_node.const_name
       end
 
@@ -50,7 +51,7 @@ module Rubyzen
 
       def instance_methods
         Collections::MethodsCollection.new(
-          node.each_node(:def).map do |def_node|
+          instance_method_nodes.map do |def_node|
             MethodDeclaration.new(def_node, self)
           end
         )
@@ -58,8 +59,8 @@ module Rubyzen
 
       def class_methods
         Collections::MethodsCollection.new(
-          node.each_node(:defs).map do |defs_node|
-            MethodDeclaration.new(defs_node, self)
+          class_method_nodes.map do |method_node|
+            MethodDeclaration.new(method_node, self)
           end
         )
       end
@@ -70,6 +71,53 @@ module Rubyzen
 
       def top_level_module
         file_declaration.top_level_module_name
+      end
+
+      private
+
+      def class_body_node
+        node.children[2]
+      end
+
+      def class_body_children
+        body = class_body_node
+        return [] unless body
+
+        body.respond_to?(:child_nodes) ? body.child_nodes : [body]
+      end
+
+      def instance_method_nodes
+        class_body_children.select { |child| child.type == :def }
+      end
+
+      def class_defs_nodes
+        class_body_children.select do |child|
+          child.type == :defs && child.children[0]&.type == :self
+        end
+      end
+
+      def class_method_nodes
+        class_defs_nodes + class_sclass_def_nodes
+      end
+
+      def class_sclass_def_nodes
+        class_body_children
+          .select { |child| singleton_class_node?(child) }
+          .flat_map { |child| body_children(child.children[1]).select { |body_child| method_node?(body_child) } }
+      end
+
+      def singleton_class_node?(child)
+        child.type == :sclass && child.children[0]&.type == :self
+      end
+
+      def body_children(body)
+        return [] unless body
+
+        body.respond_to?(:child_nodes) ? body.child_nodes : [body]
+      end
+
+      def method_node?(child)
+        %i[def defs].include?(child.type)
       end
     end
   end
