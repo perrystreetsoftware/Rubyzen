@@ -18,7 +18,9 @@ module Rubyzen
         details = item_details(item)
         identifiers = [details[:name], details[:class_name], details[:file_path]]
 
-        identifiers << "#{details[:file_path]}:#{details[:line]}" if details[:line]
+        if details[:line]
+          identifiers << "#{details[:file_path]}:#{details[:line]}"
+        end
 
         identifiers.compact.uniq
       end
@@ -79,11 +81,12 @@ module Rubyzen
         details = item_details(item)
         location = [details[:file_path], details[:line]].compact.join(':')
 
-        if details[:name] && details[:class_name]
+        case
+        when details[:name] && details[:class_name]
           "  - element: #{details[:name]}\n  - class: #{details[:class_name]}\n  - file: #{location}"
-        elsif details[:name]
+        when details[:name]
           "  - element: #{details[:name]}\n  - file: #{location}"
-        elsif details[:class_name]
+        when details[:class_name]
           "  - class: #{details[:class_name]}\n  - file: #{location}"
         else
           "  - unknown element in #{location}"
@@ -114,18 +117,16 @@ module Rubyzen
 
       def self.included(base)
         base.define_method(:message_for_failure) do |base_message|
+          return @failure_message if @failure_message
+
           details = formatted_matcher_groups
 
           if @custom_message
             if details && !details.empty?
               "#{@custom_message}\n#{details}"
-            elsif defined?(@offenders) && @offenders.any?
-              "#{@custom_message}\nViolations: #{@offenders.join(', ')}"
             else
               @custom_message
             end
-          elsif @failure_message
-            @failure_message
           elsif details && !details.empty?
             "#{base_message}\n#{details}"
           else
