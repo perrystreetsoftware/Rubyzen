@@ -103,7 +103,11 @@ module Rubyzen
       def class_sclass_def_nodes
         class_body_children
           .select { |child| singleton_class_node?(child) }
-          .flat_map { |child| body_children(child.children[1]).select { |body_child| method_node?(body_child) } }
+          .flat_map do |child|
+          body_children(child.children[1]).select do |body_child|
+            method_node?(body_child)
+          end
+        end
       end
 
       def singleton_class_node?(child)
