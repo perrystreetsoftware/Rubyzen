@@ -83,7 +83,7 @@ module Rubyzen
         body = class_body_node
         return [] unless body
 
-        body.respond_to?(:child_nodes) ? body.child_nodes : [body]
+        body.type == :begin ? body.child_nodes : [body]
       end
 
       def instance_method_nodes
@@ -113,7 +113,7 @@ module Rubyzen
       def body_children(body)
         return [] unless body
 
-        body.respond_to?(:child_nodes) ? body.child_nodes : [body]
+        body.type == :begin ? body.child_nodes : [body]
       end
 
       def method_node?(child)
