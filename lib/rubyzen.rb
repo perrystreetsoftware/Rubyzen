@@ -6,6 +6,7 @@ loader.setup
 
 # Load RSpec matchers manually since they don't follow class/module naming conventions
 require_relative 'rubyzen/matchers/be_empty_matcher'
+require_relative 'rubyzen/matchers/be_empty_with_exceptions_matcher'
 require_relative 'rubyzen/matchers/be_true_matcher'
 require_relative 'rubyzen/matchers/be_false_matcher'
 

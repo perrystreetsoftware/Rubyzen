@@ -6,6 +6,11 @@ module Rubyzen
     class ModulesCollection < BaseCollection
       include Rubyzen::Providers::CollectionFilterProvider
 
+      def all_methods
+        all_methods = flat_map(&:all_methods)
+        MethodsCollection.new(all_methods)
+      end
+
       def classes
         all_classes = flat_map(&:classes)
         ClassesCollection.new(all_classes)
