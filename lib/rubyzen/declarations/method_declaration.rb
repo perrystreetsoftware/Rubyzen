@@ -25,6 +25,17 @@ module Rubyzen
         node.method_name.to_s
       end
 
+      def parameters
+        Collections::ParametersCollection.new(
+          node.arguments.map do |arg|
+            ParameterDeclaration.new(arg, self)
+          end
+        )
+      end
+
+      def parameters?
+        node.arguments.any?
+      end
     end
   end
 end

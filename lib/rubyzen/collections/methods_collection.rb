@@ -6,6 +6,14 @@ module Rubyzen
     class MethodsCollection < BaseCollection
       include Rubyzen::Providers::CollectionFilterProvider
 
+      def parameters
+        ParametersCollection.new(
+          flat_map do |method|
+            method.parameters
+          end
+        )
+      end
+
       def if_statements
         DeclarationCollection.new(
           flat_map do |method|
