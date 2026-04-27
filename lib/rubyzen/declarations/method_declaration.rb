@@ -26,13 +26,16 @@ module Rubyzen
       end
 
       def parameters
-        node.arguments
+        Collections::ParametersCollection.new(
+          node.arguments.map do |arg|
+            ParameterDeclaration.new(arg, self)
+          end
+        )
       end
 
       def parameters?
         node.arguments.any?
       end
-
     end
   end
 end
