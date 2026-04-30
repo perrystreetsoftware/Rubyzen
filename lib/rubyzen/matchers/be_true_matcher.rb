@@ -1,10 +1,11 @@
 
 
-RSpec::Matchers.define :be_true do |custom_message=nil, baseline: nil|
+RSpec::Matchers.define :be_true do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 
   match do |subject_collection|
     options = custom_message.is_a?(Hash) ? custom_message : {}
+    resolved_allowlist = allowlist || options[:allowlist] || options['allowlist']
     resolved_baseline = baseline || options[:baseline] || options['baseline']
     @custom_message = options[:message] || options['message'] || (custom_message unless custom_message.is_a?(Hash))
     @offenders = []
@@ -13,20 +14,27 @@ RSpec::Matchers.define :be_true do |custom_message=nil, baseline: nil|
       items = Array(subject_collection) # to handle one or multiple subjects
 
       failing_items = items.filter { |item| !block_arg.call(item) }
-      @classified_items = classify_items(failing_items, baseline: resolved_baseline)
+      @classified_items = classify_items(
+        failing_items,
+        allowlist: resolved_allowlist,
+        baseline: resolved_baseline
+      )
       @offenders = @classified_items[:violations]
 
+      stale_exception_groups = []
       stale_baseline = @classified_items[:stale_baseline]
+      stale_exception_groups << 'baseline entries' if stale_baseline.any?
+      stale_exception_groups << 'allowlist entries' if @classified_items[:stale_allowlist].any?
 
-      @failure_reason = if @offenders.any? && stale_baseline.any?
-                          "Expected to return true for all elements, but found live violations and stale baseline entries."
+      @failure_reason = if @offenders.any? && stale_exception_groups.any?
+                          "Expected to return true for all elements, but found live violations and stale #{stale_exception_groups.join(' and ')}."
                         elsif @offenders.any?
                           "Expected to return true for all elements, but returned false for:\n#{@offenders.join("\n")}"
-                        elsif stale_baseline.any?
-                          "Expected to return true for all elements, but found stale baseline entries:\n#{stale_baseline.join("\n")}"
+                        elsif stale_exception_groups.any?
+                          "Expected to return true for all elements, but found stale #{stale_exception_groups.join(' and ')}."
                         end
 
-      @offenders.empty? && stale_baseline.empty?
+      @offenders.empty? && stale_baseline.empty? && @classified_items[:stale_allowlist].empty?
     else
       @failure_reason = "Expected a block, but got nil."
       false

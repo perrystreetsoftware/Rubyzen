@@ -20,7 +20,7 @@ RSpec.describe 'be_true' do
     matcher = be_true(baseline: ['Questions::Albums::Type']) { |_item| true }
 
     expect(matcher.matches?([build_item])).to be(false)
-    expect(matcher.failure_message).to include('Expected to return true for all elements, but found stale baseline entries:')
+    expect(matcher.failure_message).to include('Expected to return true for all elements, but found stale baseline entries.')
     expect(matcher.failure_message).to include('Stale baseline entries:')
     expect(matcher.failure_message).to include('Questions::Albums::Type')
   end
@@ -49,6 +49,21 @@ RSpec.describe 'be_true' do
     expect(matcher.matches?(items)).to be(false)
     expect(matcher.failure_message).to include('Stale baseline entries:')
     expect(matcher.failure_message).to include('Questions::Albums::NonExistentTypeThatWasJustDeleted')
+  end
+
+  it 'treats allowlisted entries as expected failures when they still fail' do
+    matcher = be_true(allowlist: ['Questions::Albums::Type']) { |_item| false }
+
+    expect(matcher.matches?([build_item])).to be(true)
+  end
+
+  it 'fails when an allowlist entry is stale' do
+    matcher = be_true(allowlist: ['Questions::Albums::Type']) { |_item| true }
+
+    expect(matcher.matches?([build_item])).to be(false)
+    expect(matcher.failure_message).to include('Expected to return true for all elements, but found stale allowlist entries.')
+    expect(matcher.failure_message).to include('Stale allowlist entries:')
+    expect(matcher.failure_message).to include('Questions::Albums::Type')
   end
 
 end
