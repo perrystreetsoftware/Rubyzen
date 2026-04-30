@@ -31,7 +31,7 @@ RSpec.describe 'be_true' do
     expect(matcher.matches?([build_item])).to be(true)
   end
 
-  it 'fails with expect syntax when baseline entry is stale' do
+  it 'fails with expect syntax when baseline entry refers to a passing type' do
     items = [build_item]
     baseline = ['Questions::Albums::Type']
     matcher = be_true(baseline: baseline) { |_item| true }
@@ -40,4 +40,15 @@ RSpec.describe 'be_true' do
     expect(matcher.failure_message).to include('Stale baseline entries:')
     expect(matcher.failure_message).to include('Questions::Albums::Type')
   end
+
+  it 'fails with expect syntax when baseline entry refers to a non-existent type' do
+    items = [build_item]
+    baseline = ['Questions::Albums::NonExistentTypeThatWasJustDeleted']
+    matcher = be_true(baseline: baseline) { |_item| true }
+
+    expect(matcher.matches?(items)).to be(false)
+    expect(matcher.failure_message).to include('Stale baseline entries:')
+    expect(matcher.failure_message).to include('Questions::Albums::NonExistentTypeThatWasJustDeleted')
+  end
+
 end
