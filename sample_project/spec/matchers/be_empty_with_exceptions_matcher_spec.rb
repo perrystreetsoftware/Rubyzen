@@ -3,12 +3,12 @@
 require_relative '../spec_helper'
 
 RSpec.describe 'be_empty_with_exceptions' do
-  TestItem = Struct.new(:name, :class_name, :file_path, :line, keyword_init: true)
+  let(:test_item_class) { Struct.new(:name, :class_name, :file_path, :line, keyword_init: true) }
 
   let(:root_path) { File.expand_path('../..', __dir__) }
 
   def build_item(name:, class_name:, file_path:, line: 1)
-    TestItem.new(name: name, class_name: class_name, file_path: file_path, line: line)
+    test_item_class.new(name: name, class_name: class_name, file_path: file_path, line: line)
   end
 
   it 'groups baseline, allowlist, and live violations in the failure output' do

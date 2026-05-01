@@ -3,12 +3,12 @@
 require_relative '../spec_helper'
 
 RSpec.describe 'be_true' do
-  TestItem = Struct.new(:name, :class_name, :file_path, :line, keyword_init: true)
+  let(:test_item_class) { Struct.new(:name, :class_name, :file_path, :line, keyword_init: true) }
 
   let(:root_path) { File.expand_path('../..', __dir__) }
 
   def build_item(class_name: 'Questions::Albums::Type', file_path: 'src/questions/albums/type.rb')
-    TestItem.new(
+    test_item_class.new(
       name: 'private_album?',
       class_name: class_name,
       file_path: File.join(root_path, file_path),
