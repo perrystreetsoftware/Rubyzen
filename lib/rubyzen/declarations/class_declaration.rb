@@ -1,5 +1,14 @@
 module Rubyzen
   module Declarations
+    # Represents a Ruby class definition. Provides access to methods, attributes,
+    # macros, and other class-level constructs.
+    #
+    # @example
+    #   klass = file.classes.first
+    #   klass.name                #=> "Admin::UsersController"
+    #   klass.superclass_name     #=> "ApplicationController"
+    #   klass.instance_methods    #=> MethodsCollection
+    #
     class ClassDeclaration
       include Rubyzen::Providers::IfStatementsProvider
       include Rubyzen::Providers::BlocksProvider
@@ -13,13 +22,22 @@ module Rubyzen
       include Rubyzen::Providers::RescuesProvider
       include Rubyzen::Providers::RaisesProvider
 
-      attr_reader :node, :file_declaration
+      # @return [RuboCop::AST::Node] the class AST node
+      attr_reader :node
 
+      # @return [FileDeclaration] the file this class belongs to
+      attr_reader :file_declaration
+
+      # @param node [RuboCop::AST::Node]
+      # @param file_declaration [FileDeclaration]
       def initialize(node, file_declaration)
         @node = node
         @file_declaration = file_declaration
       end
 
+      # Returns the fully-qualified class name including parent modules.
+      #
+      # @return [String] e.g. +"Admin::UsersController"+
       def name
         parent_module_names = []
         current_node = node.parent
@@ -34,10 +52,16 @@ module Rubyzen
         [parent_module_names, name_without_modules].flatten.compact.join('::')
       end
 
+      # Returns the class name without module prefixes.
+      #
+      # @return [String] e.g. +"UsersController"+
       def name_without_modules
         node.identifier&.const_name
       end
 
+      # Returns the superclass name, if any.
+      #
+      # @return [String, nil] e.g. +"ApplicationController"+
       def superclass_name
         super_node = node.children[1]
         return nil unless super_node&.type == :const
@@ -45,10 +69,17 @@ module Rubyzen
         super_node.const_name
       end
 
+      # Checks whether the superclass name starts with the given prefix.
+      #
+      # @param prefix [String]
+      # @return [Boolean]
       def superclass_prefix?(prefix)
         superclass_name&.start_with?(prefix)
       end
 
+      # Returns instance methods defined directly in this class.
+      #
+      # @return [Collections::MethodsCollection]
       def instance_methods
         Collections::MethodsCollection.new(
           instance_method_nodes.map do |def_node|
@@ -57,6 +88,9 @@ module Rubyzen
         )
       end
 
+      # Returns class methods (both +self.method+ and +class << self+ styles).
+      #
+      # @return [Collections::MethodsCollection]
       def class_methods
         Collections::MethodsCollection.new(
           class_method_nodes.map do |method_node|
@@ -65,10 +99,16 @@ module Rubyzen
         )
       end
 
+      # Returns unique method names called anywhere in this class.
+      #
+      # @return [Array<String>]
       def called_method_names
         node.each_descendant(:send).map { |send_node| send_node.method_name.to_s }.uniq
       end
 
+      # Returns the top-level module name from the enclosing file.
+      #
+      # @return [String, nil]
       def top_level_module
         file_declaration.top_level_module_name
       end

@@ -1,5 +1,13 @@
-
-
+# Custom RSpec matcher that asserts a Rubyzen collection is empty.
+#
+# Used in architectural lint rules to verify that no items match
+# a forbidden pattern (e.g., no controllers call +.where+ directly).
+#
+# @example Ensure no controllers use .where
+#   expect(controllers.that { have_call_sites_with_names('.where') }).to be_empty
+#
+# @example With a custom failure message
+#   expect(violations).to be_empty("Controllers should not call .where directly")
 RSpec::Matchers.define :be_empty do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 

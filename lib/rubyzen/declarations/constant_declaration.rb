@@ -5,19 +5,36 @@ require_relative '../providers/source_code_provider'
 
 module Rubyzen
   module Declarations
+    # Represents a constant assignment (+MAX = 100+) or reference (+MAX+).
+    #
+    # @example
+    #   const = file.constants.filter(&:assignment?).first
+    #   const.name        #=> "MAX"
+    #   const.value       #=> 100
+    #   const.top_level?  #=> true
+    #
     class ConstantDeclaration
       include Rubyzen::Providers::FilePathProvider
       include Rubyzen::Providers::LineNumberProvider
       include Rubyzen::Providers::ClassNameProvider
       include Rubyzen::Providers::SourceCodeProvider
 
-      attr_reader :node, :parent
+      # @return [RuboCop::AST::Node]
+      attr_reader :node
 
+      # @return [FileDeclaration, ClassDeclaration, ModuleDeclaration]
+      attr_reader :parent
+
+      # @param node [RuboCop::AST::Node] the AST node
+      # @param parent [FileDeclaration, ClassDeclaration, ModuleDeclaration] the parent declaration
       def initialize(node, parent)
         @node = node
         @parent = parent
       end
 
+      # Returns the constant name.
+      #
+      # @return [String]
       def name
         case node.type
         when :casgn
@@ -27,12 +44,15 @@ module Rubyzen
         end
       end
 
+      # Returns the assigned value for constant assignments.
+      #
+      # @return [String, Integer, Float, Boolean, nil]
       def value
         return nil unless assignment?
-        
+
         value_node = node.children[2]
         return nil unless value_node
-        
+
         case value_node.type
         when :str
           value_node.str_content
@@ -47,34 +67,52 @@ module Rubyzen
         end
       end
 
+      # Returns whether this is a constant assignment (+:casgn+).
+      #
+      # @return [Boolean]
       def assignment?
         node.type == :casgn
       end
 
+      # Returns whether this is a constant reference (+:const+).
+      #
+      # @return [Boolean]
       def reference?
         node.type == :const
       end
 
+      # Returns whether this constant is defined at file scope (not inside a class or module).
+      #
+      # @return [Boolean]
       def top_level?
         return false unless parent.is_a?(Rubyzen::Declarations::FileDeclaration)
-        
+
         current_node = node
         while current_node
           current_node = current_node.parent
           return false if current_node && (current_node.type == :class || current_node.type == :module)
         end
-        
+
         true
       end
 
+      # Returns the enclosing {ClassDeclaration}, if any.
+      #
+      # @return [ClassDeclaration, nil]
       def in_class?
         find_parent_of_type(Rubyzen::Declarations::ClassDeclaration)
       end
 
+      # Returns the enclosing {ModuleDeclaration}, if any.
+      #
+      # @return [ModuleDeclaration, nil]
       def in_module?
         find_parent_of_type(Rubyzen::Declarations::ModuleDeclaration)
       end
 
+      # Returns whether this constant is defined inside a class or module.
+      #
+      # @return [Boolean]
       def scoped?
         !top_level?
       end

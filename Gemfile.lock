@@ -32,6 +32,7 @@ GEM
       prism (~> 1.7)
     yaml (0.1.1)
     zeitwerk (2.7.5)
+    yard (0.9.43)
 
 PLATFORMS
   aarch64-linux
@@ -43,6 +44,7 @@ DEPENDENCIES
   rspec (~> 3.12)
   rubocop-ast (~> 1.26)
   yaml (~> 0.1.0)
+  yard (~> 0.9)
   zeitwerk (~> 2.6)
 
 BUNDLED WITH

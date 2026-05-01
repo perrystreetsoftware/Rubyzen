@@ -3,7 +3,9 @@ require_relative '../collections/requires_collection'
 
 module Rubyzen
   module Providers
+    # Provides access to require, require_relative, and load statements within a declaration.
     module RequiresProvider
+      # @return [Rubyzen::Collections::RequiresCollection] collection of require declarations
       def requires
         require_nodes = node.each_descendant(:send).select do |send_node|
           %w[require require_relative load].include?(send_node.method_name.to_s)

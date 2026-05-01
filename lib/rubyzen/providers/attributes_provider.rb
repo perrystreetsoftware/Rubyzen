@@ -3,7 +3,9 @@ require_relative '../collections/attributes_collection'
 
 module Rubyzen
   module Providers
+    # Provides access to attr_reader, attr_writer, and attr_accessor declarations.
     module AttributesProvider
+      # @return [Rubyzen::Collections::AttributesCollection] collection of attribute declarations
       def attributes
         attribute_nodes = node.each_descendant(:send).select do |send_node|
           %w[attr_reader attr_writer attr_accessor].include?(send_node.method_name.to_s)

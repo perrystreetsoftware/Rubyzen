@@ -1,6 +1,8 @@
 module Rubyzen
   module Providers
+    # Provides access to the file path of a declaration by traversing parent declarations.
     module FilePathProvider
+      # @return [String, nil] the file path containing this declaration
       def file_path
         file_path_recursive(self)
       end

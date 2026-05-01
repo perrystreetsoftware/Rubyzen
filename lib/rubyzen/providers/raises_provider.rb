@@ -1,6 +1,8 @@
 module Rubyzen
   module Providers
+    # Provides access to raise statements within a declaration.
     module RaisesProvider
+      # @return [Rubyzen::Collections::RaisesCollection] collection of raise declarations
       def raises
         raise_nodes = node.each_descendant(:send).select do |send_node|
           send_node.method_name == :raise

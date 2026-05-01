@@ -1,4 +1,6 @@
-
+# Overrides RSpec's +expect+ method to restrict subjects to Rubyzen collection types.
+# This ensures that architectural lint rules only operate on valid Rubyzen collections,
+# raising an ArgumentError if an unsupported subject type is passed.
 module RSpec
   module Matchers
     alias_method :__original_expect, :expect

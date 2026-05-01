@@ -1,5 +1,10 @@
-
-
+# Custom RSpec matcher that asserts a block returns true for every item in a collection.
+#
+# @example Ensure all controllers inherit from BaseController
+#   expect(controllers).to be_true { |c| c.class_name.end_with?('Controller') }
+#
+# @example With a custom failure message
+#   expect(models).to be_true("All models must define validations") { |m| m.has_validations? }
 RSpec::Matchers.define :be_true do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 
@@ -47,6 +52,6 @@ RSpec::Matchers.define :be_true do |custom_message=nil, allowlist: nil, baseline
   end
 
   failure_message_when_negated do |_|
-    message_for_failure("Expected to return false for at least one element, but returned true for:\n#{Array(@classified_items&.dig(:baseline)).join("\n")}")
+    message_for_failure("Expected to return false for at least one element, but all elements returned true.")
   end
 end
