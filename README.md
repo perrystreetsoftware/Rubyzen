@@ -52,6 +52,9 @@ bundle exec rspec sample_project/spec/
 
 # Run custom lint rules for the target project
 bundle exec rspec target_project/spec/rubyzen/
+
+# Run rspec on our custom matchers
+bundle exec rspec spec
 ```
 
 The lint rules are project-agnostic - you can apply any rule set to any target project by specifying the appropriate spec path.

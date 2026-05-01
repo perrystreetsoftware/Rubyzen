@@ -3,7 +3,7 @@
 require_relative '../spec_helper'
 
 RSpec.describe 'be_true' do
-  let(:test_item_class) { Struct.new(:name, :class_name, :file_path, :line, keyword_init: true) }
+    let(:test_item_class) { Struct.new(:name, :class_name, :file_path, :line, keyword_init: true) }
 
   let(:root_path) { File.expand_path('../..', __dir__) }
 

@@ -12,10 +12,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Run RubyZen Analysis
+    - name: Run RubyZen Analysis (sample_project specs)
       uses: ./
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         ruby-version: '3.3'
         target-directories: 'sample_project/src'
         target-rspec-directory: 'sample_project/spec'
+
+    - name: Run RubyZen Analysis (top-level specs)
+      uses: ./
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        ruby-version: '3.3'
+        target-directories: 'src'
+        target-rspec-directory: 'spec'
