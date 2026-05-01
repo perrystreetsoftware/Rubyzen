@@ -18,7 +18,7 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
       RUBY
 
       refs = file.constants.filter(&:reference?)
-      expect(refs.map(&:name)).to include('Foo')
+      expect(refs.map(&:name)).to include('MAX')
     end
   end
 
