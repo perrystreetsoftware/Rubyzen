@@ -41,6 +41,9 @@ Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hoo
 - Confirming that model classes do not use question-mark in methods, enforcing us to use the Ask pattern.
 
 ### Running Lint Rules
+
+You should first start a devcontainer, with `devcontainer open .` run from the `Rubyzen` folder.
+
 To run lint rules, execute RSpec with the path to your rule specifications. The rules will analyze the currently mounted target project:
 
 ```bash
