@@ -23,8 +23,9 @@ RSpec::Matchers.define :be_true do |custom_message=nil, allowlist: nil, baseline
 
       stale_exception_groups = []
       stale_baseline = @classified_items[:stale_baseline]
+      stale_allowlist = @classified_items[:stale_allowlist]
       stale_exception_groups << 'baseline entries' if stale_baseline.any?
-      stale_exception_groups << 'allowlist entries' if @classified_items[:stale_allowlist].any?
+      stale_exception_groups << 'allowlist entries' if stale_allowlist.any?
 
       @failure_reason = if @offenders.any? && stale_exception_groups.any?
                           "Expected to return true for all elements, but found live violations and stale #{stale_exception_groups.join(' and ')}."
@@ -34,7 +35,7 @@ RSpec::Matchers.define :be_true do |custom_message=nil, allowlist: nil, baseline
                           "Expected to return true for all elements, but found stale #{stale_exception_groups.join(' and ')}."
                         end
 
-      @offenders.empty? && stale_baseline.empty? && @classified_items[:stale_allowlist].empty?
+      @offenders.empty? && stale_baseline.empty? && stale_allowlist.empty?
     else
       @failure_reason = "Expected a block, but got nil."
       false
