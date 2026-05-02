@@ -57,7 +57,7 @@ module Rubyzen
       #
       # @return [Array<ModuleDeclaration>]
       def modules
-        node.each_node(:module).map { |mod_node| ModuleDeclaration.new(mod_node, file_declaration) }
+        node.each_descendant(:module).map { |mod_node| ModuleDeclaration.new(mod_node, file_declaration) }
       end
 
       # Returns classes defined within this module.

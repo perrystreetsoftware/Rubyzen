@@ -7,10 +7,10 @@ module RSpec
 
     # override the public `expect` entrypoint
     def expect(actual = nil, &block)
-      unless valid_collection_subject?(actual)
+      if block.nil? && !valid_collection_subject?(actual)
         raise ArgumentError,
               "Invalid subject for `expect`: " \
-              "only Rubyzen::Domain::Collection or Array of them allowed, " \
+              "only Rubyzen::Collections types allowed, " \
               "but got #{actual.inspect}"
       end
 

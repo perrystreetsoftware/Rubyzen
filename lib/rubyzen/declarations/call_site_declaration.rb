@@ -45,7 +45,7 @@ module Rubyzen
       #
       # @return [String]
       def method_name
-         node.method_name.to_s
+        node.method_name.to_s
       end
 
       # Returns the keyword argument keys passed in the call.
