@@ -4,7 +4,7 @@ Rubyzen is an architectural linter for Ruby that lets you write architectural li
 
 ## Architectural linters in the era of AI-generated code
 
-In the era of AI-generated code, architectural flaws and subtle bugs happen faster than ever. AI agents produce code that passes tests and looks reasonable but subtly violates your team's architecture. As more code is produced, faster, it becomes impractical for manual code reviews to spot all these mistakes.
+In the era of AI-generated code, architectural flaws and subtle bugs happen faster than ever. AI agents produce code that passes tests and looks reasonable but subtly violates your team's architecture. As more code is produced, faster, it becomes impractical for manual code reviews to catch all these violations.
 
 Architectural lint rules act as deterministic guardrails. They catch the architectural or structural mistakes that AI introduces, such as calling the database from a presenter or performing business logic in a controller, before they get merged. And since they run as unit tests, they provide immediate feedback to the AI agents to fix their own code.
 
@@ -14,7 +14,7 @@ Traditional linters such as [RuboCop](https://github.com/rubocop/rubocop) requir
 
 ## Advantages
 
-- **Readable, Easy-to-Use API:** Rubyzen provides a high-level API to access files, classes, methods, dependencies, and more, without having to deal with low-level AST operations.
+- **Readable, Easy-to-Use API:** Rubyzen provides a high-level API to access files, classes, methods, parameters, and more, without having to deal with low-level AST operations.
 
 - **Architectural Enforcement & Documentation:** By writing lint rules as tests, you can use the Given-When-Then style and document your architecture within the codebase, without maintaining wiki pages or diagrams.
 
@@ -24,7 +24,7 @@ Traditional linters such as [RuboCop](https://github.com/rubocop/rubocop) requir
 
 ## How it Works
 
-Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hood to parse Ruby code into an AST. It then provides a simplified API to access classes, methods, dependencies, and other code structures. Since RuboCop AST can access any node or token, Rubyzen's API can cover any architectural rule you want to enforce.
+Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hood to parse Ruby code into an AST. It then provides a simplified API to access classes, methods, or any other code structure. Since RuboCop AST can access any node or token, Rubyzen's API can cover any architectural rule you want to enforce.
 
 ## Example
 
@@ -51,12 +51,16 @@ end
 - **`sample_project/src/`:** A sample Ruby project with intentional violations
 - **`sample_project/spec/`:** Sample lint rules demonstrating architectural enforcement
 
-## Running
+## Running tests
 
 ```bash
 # Run unit tests (verify Rubyzen's own API works)
 bundle exec rspec spec/
+```
 
+## Running lint rules
+
+```bash
 # Run lint rules on the sample project (expected to fail — intentional violations)
 bundle exec rspec sample_project/spec/
 ```
@@ -102,7 +106,7 @@ Rubyzen includes Claude Code skills in `.claude/skills/` for AI-assisted develop
 #### Directory Structure
 ```
 parent-folder/
-├── Rubyzen/           (this linter project)
+├── Rubyzen/           (this project)
 ├── YourProject/       (target project - set via env var)
 └── OtherProject/      (another potential target)
 ```
@@ -111,8 +115,7 @@ parent-folder/
 
 ```bash
 # Different projects
-export RUBYZEN_TARGET_PROJECT=Husband-Redis && code .
-export RUBYZEN_TARGET_PROJECT=MyClientApp && code .
+export RUBYZEN_TARGET_PROJECT=MyProject && code .
 
 # Team setup with .env file
 echo "RUBYZEN_TARGET_PROJECT=OurMainProject" > .env
