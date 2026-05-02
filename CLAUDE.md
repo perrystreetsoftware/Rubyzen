@@ -224,126 +224,6 @@ All matchers use `MatcherHelpers` for formatting failure messages with element n
 
 **Important:** Use `{ }` braces (not `do...end`) with `be_true`/`be_false` — `do...end` binds to `expect()` instead of the matcher due to Ruby precedence.
 
-## Patterns for Expanding the Project
-
-### Adding a new Declaration
-
-1. Create `lib/rubyzen/declarations/foo_declaration.rb`
-2. Include relevant providers (`FilePathProvider`, `LineNumberProvider`, `ClassNameProvider` at minimum for matcher output)
-3. Add `attr_reader :node, :parent` and standard `initialize(node, parent)`
-4. Add a `name` method (used by matchers for failure messages)
-
-### Adding a new Collection
-
-1. Create `lib/rubyzen/collections/foos_collection.rb`
-2. Extend `BaseCollection`, include `CollectionFilterProvider`
-3. Add domain-specific filter methods as needed
-
-### Adding a new Provider
-
-1. Create `lib/rubyzen/providers/foos_provider.rb`
-2. Define a module with a method that finds AST nodes and returns a typed collection
-3. Include the provider in relevant declarations
-
-### Connecting it all
-
-1. Include the provider in declarations that should expose the new data
-2. Add bridge methods to collections that should aggregate the data (e.g., `MethodsCollection#foos`)
-3. Zeitwerk handles autoloading — no manual requires needed
-
-### Adding a sample lint rule
-
-1. Add violating source code in `sample_project/src/`
-2. Add lint spec in `sample_project/spec/`
-3. Use the shared context `project_config` from `spec_helper.rb`
-4. The test should **fail** (sample project intentionally contains violations)
-
-## Testing
-
-Rubyzen has two separate test suites that serve different purposes:
-
-### Unit Tests (`spec/`)
-
-Unit tests verify the correctness of Rubyzen's own API — declarations, providers, collections, and matchers. They live in `spec/` at the project root.
-
-```bash
-# Run all unit tests
-bundle exec rspec spec/
-
-# Run a specific declaration test
-bundle exec rspec spec/declarations/class_declaration_spec.rb
-```
-
-**Structure:**
-
-```
-spec/
-├── spec_helper.rb              # Loads Rubyzen, includes parse helper
-├── support/
-│   └── parse_helper.rb         # parse_ruby helper for inline snippets
-├── fixtures/                   # Small .rb files for Project path tests
-├── declarations/               # One spec per declaration type
-├── collections/                # One spec per collection type
-├── matchers/                   # One spec per matcher
-├── project_spec.rb             # Project class tests
-└── cache/
-    └── parse_cache_spec.rb     # Caching behavior tests
-```
-
-**The `parse_ruby` helper:**
-
-Most unit tests parse inline Ruby snippets using the `parse_ruby` helper defined in `spec/support/parse_helper.rb`:
-
-```ruby
-def parse_ruby(source, file_path: 'test.rb')
-  processed = RuboCop::AST::ProcessedSource.new(source, RUBY_VERSION.to_f, file_path)
-  Rubyzen::Declarations::FileDeclaration.new(file_path, processed.ast)
-end
-```
-
-This bypasses file I/O and lets each test define exactly the Ruby code it needs:
-
-```ruby
-it 'returns the class name' do
-  file = parse_ruby(<<~RUBY)
-    class UserController < ApplicationController
-      def index; end
-    end
-  RUBY
-
-  klass = file.classes.first
-  expect(klass.name).to eq('UserController')
-end
-```
-
-**When to use fixture files instead:** Tests that need to verify file-scoping behavior (`Project.new`, `FileCollection#with_paths`, `FileCollection#without_paths`) use actual `.rb` files in `spec/fixtures/` since those features depend on real file paths.
-
-**Single-statement gotcha:** When a Ruby snippet contains only one statement, the AST root node IS that statement (not a `:begin` wrapper). This means `each_descendant` won't find it. Always include at least two statements in snippets that test providers using `each_descendant` (e.g., constants, requires, blocks at file level):
-
-```ruby
-# Bad — single statement, root is :casgn, each_descendant won't find it
-file = parse_ruby('MAX = 100')
-file.constants  # => empty!
-
-# Good — two statements, root is :begin, each_descendant works
-file = parse_ruby("MAX = 100\nx = 1")
-file.constants  # => [ConstantDeclaration(MAX)]
-```
-
-### Sample Project Lint Rules (`sample_project/spec/`)
-
-Lint rule specs verify that Rubyzen can enforce architectural rules on a real codebase. They use the `project_config` shared context from `sample_project/spec/spec_helper.rb`, which provides pre-built collection helpers (`controllers`, `models`, `repos`, etc.).
-
-```bash
-# Run all lint rules on the sample project
-bundle exec rspec sample_project/spec/
-
-# Run a specific lint rule
-bundle exec rspec sample_project/spec/controllers/no_if_statements_in_controllers_lint_spec.rb
-```
-
-The sample project intentionally contains violations, so lint rule tests are expected to **fail** — they validate that Rubyzen correctly detects violations.
-
 ## Environment Setup
 
 ```bash
@@ -355,15 +235,6 @@ export RUBYZEN_PROJECT_PATH="/path/to/src"
 
 # Dev container: specify which sibling project to mount
 export RUBYZEN_TARGET_PROJECT="my-project"
-
-# Run unit tests
-bundle exec rspec spec/
-
-# Run lint rules on sample project
-bundle exec rspec sample_project/spec/
-
-# Run a specific rule
-bundle exec rspec sample_project/spec/controllers/no_if_statements_in_controllers_lint_spec.rb
 ```
 
 ## GitHub Action Integration
@@ -372,8 +243,14 @@ Rubyzen ships with a GitHub Action (`action.yml`) for running lint analysis in C
 - Configurable target directory and RSpec directory
 - Outputs violations found and full analysis results
 
-## Dependencies
+## Skills
 
-- `rubocop-ast` — AST parsing engine (wraps Parser gem)
-- `rspec` — Test framework for writing lint rules
-- `zeitwerk` — Autoloading (no manual requires needed for new files)
+The following skills are available in `.claude/skills/` to guide AI agents:
+
+| Skill | Purpose |
+|---|---|
+| `run-tests` | Run Rubyzen's unit test suite |
+| `run-lint-rules` | Run sample project lint rules and verify violation detection |
+| `write-lint-rule` | Write an architectural lint rule using the Rubyzen API |
+| `add-rubyzen-tests` | Write unit tests for Rubyzen's own components |
+| `expand-rubyzen` | Add a new Rubyzen API (Declaration + Provider + Collection) |
