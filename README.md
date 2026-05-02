@@ -1,60 +1,84 @@
 # Rubyzen
 
-Rubyzen is a prototype of a modern linter in Ruby that lets you write architectural lint rules as unit tests, inspired by tools like [Konsist](https://github.com/LemonAppDev/konsist) (for Kotlin) and [Harmonize](https://github.com/perrystreetsoftware/Harmonize) (for Swift). The goal is to explore the technical feasibility and the effort required to build such linter.
+Rubyzen is an architectural linter for Ruby that lets you write architectural lint rules as unit tests, inspired by tools like [Konsist](https://github.com/LemonAppDev/konsist) (for Kotlin) and [Harmonize](https://github.com/perrystreetsoftware/Harmonize) (for Swift).
 
-## Motivation
+## Architectural linters in the era of AI-generated code
 
-Code review feedback often includes architectural or structural comments ("Do not call repository methods from presenters", "Do not query the database from controllers", etc.). With Rubyzen, you can enforce these architectural rules as unit tests. This reduces the need for manual code reviews and allows the team to align and document their architecture and best practices.
+In the era of AI-generated code, architectural flaws and subtle bugs happen faster than ever. AI agents produce code that passes tests and looks reasonable but subtly violates your team's architecture. As more code is produced, faster, it becomes impractical for manual code reviews to spot all these mistakes.
+
+Architectural lint rules act as deterministic guardrails. They catch the architectural or structural mistakes that AI introduces, such as calling the database from a presenter or performing business logic in a controller, before they get merged. And since they run as unit tests, they provide immediate feedback to the AI agents to fix their own code.
 
 ## Why Yet Another Linter?
 
-Traditional linters such as [RuboCop](https://github.com/rubocop/rubocop) require dealing with the raw AST, which has a steep learning curve and makes the rules hard to write, hard to read, and maintain. The goal of Rubyzen is to abstract away the AST details, allowing developers to write rules in a more natural way, similarly as we write tests. This reduces complexity and improves readability and maintainability.
+Traditional linters such as [RuboCop](https://github.com/rubocop/rubocop) require dealing with the raw AST, which has a steep learning curve and makes rules hard to write, read, and maintain. Rubyzen abstracts away the AST details, allowing developers to write rules in a more natural way — the same way we write tests.
 
 ## Advantages
 
-- **Easy-to-Use API:** Rubyzen provides a friendly, high-level API to access files, classes, methods, dependencies, and more. This way developers do not have to manual access nodes and deal with low-level AST operations manually.
+- **Readable, Easy-to-Use API:** Rubyzen provides a high-level API to access files, classes, methods, dependencies, and more, without having to deal with low-level AST operations.
 
-- **Architectural Enforcement & Documentation:** By writing the lint rules as tests, we can use the Given-When-Then style and provide documentation for our architecture within the codebase, without having to maintain wiki pages or diagrams.
+- **Architectural Enforcement & Documentation:** By writing lint rules as tests, you can use the Given-When-Then style and document your architecture within the codebase, without maintaining wiki pages or diagrams.
 
-- **Less Manual Reviews:** With architectural rules automatically enforced by tests, code reviews can focus on more complex issues instead of repeating the same architectural feedback.
+- **Less Manual Reviews:** With architectural rules automatically enforced, code reviews can focus on complex issues instead of repeating the same architectural feedback.
+
+- **AI-Friendly Feedback Loop:** When lint rules fail, the failure messages tell AI agents exactly what they violated and where, allowing them to self-correct their code.
 
 ## How it Works
 
-Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hood to parse the Ruby code into an AST. It then provides a simplified API to access classes, methods, dependencies, and other code structures. Since RuboCop AST can access any node or token, the API of Rubyzen can potentially cover any architectural rule that we want to enforce.
+Rubyzen uses [RuboCop AST](https://github.com/rubocop/rubocop-ast) under the hood to parse Ruby code into an AST. It then provides a simplified API to access classes, methods, dependencies, and other code structures. Since RuboCop AST can access any node or token, Rubyzen's API can cover any architectural rule you want to enforce.
+
+## Example
+
+```ruby
+RSpec.describe 'Architecture rules' do
+  it 'controllers do not call ActiveRecord directly' do
+    violations = controllers
+      .all_methods
+      .call_sites
+      .with_name('where')
+
+    expect(violations).to be_empty
+  end
+
+  it 'all services inherit from BaseService' do
+    expect(services).to be_true { |s| s.superclass_name == 'BaseService' }
+  end
+end
+```
 
 ## Project Structure
 
-- **`lib/rubyzen/`:** Contains Rubyzen's source code, including:
-  - `project.rb` - Main project analyzer
-  - `classes_collection.rb`, `methods_collection.rb`, `file_collection.rb` - Collections for code structures
-  - `parsers/`, `matchers/`, `providers/`, `declarations/`, `cache/` - Core functionality modules
+- **`lib/rubyzen/`:** Rubyzen's source code — declarations, collections, providers, matchers, parsers, and cache
+- **`sample_project/src/`:** A sample Ruby project with intentional violations
+- **`sample_project/spec/`:** Sample lint rules demonstrating architectural enforcement
 
-- **`sample_project/src/`:** A sample Ruby project that Rubyzen can lint
-
-- **`sample_project/spec/`:** Contains sample lint rules written as unit tests, demonstrating how to enforce architectural rules
-
-## Example Lint Rules
-
-- Ensuring that non-repository classes do not use `.where` queries.
-- Verifying that presenter classes do not directly access repositories.
-- Prohibiting new additions to legacy files.
-- Confirming that model classes do not use question-mark in methods, enforcing us to use the Ask pattern.
-
-### Running Lint Rules
-
-You should first start a devcontainer, with `devcontainer open .` run from the `Rubyzen` folder.
-
-To run lint rules, execute RSpec with the path to your rule specifications. The rules will analyze the currently mounted target project:
+## Running
 
 ```bash
-# Run sample lint rules against the target project
-bundle exec rspec sample_project/spec/
+# Run unit tests (verify Rubyzen's own API works)
+bundle exec rspec spec/
 
-# Run custom lint rules for the target project
-bundle exec rspec target_project/spec/rubyzen/
+# Run lint rules on the sample project (expected to fail — intentional violations)
+bundle exec rspec sample_project/spec/
 ```
 
-The lint rules are project-agnostic - you can apply any rule set to any target project by specifying the appropriate spec path.
+## Environment Setup
+
+```bash
+# Required: comma-separated absolute paths of the project folders to lint
+export RUBYZEN_PROJECT_PATHS="/path/to/src,/path/to/spec"
+```
+
+## AI Agent Skills
+
+Rubyzen includes Claude Code skills in `.claude/skills/` for AI-assisted development:
+
+| Skill | Purpose |
+|---|---|
+| `run-tests` | Run Rubyzen's unit test suite |
+| `run-lint-rules` | Run sample project lint rules and verify the violations are detected |
+| `write-lint-rule` | Write an architectural lint rule using the Rubyzen API |
+| `add-rubyzen-tests` | Write unit tests for Rubyzen's own components |
+| `expand-rubyzen` | Add a new Rubyzen API (Declaration + Provider + Collection) |
 
 ## Dev Container Integration
 
@@ -66,11 +90,11 @@ The lint rules are project-agnostic - you can apply any rule set to any target p
    code .
    ```
 
-**Note:** When changing the `RUBYZEN_TARGET_PROJECT` environment variable, you must rebuild the dev container for the change to take effect. The container will continue to mount the previous target directory until rebuilt.
+**Note:** When changing the `RUBYZEN_TARGET_PROJECT` environment variable, you must rebuild the dev container for the change to take effect.
 
 ### Architecture
 
-**Environment-driven setup** - no configuration generation needed:
+**Environment-driven setup** — no configuration generation needed:
 - `RUBYZEN_TARGET_PROJECT` environment variable specifies which sibling project to lint
 - Target project mounts to fixed path: `/workspaces/target_project`
 - All configs use static paths pointing to multiple directories: `/workspaces/target_project/src,/workspaces/target_project/spec`
@@ -81,15 +105,6 @@ parent-folder/
 ├── Rubyzen/           (this linter project)
 ├── YourProject/       (target project - set via env var)
 └── OtherProject/      (another potential target)
-```
-
-#### Container Structure
-```
-/workspaces/
-├── Rubyzen/           (this project)
-└── target_project/    (mounted from $RUBYZEN_TARGET_PROJECT)
-    ├── src/           (Ruby source files to lint)
-    └── spec/          (Ruby test files to lint)
 ```
 
 ### Usage Examples
@@ -111,6 +126,3 @@ echo "RUBYZEN_TARGET_PROJECT=OurMainProject" > .env
 | "Target project not found" | Verify `../$RUBYZEN_TARGET_PROJECT` exists and rebuild container |
 | Mount errors on startup | Check env var is set, target exists, then rebuild container |
 | Changed env var but still seeing old project | Rebuild dev container to update mount path |
-
-
-This project is an early prototype. The intent is to explore the technical feasibility and effort to build a modern architectural linter for Ruby.
