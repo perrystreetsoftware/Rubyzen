@@ -101,7 +101,11 @@ RSpec.describe Rubyzen::Declarations::ModuleDeclaration do
 
   describe '#lines_of_code' do
     it 'returns the line count' do
-      file = parse_ruby("module Foo\n  def bar; end\nend")
+      file = parse_ruby(<<~RUBY)
+        module Foo
+          def bar; end
+        end
+      RUBY
       expect(file.modules.first.lines_of_code).to eq(3)
     end
   end

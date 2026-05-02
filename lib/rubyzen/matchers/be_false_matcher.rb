@@ -3,14 +3,14 @@
 # Supports +allowlist:+ and +baseline:+ for gradual adoption, matching items
 # where the block returns true against exception lists.
 #
-# @example Ensure no presenters include business logic
-#   expect(presenters).to be_false { |p| p.has_business_logic? }
+# @example Ensure no methods have more than 5 parameters
+#   expect(methods).to be_false { |m| m.parameters.size > 5 }
 #
 # @example With a custom failure message
-#   expect(models).to be_false("Models must not call external APIs") { |m| m.calls_api? }
+#   expect(controllers.all_methods.call_sites).to be_false("Controllers must not call .where directly") { |cs| cs.name == 'where' }
 #
 # @example With a baseline for gradual adoption
-#   expect(models).to be_false(baseline: ['LegacyModel']) { |m| m.calls_api? }
+#   expect(classes).to be_false(baseline: ['LegacyModel']) { |k| k.lines_of_code > 200 }
 RSpec::Matchers.define :be_false do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 

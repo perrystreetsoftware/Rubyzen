@@ -2,7 +2,10 @@ require 'spec_helper'
 
 RSpec.describe Rubyzen::Declarations::RequireDeclaration do
   def requires_from(source)
-    parse_ruby("#{source}\nx = 1").requires
+    parse_ruby(<<~RUBY).requires
+      #{source}
+      x = 1
+    RUBY
   end
 
   describe '#name' do
@@ -49,7 +52,10 @@ RSpec.describe Rubyzen::Declarations::RequireDeclaration do
 
   describe '#file_path' do
     it 'returns the file path' do
-      file = parse_ruby("require \"json\"\nx = 1", file_path: '/app/init.rb')
+      file = parse_ruby(<<~RUBY, file_path: '/app/init.rb')
+        require "json"
+        x = 1
+      RUBY
       expect(file.requires.first.file_path).to eq('/app/init.rb')
     end
   end

@@ -9,7 +9,7 @@ You are writing an architectural lint rule as an RSpec test using Rubyzen's high
 
 ## Step 0: Understand the Available API
 
-Read `ARCHITECTURE.md` to understand the full API surface. Pay special attention to:
+Read `CLAUDE.md` to understand the full API surface. Pay special attention to:
 - The **Data Flow** tree (what collections are available and how they chain)
 - The **Declaration Reference** table (what methods each declaration exposes)
 - The **Matchers** section (what assertions are available)

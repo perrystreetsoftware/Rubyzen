@@ -2,7 +2,7 @@
 
 ## What is Rubyzen
 
-Rubyzen is a Ruby architectural linter that lets you write lint rules as RSpec tests. Inspired by Konsist (Kotlin) and Harmonize (Swift), it wraps RuboCop AST to provide a high-level, fluent API for enforcing architectural rules across a codebase.
+Rubyzen is a Ruby architectural linter that lets you write lint rules as RSpec tests. Inspired by Konsist (Kotlin) and Harmonize (Swift), it wraps RuboCop AST to provide a high-level, easy-to-use API for enforcing architectural rules across a codebase.
 
 Instead of configuring YAML rules, you write standard RSpec tests:
 

@@ -3,7 +3,10 @@ require 'spec_helper'
 RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
   describe '#name' do
     it 'returns the constant name for assignments' do
-      file = parse_ruby("MAX = 100\nx = 1")
+      file = parse_ruby(<<~RUBY)
+        MAX = 100
+        x = 1
+      RUBY
       const = file.constants.filter(&:assignment?).first
       expect(const.name).to eq('MAX')
     end
@@ -24,19 +27,28 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
 
   describe '#value' do
     it 'returns string values' do
-      file = parse_ruby("NAME = \"hello\"\nx = 1")
+      file = parse_ruby(<<~RUBY)
+        NAME = "hello"
+        x = 1
+      RUBY
       const = file.constants.filter(&:assignment?).first
       expect(const.value).to eq('hello')
     end
 
     it 'returns integer values' do
-      file = parse_ruby("MAX = 100\nx = 1")
+      file = parse_ruby(<<~RUBY)
+        MAX = 100
+        x = 1
+      RUBY
       const = file.constants.filter(&:assignment?).first
       expect(const.value).to eq(100)
     end
 
     it 'returns boolean values' do
-      file = parse_ruby("ENABLED = true\nx = 1")
+      file = parse_ruby(<<~RUBY)
+        ENABLED = true
+        x = 1
+      RUBY
       const = file.constants.filter(&:assignment?).first
       expect(const.value).to eq(true)
     end
@@ -50,7 +62,10 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
 
   describe '#assignment?' do
     it 'returns true for constant assignments' do
-      file = parse_ruby("MAX = 100\nx = 1")
+      file = parse_ruby(<<~RUBY)
+        MAX = 100
+        x = 1
+      RUBY
       const = file.constants.filter(&:assignment?).first
       expect(const.assignment?).to be true
     end
@@ -66,7 +81,10 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
 
   describe '#top_level?' do
     it 'returns true for constants defined at file scope' do
-      file = parse_ruby("MAX = 100\nx = 1")
+      file = parse_ruby(<<~RUBY)
+        MAX = 100
+        x = 1
+      RUBY
       const = file.constants.filter(&:assignment?).first
       expect(const.top_level?).to be true
     end
@@ -98,7 +116,10 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
 
   describe '#source_code' do
     it 'returns the source' do
-      file = parse_ruby("MAX = 100\nx = 1")
+      file = parse_ruby(<<~RUBY)
+        MAX = 100
+        x = 1
+      RUBY
       const = file.constants.filter(&:assignment?).first
       expect(const.source_code).to eq('MAX = 100')
     end
@@ -106,7 +127,10 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
 
   describe '#value with float' do
     it 'returns float values' do
-      file = parse_ruby("RATE = 3.14\nx = 1")
+      file = parse_ruby(<<~RUBY)
+        RATE = 3.14
+        x = 1
+      RUBY
       const = file.constants.filter(&:assignment?).first
       expect(const.value).to eq(3.14)
     end
@@ -126,7 +150,10 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
     end
 
     it 'returns nil when at file level' do
-      file = parse_ruby("MAX = 100\nx = 1")
+      file = parse_ruby(<<~RUBY)
+        MAX = 100
+        x = 1
+      RUBY
       const = file.constants.filter(&:assignment?).first
       expect(const.in_class?).to be_nil
     end

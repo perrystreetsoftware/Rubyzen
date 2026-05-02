@@ -11,7 +11,7 @@ require_relative 'rubyzen/matchers/be_true_matcher'
 require_relative 'rubyzen/matchers/be_false_matcher'
 
 # Rubyzen is a Ruby architectural linter that lets you write lint rules as RSpec tests.
-# It wraps RuboCop AST to provide a high-level, fluent API for enforcing architectural
+# It wraps RuboCop AST to provide a high-level, easy-to-use API for enforcing architectural
 # rules across a codebase.
 #
 # @example Basic usage

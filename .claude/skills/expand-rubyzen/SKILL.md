@@ -170,7 +170,7 @@ end
 - Filter methods use `filter { }`, **never** `select` or `reject` (they are undefined on BaseCollection)
 - Filter methods return the same collection type (this happens automatically via `filter`)
 
-## Step 5: Wire It Up
+## Step 5: Integrate
 
 Include the provider in the declarations that should expose this concept:
 

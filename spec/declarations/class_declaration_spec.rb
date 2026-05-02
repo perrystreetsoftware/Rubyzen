@@ -175,7 +175,11 @@ RSpec.describe Rubyzen::Declarations::ClassDeclaration do
 
   describe '#lines_of_code' do
     it 'returns the number of lines' do
-      file = parse_ruby("class Foo\n  def bar; end\nend")
+      file = parse_ruby(<<~RUBY)
+        class Foo
+          def bar; end
+        end
+      RUBY
       expect(file.classes.first.lines_of_code).to eq(3)
     end
   end
