@@ -41,7 +41,7 @@ RSpec::Matchers.define :be_false do |custom_message=nil, allowlist: nil, baselin
       @failure_reason = if @offenders.any? && stale_exception_groups.any?
                           "Expected to return false for all elements, but found live violations and stale #{stale_exception_groups.join(' and ')}."
                         elsif @offenders.any?
-                          "Expected to return false for all elements, but returned true for:\n#{@offenders.join("\n")}"
+                          "Expected to return false for all elements."
                         elsif stale_exception_groups.any?
                           "Expected to return false for all elements, but found stale #{stale_exception_groups.join(' and ')}."
                         end

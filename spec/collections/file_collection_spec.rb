@@ -45,7 +45,10 @@ RSpec.describe Rubyzen::Collections::FileCollection do
 
   describe '#constants' do
     it 'returns a ConstantsCollection' do
-      file = parse_ruby('MAX = 100', file_path: '/app/config.rb')
+      file = parse_ruby(<<~RUBY, file_path: '/app/config.rb')
+        MAX = 100
+        x = 1
+      RUBY
       coll = Rubyzen::Collections::FileCollection.new([file])
       expect(coll.constants).to be_a(Rubyzen::Collections::ConstantsCollection)
     end
@@ -53,7 +56,10 @@ RSpec.describe Rubyzen::Collections::FileCollection do
 
   describe '#requires' do
     it 'returns a RequiresCollection' do
-      file = parse_ruby('require "json"', file_path: '/app/init.rb')
+      file = parse_ruby(<<~RUBY, file_path: '/app/init.rb')
+        require "json"
+        x = 1
+      RUBY
       coll = Rubyzen::Collections::FileCollection.new([file])
       expect(coll.requires).to be_a(Rubyzen::Collections::RequiresCollection)
     end
