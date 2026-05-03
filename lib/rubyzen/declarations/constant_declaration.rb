@@ -100,7 +100,9 @@ module Rubyzen
       #
       # @return [ClassDeclaration, nil]
       def enclosing_class
-        find_parent_of_type(Rubyzen::Declarations::ClassDeclaration)
+        find_enclosing_ast_node(:class) do |n|
+          Rubyzen::Declarations::ClassDeclaration.new(n, file_declaration)
+        end
       end
 
       # Returns whether this constant is defined inside a class.
@@ -114,7 +116,9 @@ module Rubyzen
       #
       # @return [ModuleDeclaration, nil]
       def enclosing_module
-        find_parent_of_type(Rubyzen::Declarations::ModuleDeclaration)
+        find_enclosing_ast_node(:module) do |n|
+          Rubyzen::Declarations::ModuleDeclaration.new(n, file_declaration)
+        end
       end
 
       # Returns whether this constant is defined inside a module.
@@ -133,11 +137,19 @@ module Rubyzen
 
       private
 
-      def find_parent_of_type(type)
+      def file_declaration
         current = parent
-        while current
-          return current if current.is_a?(type)
-          current = current.respond_to?(:parent) ? current.parent : nil
+        return current if current.is_a?(Rubyzen::Declarations::FileDeclaration)
+        return current.file_declaration if current.respond_to?(:file_declaration)
+
+        nil
+      end
+
+      def find_enclosing_ast_node(type)
+        current_node = node.parent
+        while current_node
+          return yield(current_node) if current_node.type == type
+          current_node = current_node.respond_to?(:parent) ? current_node.parent : nil
         end
         nil
       end

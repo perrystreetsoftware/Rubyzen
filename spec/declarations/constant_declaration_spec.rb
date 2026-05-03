@@ -149,6 +149,17 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
       expect(const.in_class?).to be true
     end
 
+    it 'returns true when obtained via file.constants but inside a class' do
+      file = parse_ruby(<<~RUBY)
+        class Foo
+          MAX = 100
+        end
+      RUBY
+
+      const = file.constants.filter(&:assignment?).first
+      expect(const.in_class?).to be true
+    end
+
     it 'returns false when at file level' do
       file = parse_ruby(<<~RUBY)
         MAX = 100

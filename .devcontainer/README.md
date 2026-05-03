@@ -9,7 +9,7 @@ Rubyzen and the project you want to lint must live in the same parent directory:
 ```
 ~/parent-folder/
 ├── Rubyzen/               (this project)
-├── MyProject/             (the project you want to lint)
+├── YourProject/           (the project you want to lint)
 ```
 
 ## Quick Start
@@ -18,11 +18,11 @@ From your host machine, inside the Rubyzen directory:
 
 ```bash
 cd path/to/Rubyzen
-export RUBYZEN_TARGET_PROJECT=YourProjectName
+export RUBYZEN_TARGET_PROJECT=YourProject
 devcontainer open .
 ```
 
-As a result, the dev container will automatically mount `../YourProjectName` into `/workspaces/target_project` and set `RUBYZEN_PROJECT_PATHS` to `/workspaces/target_project/src,/workspaces/target_project/spec`.
+As a result, the dev container will automatically mount `../YourProject` into `/workspaces/target_project` and set `RUBYZEN_PROJECT_PATHS` to `/workspaces/target_project/src,/workspaces/target_project/spec`.
 
 ## Troubleshooting
 
