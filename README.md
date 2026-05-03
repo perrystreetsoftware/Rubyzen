@@ -55,21 +55,28 @@ end
 
 ```bash
 # Run unit tests (verify Rubyzen's own API works)
+cd path/to/Rubyzen
 bundle exec rspec spec/
 ```
 
-## Running lint rules
+## Running lint rules against the sample project
 
 ```bash
 # Run lint rules on the sample project (expected to fail — intentional violations)
+cd path/to/Rubyzen
 bundle exec rspec sample_project/spec/
 ```
 
-## Environment Setup
+## Running lint rules against your own project
+
+To run the lint rules against your own project, set the `RUBYZEN_PROJECT_PATHS` env var to the folders you want to lint, and then run `bundle exec rspec`:
 
 ```bash
-# Required: comma-separated absolute paths of the project folders to lint
-export RUBYZEN_PROJECT_PATHS="/path/to/src,/path/to/spec"
+cd path/to/Rubyzen
+export RUBYZEN_PROJECT_PATHS="/path/to/your-project/src"
+# Optionally include test files or other folders if you want to lint those too
+# export RUBYZEN_PROJECT_PATHS="/path/to/your-project/src,/path/to/your-project/spec"
+bundle exec rspec path/to/your-project-lint-rules
 ```
 
 ## AI Agent Skills
@@ -84,48 +91,6 @@ Rubyzen includes Claude Code skills in `.claude/skills/` for AI-assisted develop
 | `add-rubyzen-tests` | Write unit tests for Rubyzen's own components |
 | `expand-rubyzen` | Add a new Rubyzen API (Declaration + Provider + Collection) |
 
-## Dev Container Integration
+## Dev Container (optional)
 
-### Quick Start
-
-1. **Set target project environment variable** (REQUIRED):
-   ```bash
-   export RUBYZEN_TARGET_PROJECT=YourProjectName
-   code .
-   ```
-
-**Note:** When changing the `RUBYZEN_TARGET_PROJECT` environment variable, you must rebuild the dev container for the change to take effect.
-
-### Architecture
-
-**Environment-driven setup** — no configuration generation needed:
-- `RUBYZEN_TARGET_PROJECT` environment variable specifies which sibling project to lint
-- Target project mounts to fixed path: `/workspaces/target_project`
-- All configs use static paths pointing to multiple directories: `/workspaces/target_project/src,/workspaces/target_project/spec`
-
-#### Directory Structure
-```
-parent-folder/
-├── Rubyzen/           (this project)
-├── YourProject/       (target project - set via env var)
-└── OtherProject/      (another potential target)
-```
-
-### Usage Examples
-
-```bash
-# Different projects
-export RUBYZEN_TARGET_PROJECT=MyProject && code .
-
-# Team setup with .env file
-echo "RUBYZEN_TARGET_PROJECT=OurMainProject" > .env
-```
-
-### Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| "Environment variable not set" error | `export RUBYZEN_TARGET_PROJECT=YourProject` before `code .` |
-| "Target project not found" | Verify `../$RUBYZEN_TARGET_PROJECT` exists and rebuild container |
-| Mount errors on startup | Check env var is set, target exists, then rebuild container |
-| Changed env var but still seeing old project | Rebuild dev container to update mount path |
+Rubyzen includes a dev container that automatically mounts a sibling project and configures the environment for you. See [`.devcontainer/README.md`](.devcontainer/README.md) for setup instructions.

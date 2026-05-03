@@ -137,6 +137,29 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
   end
 
   describe '#in_class?' do
+    it 'returns true when inside a class' do
+      file = parse_ruby(<<~RUBY)
+        class Foo
+          MAX = 100
+          MIN = 0
+        end
+      RUBY
+
+      const = file.classes.first.constants.filter(&:assignment?).first
+      expect(const.in_class?).to be true
+    end
+
+    it 'returns false when at file level' do
+      file = parse_ruby(<<~RUBY)
+        MAX = 100
+        x = 1
+      RUBY
+      const = file.constants.filter(&:assignment?).first
+      expect(const.in_class?).to be false
+    end
+  end
+
+  describe '#enclosing_class' do
     it 'returns the class declaration when inside a class' do
       file = parse_ruby(<<~RUBY)
         class Foo
@@ -146,7 +169,7 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
       RUBY
 
       const = file.classes.first.constants.filter(&:assignment?).first
-      expect(const.in_class?).to be_a(Rubyzen::Declarations::ClassDeclaration)
+      expect(const.enclosing_class).to be_a(Rubyzen::Declarations::ClassDeclaration)
     end
 
     it 'returns nil when at file level' do
@@ -155,11 +178,25 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
         x = 1
       RUBY
       const = file.constants.filter(&:assignment?).first
-      expect(const.in_class?).to be_nil
+      expect(const.enclosing_class).to be_nil
     end
   end
 
   describe '#in_module?' do
+    it 'returns true when inside a module' do
+      file = parse_ruby(<<~RUBY)
+        module Config
+          TIMEOUT = 30
+          RETRIES = 3
+        end
+      RUBY
+
+      const = file.modules.first.constants.filter(&:assignment?).first
+      expect(const.in_module?).to be true
+    end
+  end
+
+  describe '#enclosing_module' do
     it 'returns the module declaration when inside a module' do
       file = parse_ruby(<<~RUBY)
         module Config
@@ -169,7 +206,7 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
       RUBY
 
       const = file.modules.first.constants.filter(&:assignment?).first
-      expect(const.in_module?).to be_a(Rubyzen::Declarations::ModuleDeclaration)
+      expect(const.enclosing_module).to be_a(Rubyzen::Declarations::ModuleDeclaration)
     end
   end
 end

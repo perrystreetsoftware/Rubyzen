@@ -99,15 +99,29 @@ module Rubyzen
       # Returns the enclosing {ClassDeclaration}, if any.
       #
       # @return [ClassDeclaration, nil]
-      def in_class?
+      def enclosing_class
         find_parent_of_type(Rubyzen::Declarations::ClassDeclaration)
+      end
+
+      # Returns whether this constant is defined inside a class.
+      #
+      # @return [Boolean]
+      def in_class?
+        !enclosing_class.nil?
       end
 
       # Returns the enclosing {ModuleDeclaration}, if any.
       #
       # @return [ModuleDeclaration, nil]
-      def in_module?
+      def enclosing_module
         find_parent_of_type(Rubyzen::Declarations::ModuleDeclaration)
+      end
+
+      # Returns whether this constant is defined inside a module.
+      #
+      # @return [Boolean]
+      def in_module?
+        !enclosing_module.nil?
       end
 
       # Returns whether this constant is defined inside a class or module.

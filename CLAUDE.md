@@ -227,14 +227,11 @@ All matchers use `MatcherHelpers` for formatting failure messages with element n
 ## Environment Setup
 
 ```bash
-# Required: comma-separated absolute paths to analyze
+# Required: comma-separated absolute paths of the project folders to lint
 export RUBYZEN_PROJECT_PATHS="/path/to/src,/path/to/spec"
 
 # Legacy: single directory (still supported)
 export RUBYZEN_PROJECT_PATH="/path/to/src"
-
-# Dev container: specify which sibling project to mount
-export RUBYZEN_TARGET_PROJECT="my-project"
 ```
 
 ## GitHub Action Integration

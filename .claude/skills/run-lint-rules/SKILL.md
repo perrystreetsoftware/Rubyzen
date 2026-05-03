@@ -63,7 +63,4 @@ export RUBYZEN_PROJECT_PATHS="/path/to/src,/path/to/spec"
 
 # Legacy: single directory (still supported)
 export RUBYZEN_PROJECT_PATH="/path/to/src"
-
-# Dev container: specify which sibling project to mount
-export RUBYZEN_TARGET_PROJECT="my-project"
 ```
