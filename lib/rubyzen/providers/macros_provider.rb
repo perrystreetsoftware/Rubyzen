@@ -1,6 +1,8 @@
 module Rubyzen
   module Providers
+    # Provides access to macro-style method calls (e.g., validates, has_many) within a declaration.
     module MacrosProvider
+      # @return [Rubyzen::Collections::MacrosCollection] collection of macro declarations
       def macros
         macros_nodes = node.each_descendant(:send).select(&:macro?)
 

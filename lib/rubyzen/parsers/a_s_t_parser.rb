@@ -2,7 +2,12 @@ require 'rubocop-ast'
 
 module Rubyzen
   module Parsers
+    # Singleton parser that converts Ruby source files into Rubyzen declarations
+    # using RuboCop's AST processing. Results are cached via {Cache::ParseCache}.
     class ASTParser
+      # Returns the singleton instance of the parser.
+      #
+      # @return [ASTParser]
       def self.instance
         @instance ||= new
       end
@@ -11,6 +16,10 @@ module Rubyzen
         @cache = Rubyzen::Cache::ParseCache.new
       end
 
+      # Parses a Ruby source file and returns its declaration, using the cache.
+      #
+      # @param file_path [String] absolute path to the Ruby file
+      # @return [Declarations::FileDeclaration, nil] the parsed file declaration, or nil if unparseable
       def parse_file(file_path)
         @cache.fetch_or_parse(file_path) do
           source = File.read(file_path)

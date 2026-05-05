@@ -1,6 +1,8 @@
 module Rubyzen
   module Providers
+    # Provides access to the enclosing class name by traversing parent declarations.
     module ClassNameProvider
+      # @return [String, nil] the name of the enclosing class, or nil if not within a class
       def class_name
         class_name_recursive(self)
       end

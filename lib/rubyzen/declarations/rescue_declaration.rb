@@ -1,17 +1,33 @@
 module Rubyzen
   module Declarations
+    # Represents a +rescue+ clause within a method or block.
+    #
+    # @example
+    #   rescue_decl = method.rescues.first
+    #   rescue_decl.exception_types #=> ["ArgumentError", "TypeError"]
+    #
     class RescueDeclaration
       include Rubyzen::Providers::FilePathProvider
       include Rubyzen::Providers::LineNumberProvider
       include Rubyzen::Providers::ClassNameProvider
 
-      attr_reader :node, :parent
+      # @return [RuboCop::AST::Node]
+      attr_reader :node
 
+      # @return [MethodDeclaration, BlockDeclaration]
+      attr_reader :parent
+
+      # @param node [RuboCop::AST::Node] the AST node
+      # @param parent [MethodDeclaration, BlockDeclaration] the parent declaration
       def initialize(node, parent)
         @node = node
         @parent = parent
       end
 
+      # Returns the rescued exception class names.
+      # Defaults to +["StandardError"]+ for bare +rescue+.
+      #
+      # @return [Array<String>]
       def exception_types
         extract_exception_types
       end

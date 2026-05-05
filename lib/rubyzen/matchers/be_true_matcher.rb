@@ -1,5 +1,10 @@
-
-
+# Custom RSpec matcher that asserts a block returns true for every item in a collection.
+#
+# @example Ensure all methods have parameters
+#   expect(methods).to be_true { |m| m.parameters? }
+#
+# @example With a custom failure message
+#   expect(services).to be_true("All services must inherit from BaseService") { |s| s.superclass_name == 'BaseService' }
 RSpec::Matchers.define :be_true do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 
@@ -30,7 +35,7 @@ RSpec::Matchers.define :be_true do |custom_message=nil, allowlist: nil, baseline
       @failure_reason = if @offenders.any? && stale_exception_groups.any?
                           "Expected to return true for all elements, but found live violations and stale #{stale_exception_groups.join(' and ')}."
                         elsif @offenders.any?
-                          "Expected to return true for all elements, but returned false for:\n#{@offenders.join("\n")}"
+                          "Expected to return true for all elements."
                         elsif stale_exception_groups.any?
                           "Expected to return true for all elements, but found stale #{stale_exception_groups.join(' and ')}."
                         end
@@ -47,6 +52,6 @@ RSpec::Matchers.define :be_true do |custom_message=nil, allowlist: nil, baseline
   end
 
   failure_message_when_negated do |_|
-    message_for_failure("Expected to return false for at least one element, but returned true for:\n#{Array(@classified_items&.dig(:baseline)).join("\n")}")
+    message_for_failure("Expected to return false for at least one element, but all elements returned true.")
   end
 end

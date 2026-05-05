@@ -1,14 +1,16 @@
-
+# Overrides RSpec's +expect+ method to restrict subjects to Rubyzen collection types.
+# This ensures that architectural lint rules only operate on valid Rubyzen collections,
+# raising an ArgumentError if an unsupported subject type is passed.
 module RSpec
   module Matchers
     alias_method :__original_expect, :expect
 
     # override the public `expect` entrypoint
     def expect(actual = nil, &block)
-      unless valid_collection_subject?(actual)
+      if block.nil? && !valid_collection_subject?(actual)
         raise ArgumentError,
               "Invalid subject for `expect`: " \
-              "only Rubyzen::Domain::Collection or Array of them allowed, " \
+              "only Rubyzen::Collections types allowed, " \
               "but got #{actual.inspect}"
       end
 

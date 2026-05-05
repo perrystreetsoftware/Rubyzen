@@ -1,10 +1,23 @@
 module Rubyzen
   module Matchers
+    # Shared helper methods used by Rubyzen's custom RSpec matchers.
+    #
+    # Provides utilities for normalizing exception lists, extracting item
+    # details, matching items against allowlist/baseline entries, and
+    # formatting failure messages.
     module MatcherHelpers
+      # Normalizes a list of exception entries into unique, non-blank strings.
+      #
+      # @param entries [Array<String>, String, nil] raw exception entries
+      # @return [Array<String>] deduplicated, stripped, non-empty strings
       def normalize_exception_entries(entries)
         Array(entries).flatten.compact.map(&:to_s).map(&:strip).reject(&:empty?).uniq
       end
 
+      # Extracts identifying details from a declaration item.
+      #
+      # @param item [Object] a declaration object (e.g., FileDeclaration, ClassDeclaration)
+      # @return [Hash{Symbol => String, nil}] hash with :name, :class_name, :file_path, :line
       def item_details(item)
         {
           name: item.respond_to?(:name) ? item.name : nil,
@@ -14,6 +27,10 @@ module Rubyzen
         }
       end
 
+      # Returns a list of unique identifier strings for an item, used for matching.
+      #
+      # @param item [Object] a declaration object
+      # @return [Array<String>] identifiers such as name, class name, file path, and file:line
       def item_identifiers(item)
         details = item_details(item)
         identifiers = [details[:name], details[:class_name], details[:file_path]]
@@ -25,6 +42,11 @@ module Rubyzen
         identifiers.compact.uniq
       end
 
+      # Checks whether a given exception entry string matches an item.
+      #
+      # @param entry [String] an allowlist or baseline entry
+      # @param item [Object] a declaration object
+      # @return [Boolean] true if the entry matches the item by name, class, or path
       def exception_entry_matches_item?(entry, item)
         normalized_entry = entry.to_s.strip
         return false if normalized_entry.empty?
@@ -36,6 +58,14 @@ module Rubyzen
         file_path && (file_path.end_with?(normalized_entry) || file_path.end_with?("/#{normalized_entry}"))
       end
 
+      # Classifies items into violations, baseline matches, allowlist matches,
+      # and detects stale entries in either list.
+      #
+      # @param subject_collection [Array, Object] items to classify
+      # @param allowlist [Array<String>, nil] allowed exception entries
+      # @param baseline [Array<String>, nil] baseline exception entries
+      # @return [Hash{Symbol => Array<String>}] keys: :violations, :baseline, :allowlist,
+      #   :stale_baseline, :stale_allowlist
       def classify_items(subject_collection, allowlist: nil, baseline: nil)
         items = Array(subject_collection).compact
         normalized_allowlist = normalize_exception_entries(allowlist)
@@ -77,6 +107,10 @@ module Rubyzen
         )
       end
 
+      # Formats a human-readable description of an item for failure messages.
+      #
+      # @param item [Object] a declaration object
+      # @return [String] formatted multi-line description
       def element_name(item)
         details = item_details(item)
         location = [details[:file_path], details[:line]].compact.join(':')
@@ -93,6 +127,9 @@ module Rubyzen
         end
       end
 
+      # Builds a formatted string of violations and stale entries for failure output.
+      #
+      # @return [String, nil] formatted sections or nil if no classified items
       def formatted_matcher_groups
         return unless defined?(@classified_items) && @classified_items
 

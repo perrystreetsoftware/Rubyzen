@@ -1,18 +1,23 @@
 module Rubyzen
   module Providers
+    # Provides method visibility detection (public, private, protected).
     module VisibilityProvider
+      # @return [Symbol] the visibility of this declaration (:public, :private, or :protected)
       def visibility
         determine_visibility
       end
 
+      # @return [Boolean] true if this declaration is private
       def private?
         visibility == :private
       end
 
+      # @return [Boolean] true if this declaration is protected
       def protected?
         visibility == :protected
       end
 
+      # @return [Boolean] true if this declaration is public
       def public?
         visibility == :public
       end

@@ -1,5 +1,13 @@
 module Rubyzen
   module Declarations
+    # Represents a Ruby module definition.
+    #
+    # @example
+    #   mod = file.modules.first
+    #   mod.name           #=> "Admin::Api"
+    #   mod.all_methods    #=> MethodsCollection
+    #   mod.classes        #=> [ClassDeclaration, ...]
+    #
     class ModuleDeclaration
       include Rubyzen::Providers::FilePathProvider
       include Rubyzen::Providers::LineNumberProvider
@@ -8,13 +16,22 @@ module Rubyzen
       include Rubyzen::Providers::LinesOfCodeProvider
       include Rubyzen::Providers::AttributesProvider
 
-      attr_reader :node, :file_declaration
+      # @return [RuboCop::AST::Node]
+      attr_reader :node
 
+      # @return [FileDeclaration]
+      attr_reader :file_declaration
+
+      # @param node [RuboCop::AST::Node] the AST node
+      # @param file_declaration [FileDeclaration] the parent file declaration
       def initialize(node, file_declaration)
         @node = node
         @file_declaration = file_declaration
       end
 
+      # Returns the fully-qualified module name including parent modules.
+      #
+      # @return [String] e.g. +"Admin::Api"+
       def name
         parent_module_names = []
         current_node = node.parent
@@ -29,20 +46,32 @@ module Rubyzen
         [parent_module_names, name_without_modules].flatten.compact.join('::')
       end
 
+      # Returns the module name without parent module prefixes.
+      #
+      # @return [String]
       def name_without_modules
         node.identifier&.const_name
       end
 
+      # Returns nested modules within this module.
+      #
+      # @return [Array<ModuleDeclaration>]
       def modules
-        node.each_node(:module).map { |mod_node| ModuleDeclaration.new(mod_node, file_declaration) }
+        node.each_descendant(:module).map { |mod_node| ModuleDeclaration.new(mod_node, file_declaration) }
       end
 
+      # Returns classes defined within this module.
+      #
+      # @return [Array<ClassDeclaration>]
       def classes
         node.each_node(:class).map do |class_node|
           ClassDeclaration.new(class_node, file_declaration)
         end
       end
 
+      # Returns methods defined directly in this module.
+      #
+      # @return [Collections::MethodsCollection]
       def all_methods
         Collections::MethodsCollection.new(
           direct_method_nodes.map { |method_node| MethodDeclaration.new(method_node, self) }
