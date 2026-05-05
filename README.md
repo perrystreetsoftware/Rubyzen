@@ -81,7 +81,7 @@ bundle exec rspec path/to/your-project-lint-rules
 
 ## AI Agent Skills
 
-Rubyzen includes Claude Code skills in `.claude/skills/` for AI-assisted development:
+Rubyzen includes agent skills in `.claude/skills/` (also symlinked at `.github/skills/`) that work with both Claude Code and GitHub Copilot:
 
 | Skill | Purpose |
 |---|---|
