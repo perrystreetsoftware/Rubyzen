@@ -139,9 +139,11 @@ module Rubyzen
 
       def file_declaration
         current = parent
-        return current if current.is_a?(Rubyzen::Declarations::FileDeclaration)
-        return current.file_declaration if current.respond_to?(:file_declaration)
-
+        while current
+          return current if current.is_a?(Rubyzen::Declarations::FileDeclaration)
+          return current.file_declaration if current.respond_to?(:file_declaration)
+          current = current.respond_to?(:parent) ? current.parent : nil
+        end
         nil
       end
 

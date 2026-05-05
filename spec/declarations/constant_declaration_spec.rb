@@ -160,6 +160,20 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
       expect(const.in_class?).to be true
     end
 
+    it 'returns true when obtained via method.constants inside a class' do
+      file = parse_ruby(<<~RUBY)
+        class Foo
+          MAX = 100
+          def bar
+            x = MAX
+          end
+        end
+      RUBY
+
+      const = file.classes.first.instance_methods.first.constants.filter(&:reference?).first
+      expect(const.in_class?).to be true
+    end
+
     it 'returns false when at file level' do
       file = parse_ruby(<<~RUBY)
         MAX = 100
@@ -180,6 +194,20 @@ RSpec.describe Rubyzen::Declarations::ConstantDeclaration do
       RUBY
 
       const = file.classes.first.constants.filter(&:assignment?).first
+      expect(const.enclosing_class).to be_a(Rubyzen::Declarations::ClassDeclaration)
+    end
+
+    it 'returns the class declaration when obtained via method.constants' do
+      file = parse_ruby(<<~RUBY)
+        class Foo
+          MAX = 100
+          def bar
+            x = MAX
+          end
+        end
+      RUBY
+
+      const = file.classes.first.instance_methods.first.constants.filter(&:reference?).first
       expect(const.enclosing_class).to be_a(Rubyzen::Declarations::ClassDeclaration)
     end
 
