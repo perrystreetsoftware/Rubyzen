@@ -1,6 +1,3 @@
-require_relative 'base_collection'
-require_relative '../providers/collection_filter_provider'
-
 module Rubyzen
   module Collections
     # Collection of module declarations with methods for navigating into

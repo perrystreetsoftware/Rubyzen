@@ -18,7 +18,7 @@ RSpec.describe 'Do not call ActiveRecord methods on non-repo classes' do
         else
           false
         end
-      }).to be_empty
+      }).to zen_empty
     end
   end
 end
@@ -34,6 +34,3 @@ ACTIVE_RECORD_METHODS = %i[
 ACTIVE_RECORD_MODEL_ALLOWLIST = %w[
   :ProfilePhoto
 ].freeze
-
-# This lint rule solves this comment: https://github.com/perrystreetsoftware/Husband-Redis/pull/4706#discussion_r1870962075
-# It also replaces this custom cop https://github.com/perrystreetsoftware/Husband-Redis/blob/develop/linters/custom_cops/model_use_outside_of_repo.rb

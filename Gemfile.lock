@@ -1,3 +1,11 @@
+PATH
+  remote: .
+  specs:
+    rubyzen (0.1.0)
+      rspec (~> 3.12)
+      rubocop-ast (~> 1.26)
+      zeitwerk (~> 2.6)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -30,22 +38,17 @@ GEM
     rubocop-ast (1.49.1)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
-    yaml (0.1.1)
-    zeitwerk (2.7.5)
     yard (0.9.43)
+    zeitwerk (2.7.5)
 
 PLATFORMS
-  aarch64-linux
   ruby
 
 DEPENDENCIES
   ostruct (~> 0.6.2)
   pry (~> 0.14.1)
-  rspec (~> 3.12)
-  rubocop-ast (~> 1.26)
-  yaml (~> 0.1.0)
+  rubyzen!
   yard (~> 0.9)
-  zeitwerk (~> 2.6)
 
 BUNDLED WITH
    2.5.22

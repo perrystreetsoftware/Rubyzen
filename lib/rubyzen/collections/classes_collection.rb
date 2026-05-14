@@ -4,7 +4,7 @@ module Rubyzen
     # child elements (methods, attributes, macros) and filtering by inheritance.
     #
     # @example Ensuring controllers inherit from ApplicationController
-    #   expect(controllers.with_parent_prefix('ApplicationController')).not_to be_empty
+    #   expect(controllers.with_parent_prefix('ApplicationController')).not_to zen_empty
     class ClassesCollection < BaseCollection
       include Rubyzen::Providers::CollectionFilterProvider
 

@@ -3,7 +3,7 @@ module Rubyzen
     # Collection of raise declarations found in methods or classes.
     #
     # @example Ensuring no plain-string raises in controllers
-    #   expect(controllers.raises.with_string).to be_empty
+    #   expect(controllers.raises.with_string).to zen_empty
     class RaisesCollection < BaseCollection
       # Filters raises that use a plain string message (not an exception class).
       #

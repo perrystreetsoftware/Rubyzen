@@ -53,7 +53,7 @@ spec/
 
 ## Interpreting Failures
 
-- Matcher specs test the custom RSpec matchers (`be_empty`, `be_true`, `be_false`)
+- Matcher specs test the custom RSpec matchers (`zen_empty`, `zen_true`, `zen_false`)
 - Declaration specs test that AST nodes are correctly wrapped and exposed
 - Collection specs test filtering, chaining, and bridge methods
 - If a test fails after adding a new concept, check that providers are included in the right declarations and that bridge methods return the correct collection type

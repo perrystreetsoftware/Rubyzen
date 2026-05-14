@@ -35,7 +35,7 @@ RSpec.describe Rubyzen::Declarations::MethodDeclaration do
         end
       RUBY
 
-      expect(method.parameters).to be_empty
+      expect(method.parameters).to zen_empty
     end
   end
 

@@ -30,7 +30,7 @@ RSpec.describe Rubyzen::Collections::RaisesCollection do
 
     it 'returns empty for non-matching type' do
       result = raises.with_exception_type('TypeError')
-      expect(result).to be_empty
+      expect(result).to zen_empty
     end
   end
 end

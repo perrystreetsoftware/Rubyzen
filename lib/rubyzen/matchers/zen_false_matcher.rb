@@ -4,14 +4,14 @@
 # where the block returns true against exception lists.
 #
 # @example Ensure no methods have more than 5 parameters
-#   expect(methods).to be_false { |m| m.parameters.size > 5 }
+#   expect(methods).to zen_false { |m| m.parameters.size > 5 }
 #
 # @example With a custom failure message
-#   expect(controllers.all_methods.call_sites).to be_false("Controllers must not call .where directly") { |cs| cs.name == 'where' }
+#   expect(controllers.all_methods.call_sites).to zen_false("Controllers must not call .where directly") { |cs| cs.name == 'where' }
 #
 # @example With a baseline for gradual adoption
-#   expect(classes).to be_false(baseline: ['LegacyModel']) { |k| k.lines_of_code > 200 }
-RSpec::Matchers.define :be_false do |custom_message=nil, allowlist: nil, baseline: nil|
+#   expect(classes).to zen_false(baseline: ['LegacyModel']) { |k| k.lines_of_code > 200 }
+RSpec::Matchers.define :zen_false do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 
   match do |subject_collection|

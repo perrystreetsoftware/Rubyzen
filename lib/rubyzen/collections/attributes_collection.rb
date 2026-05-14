@@ -1,12 +1,9 @@
-require_relative 'base_collection'
-require_relative '../providers/collection_filter_provider'
-
 module Rubyzen
   module Collections
     # Collection of attribute declarations (attr_reader, attr_writer, attr_accessor).
     #
     # @example Ensuring no class uses attr_accessor
-    #   expect(controllers.attributes.accessors).to be_empty
+    #   expect(controllers.attributes.accessors).to zen_empty
     class AttributesCollection < BaseCollection
       include Rubyzen::Providers::CollectionFilterProvider
 

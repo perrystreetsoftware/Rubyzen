@@ -51,4 +51,18 @@ RSpec.describe Rubyzen::Project do
       expect(project.files.size).to eq(2)
     end
   end
+
+  describe 'error handling' do
+    it 'raises Rubyzen::Error for a non-existent path' do
+      expect {
+        Rubyzen::Project.new('/non/existent/path')
+      }.to raise_error(Rubyzen::Error, /Path does not exist/)
+    end
+
+    it 'raises Rubyzen::Error for a non-existent path in an array' do
+      expect {
+        Rubyzen::Project.new([fixtures_path, '/non/existent/path'])
+      }.to raise_error(Rubyzen::Error, /Path does not exist/)
+    end
+  end
 end

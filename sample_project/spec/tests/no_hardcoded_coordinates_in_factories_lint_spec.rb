@@ -13,7 +13,7 @@ RSpec.describe 'Use location traits instead of hardcoded coordinates in profile 
     end
 
     it 'does not hardcode latitude and longitude in profile factory calls' do
-      expect(profile_factory_calls).to be_false { |cs|
+      expect(profile_factory_calls).to zen_false { |cs|
         cs.keyword_arg_value_pairs[:latitude].is_a?(Numeric) ||
           cs.keyword_arg_value_pairs[:longitude].is_a?(Numeric)
       }

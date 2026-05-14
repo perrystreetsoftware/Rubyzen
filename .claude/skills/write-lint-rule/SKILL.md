@@ -33,12 +33,12 @@ SCOPE → FILTER → EXTRACT → ASSERT
 
 | English Rule | Rubyzen API |
 |---|---|
-| "Controllers must not call `.where`" | `controllers.all_methods.call_sites.with_name('where')` → `be_empty` |
-| "Models must not define methods ending with `?`" | `models.all_methods.with_name_ending_with('?')` → `be_empty` |
-| "All service classes must inherit from BaseService" | `services` → `be_true { \|k\| k.superclass_name == 'BaseService' }` |
-| "Presenters must not use repository classes" | `presenters.all_methods.call_sites.with_receiver('UserRepo')` → `be_empty` |
-| "No class should have more than 200 lines" | `all_classes` → `be_true { \|k\| k.lines_of_code <= 200 }` |
-| "Every public method must have at most 3 parameters" | `methods.filter(&:public?)` → `be_true { \|m\| m.parameters.size <= 3 }` |
+| "Controllers must not call `.where`" | `controllers.all_methods.call_sites.with_name('where')` → `zen_empty` |
+| "Models must not define methods ending with `?`" | `models.all_methods.with_name_ending_with('?')` → `zen_empty` |
+| "All service classes must inherit from BaseService" | `services` → `zen_true { \|k\| k.superclass_name == 'BaseService' }` |
+| "Presenters must not use repository classes" | `presenters.all_methods.call_sites.with_receiver('UserRepo')` → `zen_empty` |
+| "No class should have more than 200 lines" | `all_classes` → `zen_true { \|k\| k.lines_of_code <= 200 }` |
+| "Every public method must have at most 3 parameters" | `methods.filter(&:public?)` → `zen_true { \|m\| m.parameters.size <= 3 }` |
 
 ## Step 2: Set Up the Shared Context
 
@@ -82,7 +82,7 @@ RSpec.describe 'Rule: Controllers must not call ActiveRecord directly' do
       .call_sites
       .with_name('where')
 
-    expect(violations).to be_empty
+    expect(violations).to zen_empty
   end
 
   it 'controllers do not use .find_by' do
@@ -91,60 +91,49 @@ RSpec.describe 'Rule: Controllers must not call ActiveRecord directly' do
       .call_sites
       .with_name('find_by')
 
-    expect(violations).to be_empty
+    expect(violations).to zen_empty
   end
 end
 ```
 
 ## Available Matchers
 
-### `be_empty`
+### `zen_empty`
 Asserts the collection has no elements. Use for "must not" / "should never" rules. Supports `allowlist:` and `baseline:` for gradual adoption.
 
 ```ruby
-expect(violations).to be_empty
-expect(violations).to be_empty("Custom failure message explaining the rule")
+expect(violations).to zen_empty
+expect(violations).to zen_empty("Custom failure message explaining the rule")
 
 # Allowlist: permanently accepted exceptions
-expect(violations).to be_empty(allowlist: ['LegacyController'])
+expect(violations).to zen_empty(allowlist: ['LegacyController'])
 
 # Baseline: existing violations to fix over time (stale entries cause failure)
-expect(violations).to be_empty(baseline: ['OldController', 'AncientController'])
+expect(violations).to zen_empty(baseline: ['OldController', 'AncientController'])
 ```
 
 Entries match against `name`, `class_name`, `file_path`, or `file_path:line`. Stale entries (listed but no longer violating) cause test failure — this prevents the baseline from going stale.
 
-### `be_true { |item| ... }`
+### `zen_true { |item| ... }`
 Asserts the block returns `true` for ALL elements. Use for "must always" / "every X should" rules. Supports `allowlist:` and `baseline:` for items that fail the check.
 
 ```ruby
-expect(services).to be_true { |klass| klass.superclass_name == 'BaseService' }
+expect(services).to zen_true { |klass| klass.superclass_name == 'BaseService' }
 
 # With baseline for gradual adoption
-expect(services).to be_true(baseline: ['LegacyService']) { |klass| klass.superclass_name == 'BaseService' }
+expect(services).to zen_true(baseline: ['LegacyService']) { |klass| klass.superclass_name == 'BaseService' }
 ```
 
 **IMPORTANT:** Use `{ }` braces, NOT `do...end`. Due to Ruby operator precedence, `do...end` binds to `expect()` instead of the matcher, causing a silent bug.
 
-### `be_false { |item| ... }`
-Asserts the block returns `false` for ALL elements. Inverse of `be_true`. Supports `allowlist:` and `baseline:` for items that fail the check.
+### `zen_false { |item| ... }`
+Asserts the block returns `false` for ALL elements. Inverse of `zen_true`. Supports `allowlist:` and `baseline:` for items that fail the check.
 
 ```ruby
-expect(models).to be_false { |m| m.name.end_with?('Helper') }
+expect(models).to zen_false { |m| m.name.end_with?('Helper') }
 
 # With baseline for gradual adoption
-expect(models).to be_false(baseline: ['OldHelper']) { |m| m.name.end_with?('Helper') }
-```
-
-### `be_empty_with_exceptions` (deprecated)
-**Deprecated.** Use `be_empty(allowlist:, baseline:)` instead — it now supports all the same capabilities.
-
-```ruby
-# Before (deprecated):
-expect(violations).to be_empty_with_exceptions(allowlist: ['LegacyController'])
-
-# After (preferred):
-expect(violations).to be_empty(allowlist: ['LegacyController'])
+expect(models).to zen_false(baseline: ['OldHelper']) { |m| m.name.end_with?('Helper') }
 ```
 
 ## Common API Patterns
@@ -224,7 +213,7 @@ violations = deliver_calls.filter do |site|
     !site.keyword_args.include?(:remote_addr)
 end
 
-expect(violations).to be_empty
+expect(violations).to zen_empty
 ```
 
 ### Block analysis
@@ -247,7 +236,7 @@ This makes violations immediately actionable — developers see exactly where th
 
 - [ ] Rule file is in the correct spec directory
 - [ ] Shared context is available (auto-included or via `include_context 'project_config'`)
-- [ ] Uses `be_empty` for "must not" rules, `be_true { }` for "must always" rules
-- [ ] Uses `{ }` braces (not `do...end`) with `be_true`/`be_false`
+- [ ] Uses `zen_empty` for "must not" rules, `zen_true { }` for "must always" rules
+- [ ] Uses `{ }` braces (not `do...end`) with `zen_true`/`zen_false`
 - [ ] Custom failure message explains *why* the rule exists (optional but recommended)
 - [ ] `bundle exec rspec path/to/spec` runs successfully

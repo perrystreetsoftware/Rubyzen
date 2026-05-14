@@ -15,11 +15,9 @@ RSpec.describe 'Logger info calls include the details keyword arg' do
     end
 
     it "includes the details keyword arg" do
-      expect(logger_call_sites).to be_true { |cs|
+      expect(logger_call_sites).to zen_true { |cs|
         cs.keyword_args.any? { |arg| arg == :details }
       }
     end
   end
 end
-
-# This lint rule solves this comment: https://github.com/perrystreetsoftware/Husband-Redis/pull/4679#discussion_r1857501620
