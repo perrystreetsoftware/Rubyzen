@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'rubocop-ast', '~> 1.26'
-  spec.add_dependency 'zeitwerk', '>= 2.6', '< 2.7'
+  spec.add_dependency 'zeitwerk', '~> 2.6'
   spec.add_dependency 'rspec', '~> 3.12'
 
   spec.metadata = {
