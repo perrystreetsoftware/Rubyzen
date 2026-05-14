@@ -77,7 +77,7 @@ module Rubyzen
     private
 
     def resolve_paths(paths)
-      return nil unless paths
+      return nil unless paths&.any?
 
       root = Dir.pwd
       paths.map do |path|

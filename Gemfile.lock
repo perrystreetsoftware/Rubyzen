@@ -4,7 +4,7 @@ PATH
     rubyzen (0.1.0)
       rspec (~> 3.12)
       rubocop-ast (~> 1.26)
-      zeitwerk (~> 2.6)
+      zeitwerk (>= 2.6, < 2.7)
 
 GEM
   remote: https://rubygems.org/
@@ -39,7 +39,7 @@ GEM
       parser (>= 3.3.7.2)
       prism (~> 1.7)
     yard (0.9.43)
-    zeitwerk (2.7.5)
+    zeitwerk (2.6.18)
 
 PLATFORMS
   ruby

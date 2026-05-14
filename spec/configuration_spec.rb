@@ -14,7 +14,7 @@ RSpec.describe Rubyzen::Configuration do
       config = Rubyzen::Configuration.new
       paths = config.project_paths
       expect(paths).to be_an(Array)
-      expect(paths).not_to zen_empty
+      expect(paths).not_to be_empty
     end
 
     it 'discovers app/, lib/, src/, spec/ from Dir.pwd' do
