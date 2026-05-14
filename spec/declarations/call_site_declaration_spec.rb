@@ -51,7 +51,7 @@ RSpec.describe Rubyzen::Declarations::CallSiteDeclaration do
     it 'returns empty array when no keyword args' do
       sites = call_sites_from('puts "hello"')
       site = sites.with_name('puts').first
-      expect(site.keyword_args).to be_empty
+      expect(site.keyword_args).to zen_empty
     end
   end
 

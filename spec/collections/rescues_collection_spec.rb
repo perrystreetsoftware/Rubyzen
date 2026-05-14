@@ -27,7 +27,7 @@ RSpec.describe Rubyzen::Collections::RescuesCollection do
 
     it 'returns empty for non-matching type' do
       result = rescues.with_exception_type('RuntimeError')
-      expect(result).to be_empty
+      expect(result).to zen_empty
     end
   end
 end

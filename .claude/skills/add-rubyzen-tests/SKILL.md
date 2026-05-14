@@ -193,7 +193,7 @@ Test pass and fail cases. Use `raise_error(RSpec::Expectations::ExpectationNotMe
 ```ruby
 require 'spec_helper'
 
-RSpec.describe 'be_empty matcher' do
+RSpec.describe 'zen_empty matcher' do
   it 'passes when collection is empty' do
     file = parse_ruby(<<~RUBY)
       class Foo
@@ -203,7 +203,7 @@ RSpec.describe 'be_empty matcher' do
 
     # Get an empty collection
     collection = file.classes.first.instance_methods.first.call_sites
-    expect(collection).to be_empty
+    expect(collection).to zen_empty
   end
 
   it 'fails when collection is not empty' do
@@ -217,7 +217,7 @@ RSpec.describe 'be_empty matcher' do
 
     collection = file.classes.first.instance_methods.first.call_sites
     expect {
-      expect(collection).to be_empty
+      expect(collection).to zen_empty
     }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
   end
 end

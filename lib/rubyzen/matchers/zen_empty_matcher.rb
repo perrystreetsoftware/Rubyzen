@@ -4,11 +4,11 @@
 # a forbidden pattern (e.g., no controllers call +.where+ directly).
 #
 # @example Ensure no controllers use .where
-#   expect(controllers.that { have_call_sites_with_names('.where') }).to be_empty
+#   expect(controllers.all_methods.call_sites.with_name('where')).to zen_empty
 #
 # @example With a custom failure message
-#   expect(violations).to be_empty("Controllers should not call .where directly")
-RSpec::Matchers.define :be_empty do |custom_message=nil, allowlist: nil, baseline: nil|
+#   expect(violations).to zen_empty("Controllers should not call .where directly")
+RSpec::Matchers.define :zen_empty do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 
   match do |subject_collection|

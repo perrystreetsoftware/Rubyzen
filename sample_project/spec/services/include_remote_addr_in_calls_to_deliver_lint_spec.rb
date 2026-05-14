@@ -19,7 +19,7 @@ RSpec.describe 'Make sure to include remote_addr: as a param to Relay.deliver' d
         expect(deliver_call_sites.filter do |site|
           !site.keyword_args.include?(:remote_addr) &&
             site.keyword_args.include?(:request_guid)
-        end).to be_empty
+        end).to zen_empty
       end
     end
   end

@@ -27,7 +27,7 @@ RSpec.describe Rubyzen::Declarations::FileDeclaration do
 
     it 'returns empty array when no classes exist' do
       file = parse_ruby('x = 1')
-      expect(file.classes).to be_empty
+      expect(file.classes).to zen_empty
     end
   end
 

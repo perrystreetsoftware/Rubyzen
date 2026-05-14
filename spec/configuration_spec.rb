@@ -1,54 +1,61 @@
 require 'spec_helper'
+require 'tmpdir'
 
 RSpec.describe Rubyzen::Configuration do
   around do |example|
-    original = ENV['RUBYZEN_PROJECT_PATHS']
+    Rubyzen.instance_variable_set(:@configuration, nil)
     example.run
   ensure
-    if original
-      ENV['RUBYZEN_PROJECT_PATHS'] = original
-    else
-      ENV.delete('RUBYZEN_PROJECT_PATHS')
-    end
     Rubyzen.instance_variable_set(:@configuration, nil)
   end
 
   describe '#project_paths' do
-    it 'returns parsed paths from RUBYZEN_PROJECT_PATHS' do
-      ENV['RUBYZEN_PROJECT_PATHS'] = '/tmp,/usr'
+    it 'uses auto-discovery when no paths configured' do
       config = Rubyzen::Configuration.new
-      expect(config.project_paths).to eq(['/tmp', '/usr'])
+      paths = config.project_paths
+      expect(paths).to be_an(Array)
+      expect(paths).not_to be_empty
     end
 
-    it 'strips whitespace from paths' do
-      ENV['RUBYZEN_PROJECT_PATHS'] = ' /tmp , /usr '
+    it 'discovers app/, lib/, src/, spec/ from Dir.pwd' do
       config = Rubyzen::Configuration.new
-      expect(config.project_paths).to eq(['/tmp', '/usr'])
+      paths = config.project_paths
+      lib_path = File.join(Dir.pwd, 'lib')
+      spec_path = File.join(Dir.pwd, 'spec')
+      expect(paths).to include(lib_path)
+      expect(paths).to include(spec_path)
     end
 
-    it 'rejects empty segments' do
-      ENV['RUBYZEN_PROJECT_PATHS'] = '/tmp,,/usr'
-      config = Rubyzen::Configuration.new
-      expect(config.project_paths).to eq(['/tmp', '/usr'])
+    it 'falls back to Dir.pwd when no standard directories exist' do
+      Dir.mktmpdir do |tmpdir|
+        real_tmpdir = File.realpath(tmpdir)
+        Dir.chdir(real_tmpdir) do
+          config = Rubyzen::Configuration.new
+          expect(config.project_paths).to eq([real_tmpdir])
+        end
+      end
     end
   end
 
-  describe 'error handling' do
-    it 'raises when RUBYZEN_PROJECT_PATHS is not set' do
-      ENV.delete('RUBYZEN_PROJECT_PATHS')
-      expect { Rubyzen::Configuration.new }.to raise_error(RuntimeError, /RUBYZEN_PROJECT_PATHS/)
+  describe 'Rubyzen.configure' do
+    it 'allows setting paths via DSL' do
+      Rubyzen.configure do |config|
+        config.paths = ['/tmp', '/usr']
+      end
+      expect(Rubyzen.configuration.project_paths).to eq(['/tmp', '/usr'])
     end
 
-    it 'raises when a path does not exist' do
-      ENV['RUBYZEN_PROJECT_PATHS'] = '/nonexistent/path/abc123'
-      expect { Rubyzen::Configuration.new }.to raise_error(RuntimeError, /Directory not found/)
+    it 'resolves relative paths against Dir.pwd' do
+      Rubyzen.configure do |config|
+        config.paths = ['lib', 'spec']
+      end
+      expected = [File.join(Dir.pwd, 'lib'), File.join(Dir.pwd, 'spec')]
+      expect(Rubyzen.configuration.project_paths).to eq(expected)
     end
   end
 
   describe 'Rubyzen.configuration' do
     it 'returns a memoized Configuration instance' do
-      ENV['RUBYZEN_PROJECT_PATHS'] = '/tmp'
-      Rubyzen.instance_variable_set(:@configuration, nil)
       config1 = Rubyzen.configuration
       config2 = Rubyzen.configuration
       expect(config1).to be(config2)

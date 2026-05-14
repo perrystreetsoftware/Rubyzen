@@ -1,12 +1,9 @@
-require_relative 'base_collection'
-require_relative '../providers/collection_filter_provider'
-
 module Rubyzen
   module Collections
     # Collection of require/require_relative/load statements found in files.
     #
     # @example Ensuring controllers do not use require_relative
-    #   expect(controller_files.requires.require_relative_calls).to be_empty
+    #   expect(controller_files.requires.require_relative_calls).to zen_empty
     class RequiresCollection < BaseCollection
       include Rubyzen::Providers::CollectionFilterProvider
 

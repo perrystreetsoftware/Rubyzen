@@ -1,6 +1,3 @@
-require_relative '../declarations/attribute_declaration'
-require_relative '../collections/attributes_collection'
-
 module Rubyzen
   module Providers
     # Provides access to attr_reader, attr_writer, and attr_accessor declarations.

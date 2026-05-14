@@ -13,7 +13,7 @@ RSpec.describe 'Limit let block size in test files' do
     end
 
     it 'does not have let blocks exceeding the max line limit' do
-      expect(let_blocks).to be_false { |block| block.lines_of_code > max_let_lines }
+      expect(let_blocks).to zen_false { |block| block.lines_of_code > max_let_lines }
     end
   end
 end

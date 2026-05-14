@@ -1,22 +1,22 @@
 require 'spec_helper'
 
-RSpec.describe 'be_true matcher' do
+RSpec.describe 'zen_false matcher' do
   let(:file) do
     parse_ruby(<<~RUBY)
       class Foo
-        def bar(x); end
-        def baz(y); end
+        def bar; end
+        def baz; end
       end
     RUBY
   end
 
   let(:methods) { file.classes.first.instance_methods }
 
-  it 'passes when block returns true for all elements' do
-    expect(methods).to be_true { |m| m.parameters? }
+  it 'passes when block returns false for all elements' do
+    expect(methods).to zen_false { |m| m.parameters? }
   end
 
-  it 'fails when block returns false for any element' do
+  it 'fails when block returns true for any element' do
     file = parse_ruby(<<~RUBY)
       class Foo
         def bar(x); end
@@ -26,27 +26,27 @@ RSpec.describe 'be_true matcher' do
 
     methods = file.classes.first.instance_methods
     expect {
-      expect(methods).to be_true { |m| m.parameters? }
-    }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /Expected to return true for all elements/)
+      expect(methods).to zen_false { |m| m.parameters? }
+    }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /Expected to return false for all elements/)
   end
 
   it 'fails when no block is given' do
     expect {
-      expect(methods).to be_true
+      expect(methods).to zen_false
     }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /Expected a block/)
   end
 
   it 'supports custom failure message' do
     file = parse_ruby(<<~RUBY)
       class Foo
-        def bar; end
+        def bar(x); end
       end
     RUBY
 
     methods = file.classes.first.instance_methods
     expect {
-      expect(methods).to be_true("All methods must have params") { |m| m.parameters? }
-    }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /All methods must have params/)
+      expect(methods).to zen_false("No methods should have params") { |m| m.parameters? }
+    }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /No methods should have params/)
   end
 
   describe 'with allowlist' do
@@ -59,20 +59,20 @@ RSpec.describe 'be_true matcher' do
       RUBY
 
       methods = file.classes.first.instance_methods
-      expect(methods).to be_true(allowlist: ['baz']) { |m| m.parameters? }
+      expect(methods).to zen_false(allowlist: ['bar']) { |m| m.parameters? }
     end
 
     it 'fails on stale allowlist entries' do
       file = parse_ruby(<<~RUBY)
         class Foo
-          def bar(x); end
-          def baz(y); end
+          def bar; end
+          def baz; end
         end
       RUBY
 
       methods = file.classes.first.instance_methods
       expect {
-        expect(methods).to be_true(allowlist: ['nonexistent']) { |m| m.parameters? }
+        expect(methods).to zen_false(allowlist: ['nonexistent']) { |m| m.parameters? }
       }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /stale/i)
     end
   end
@@ -87,20 +87,20 @@ RSpec.describe 'be_true matcher' do
       RUBY
 
       methods = file.classes.first.instance_methods
-      expect(methods).to be_true(baseline: ['baz']) { |m| m.parameters? }
+      expect(methods).to zen_false(baseline: ['bar']) { |m| m.parameters? }
     end
 
     it 'fails on stale baseline entries' do
       file = parse_ruby(<<~RUBY)
         class Foo
-          def bar(x); end
-          def baz(y); end
+          def bar; end
+          def baz; end
         end
       RUBY
 
       methods = file.classes.first.instance_methods
       expect {
-        expect(methods).to be_true(baseline: ['ghost']) { |m| m.parameters? }
+        expect(methods).to zen_false(baseline: ['ghost']) { |m| m.parameters? }
       }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /stale/i)
     end
   end

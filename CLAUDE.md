@@ -8,7 +8,7 @@ Instead of configuring YAML rules, you write standard RSpec tests:
 
 ```ruby
 it 'controllers do not call ActiveRecord directly' do
-  expect(controllers.all_methods.call_sites.with_name('where')).to be_empty
+  expect(controllers.all_methods.call_sites.with_name('where')).to zen_empty
 end
 ```
 
@@ -21,7 +21,7 @@ Rubyzen has four main building blocks:
 | **Declarations** | Domain objects wrapping AST nodes | `ClassDeclaration`, `MethodDeclaration`, `CallSiteDeclaration` |
 | **Collections** | Typed arrays of declarations with filtering/aggregation | `ClassesCollection`, `MethodsCollection` |
 | **Providers** | Mixins that add capabilities to declarations | `CallSiteProvider`, `BlocksProvider` |
-| **Matchers** | RSpec matchers for asserting on collections | `be_empty`, `be_true { }`, `be_false { }` |
+| **Matchers** | RSpec matchers for asserting on collections | `zen_empty`, `zen_true { }`, `zen_false { }` |
 
 ## Data Flow
 
@@ -53,7 +53,7 @@ Every arrow is a method that returns a typed collection. Collections support cha
 
 ```
 lib/rubyzen/
-├── rubyzen.rb                    # Entry point, Zeitwerk loader, configuration
+├── rubyzen.rb                    # Entry point, Zeitwerk loader, configuration, matchers
 ├── project.rb                    # Parses all .rb files, returns FileCollection
 ├── declarations/                 # Domain objects wrapping AST nodes
 │   ├── file_declaration.rb
@@ -105,16 +105,14 @@ lib/rubyzen/
 │   └── collection_filter_provider.rb
 ├── matchers/                     # RSpec custom matchers
 │   ├── matcher_helpers.rb
-│   ├── be_empty_matcher.rb
-│   ├── be_empty_with_exceptions_matcher.rb
-│   ├── be_true_matcher.rb
-│   └── be_false_matcher.rb
+│   ├── zen_empty_matcher.rb
+│   ├── zen_true_matcher.rb
+│   └── zen_false_matcher.rb
 ├── parsers/
 │   └── a_s_t_parser.rb          # Wraps RuboCop AST ProcessedSource
 ├── cache/
 │   └── parse_cache.rb           # SHA256-based in-memory parse cache
-└── rspec/
-    └── rspec_config.rb           # Validates expect() subjects are collections
+└── version.rb                    # Gem version constant
 
 sample_project/
 ├── src/                          # Sample app with intentional violations
@@ -217,28 +215,21 @@ All matchers use `MatcherHelpers` for formatting failure messages with element n
 
 | Matcher | Purpose | Usage |
 |---|---|---|
-| `be_empty` | Collection has no elements. Supports `allowlist:` and `baseline:` for gradual adoption. | `expect(violations).to be_empty` or `expect(violations).to be_empty(baseline: [...])` |
-| `be_true { \|item\| }` | Block returns true for ALL elements. Supports `allowlist:` and `baseline:`. | `expect(methods).to be_true { \|m\| m.parameters.any? }` |
-| `be_false { \|item\| }` | Block returns false for ALL elements. Supports `allowlist:` and `baseline:`. | `expect(methods).to be_false { \|m\| m.name == :biz }` |
-| `be_empty_with_exceptions` | **Deprecated.** Use `be_empty(allowlist:, baseline:)` instead. | `expect(items).to be_empty_with_exceptions(baseline: [...])` |
+| `zen_empty` | Collection has no elements. Supports `allowlist:` and `baseline:` for gradual adoption. | `expect(violations).to zen_empty` or `expect(violations).to zen_empty(baseline: [...])` |
+| `zen_true { \|item\| }` | Block returns true for ALL elements. Supports `allowlist:` and `baseline:`. | `expect(methods).to zen_true { \|m\| m.parameters.any? }` |
+| `zen_false { \|item\| }` | Block returns false for ALL elements. Supports `allowlist:` and `baseline:`. | `expect(methods).to zen_false { \|m\| m.name == :biz }` |
 
-**Important:** Use `{ }` braces (not `do...end`) with `be_true`/`be_false` — `do...end` binds to `expect()` instead of the matcher due to Ruby precedence.
+**Important:** Use `{ }` braces (not `do...end`) with `zen_true`/`zen_false` — `do...end` binds to `expect()` instead of the matcher due to Ruby precedence.
 
-## Environment Setup
+## Configuration
 
-```bash
-# Required: comma-separated absolute paths of the project folders to lint
-export RUBYZEN_PROJECT_PATHS="/path/to/src,/path/to/spec"
+Rubyzen resolves project paths in this order:
 
-# Legacy: single directory (still supported)
-export RUBYZEN_PROJECT_PATH="/path/to/src"
-```
+1. **Explicit paths:** `Rubyzen::Project.new(['app', 'lib'])`
+2. **DSL config:** `Rubyzen.configure { |c| c.paths = ['app', 'lib'] }`
+3. **Auto-discovery:** Scans `app/`, `lib/`, `src/`, `spec/` from `Dir.pwd`
 
-## GitHub Action Integration
-
-Rubyzen ships with a GitHub Action (`action.yml`) for running lint analysis in CI/CD:
-- Configurable target directory and RSpec directory
-- Outputs violations found and full analysis results
+Relative paths are resolved against `Dir.pwd`.
 
 ## Skills
 

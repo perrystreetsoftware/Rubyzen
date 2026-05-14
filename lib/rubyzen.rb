@@ -1,14 +1,16 @@
 require 'rubocop-ast'
+require 'rspec'
 require 'zeitwerk'
 
 loader = Zeitwerk::Loader.for_gem
+loader.ignore("#{__dir__}/rubyzen/matchers")
+loader.ignore("#{__dir__}/rubyzen/rspec")
 loader.setup
 
-# Load RSpec matchers manually since they don't follow class/module naming conventions
-require_relative 'rubyzen/matchers/be_empty_matcher'
-require_relative 'rubyzen/matchers/be_empty_with_exceptions_matcher'
-require_relative 'rubyzen/matchers/be_true_matcher'
-require_relative 'rubyzen/matchers/be_false_matcher'
+require_relative 'rubyzen/matchers/matcher_helpers'
+require_relative 'rubyzen/matchers/zen_empty_matcher'
+require_relative 'rubyzen/matchers/zen_true_matcher'
+require_relative 'rubyzen/matchers/zen_false_matcher'
 
 # Rubyzen is a Ruby architectural linter that lets you write lint rules as RSpec tests.
 # It wraps RuboCop AST to provide a high-level, easy-to-use API for enforcing architectural
@@ -19,50 +21,76 @@ require_relative 'rubyzen/matchers/be_false_matcher'
 #   controllers = project.files.with_paths("controllers/").classes
 #
 #   # Assert controllers don't call ActiveRecord directly
-#   expect(controllers.all_methods.call_sites.with_name("where")).to be_empty
+#   expect(controllers.all_methods.call_sites.with_name("where")).to zen_empty
 #
-# @example Using environment variable
-#   # Set RUBYZEN_PROJECT_PATHS="/path/to/src,/path/to/spec"
-#   project = Rubyzen::Project.new  # reads from env var
+# @example Using auto-discovery (from project root)
+#   project = Rubyzen::Project.new  # scans app/, lib/, src/, spec/ automatically
 #
 module Rubyzen
-  # Returns the global configuration, reading from the +RUBYZEN_PROJECT_PATHS+ environment variable.
+  # Base error class for all Rubyzen errors.
+  class Error < StandardError; end
+
+  # Raised when a Ruby file cannot be parsed.
+  class ParseError < Error; end
+
+  # Yields the global configuration for customization.
+  #
+  # @example
+  #   Rubyzen.configure do |config|
+  #     config.paths = ['app', 'lib']
+  #   end
+  def self.configure
+    yield(configuration)
+  end
+
+  # Returns the global configuration instance.
   #
   # @return [Configuration]
-  # @raise [RuntimeError] if +RUBYZEN_PROJECT_PATHS+ is not set or contains invalid paths
   def self.configuration
     @configuration ||= Configuration.new
   end
 
-  # Reads and validates project paths from the +RUBYZEN_PROJECT_PATHS+ environment variable.
+  # Holds project path configuration with auto-discovery support.
+  #
+  # Resolution order:
+  # 1. Explicit paths via {#paths=} (set via +Rubyzen.configure+)
+  # 2. Auto-discovery of +app/+, +lib/+, +src/+, +spec/+ from +Dir.pwd+
   #
   # @example
-  #   ENV['RUBYZEN_PROJECT_PATHS'] = "/app/src,/app/spec"
-  #   config = Rubyzen::Configuration.new
-  #   config.project_paths #=> ["/app/src", "/app/spec"]
+  #   Rubyzen.configure { |c| c.paths = ['app/models', 'app/controllers'] }
+  #   Rubyzen.configuration.project_paths #=> ["/full/path/app/models", "/full/path/app/controllers"]
   #
   class Configuration
-    # @return [Array<String>] absolute paths to directories to analyze
-    attr_reader :project_paths
+    # Sets explicit paths to scan.
+    # Relative paths are resolved against +Dir.pwd+.
+    #
+    # @param value [Array<String>] directories to analyze
+    attr_writer :paths
 
-    def initialize
-      load_configuration
+    # Returns the resolved project paths.
+    #
+    # @return [Array<String>] absolute paths to directories to analyze
+    def project_paths
+      resolve_paths(@paths) || auto_discover_paths
     end
 
     private
 
-    def load_configuration
-      unless ENV['RUBYZEN_PROJECT_PATHS']
-        raise 'RUBYZEN_PROJECT_PATHS environment variable is required.'
-      end
+    def resolve_paths(paths)
+      return nil unless paths&.any?
 
-      @project_paths = ENV['RUBYZEN_PROJECT_PATHS'].split(',').map(&:strip).reject(&:empty?)
-
-      @project_paths.each do |path|
-        unless Dir.exist?(path)
-          raise "Directory not found: #{path}. Please ensure all paths in RUBYZEN_PROJECT_PATHS exist."
-        end
+      root = Dir.pwd
+      paths.map do |path|
+        File.expand_path(path, root)
       end
+    end
+
+    def auto_discover_paths
+      root = Dir.pwd
+      candidates = %w[app lib src spec].map { |d| File.join(root, d) }
+      paths = candidates.select { |d| Dir.exist?(d) }
+      paths = [root] if paths.empty?
+      paths
     end
   end
 end

@@ -4,7 +4,7 @@ module Rubyzen
     # Collection of method call sites found in classes, methods, or blocks.
     #
     # @example Ensuring controllers do not call .where directly
-    #   expect(controllers.that { have_call_sites_with_names('.where') }).to be_empty
+    #   expect(controllers.that { have_call_sites_with_names('.where') }).to zen_empty
     class CallSiteCollection < BaseCollection
       include Rubyzen::Providers::CollectionFilterProvider
 

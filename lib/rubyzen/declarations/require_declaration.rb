@@ -1,6 +1,3 @@
-require_relative '../providers/file_path_provider'
-require_relative '../providers/line_number_provider'
-
 module Rubyzen
   module Declarations
     # Represents a +require+, +require_relative+, or +load+ statement.

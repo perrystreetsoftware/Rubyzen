@@ -8,7 +8,7 @@ RSpec.describe 'Controllers must have tests' do
   it "Must have corresponding test file" do
     expect(controllers.filter do |c|
       !controller_test_files_set.any? { |f| f.end_with?(corresponding_spec_file(c.file_path)) }
-    end).to be_empty
+    end).to zen_empty
   end
 
   def corresponding_spec_file(source_file_path)

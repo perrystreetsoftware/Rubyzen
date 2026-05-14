@@ -48,19 +48,8 @@ sample_project/
 Lint rules use a shared context defined in `sample_project/spec/spec_helper.rb` that provides pre-built collections:
 
 ```ruby
+let(:project) { Rubyzen::Project.new([sample_src]) }
 let(:controllers) { project.files.with_paths('src/controllers/').classes }
 let(:models) { project.files.with_paths('src/models/').classes }
 let(:services) { project.files.with_paths('src/services/').classes }
-```
-
-## Environment Setup
-
-Lint rules require `RUBYZEN_PROJECT_PATHS` to point at the source to analyze:
-
-```bash
-# Required: comma-separated absolute paths
-export RUBYZEN_PROJECT_PATHS="/path/to/src,/path/to/spec"
-
-# Legacy: single directory (still supported)
-export RUBYZEN_PROJECT_PATH="/path/to/src"
 ```

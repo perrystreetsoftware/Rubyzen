@@ -1,6 +1,3 @@
-require_relative '../declarations/require_declaration'
-require_relative '../collections/requires_collection'
-
 module Rubyzen
   module Providers
     # Provides access to require, require_relative, and load statements within a declaration.

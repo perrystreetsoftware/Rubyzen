@@ -1,11 +1,11 @@
 # Custom RSpec matcher that asserts a block returns true for every item in a collection.
 #
 # @example Ensure all methods have parameters
-#   expect(methods).to be_true { |m| m.parameters? }
+#   expect(methods).to zen_true { |m| m.parameters? }
 #
 # @example With a custom failure message
-#   expect(services).to be_true("All services must inherit from BaseService") { |s| s.superclass_name == 'BaseService' }
-RSpec::Matchers.define :be_true do |custom_message=nil, allowlist: nil, baseline: nil|
+#   expect(services).to zen_true("All services must inherit from BaseService") { |s| s.superclass_name == 'BaseService' }
+RSpec::Matchers.define :zen_true do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 
   match do |subject_collection|
