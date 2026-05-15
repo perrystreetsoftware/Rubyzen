@@ -1,7 +1,7 @@
 require_relative 'lib/rubyzen/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'rubyzen'
+  spec.name          = 'rubyzen-lint'
   spec.version       = Rubyzen::VERSION
   spec.authors       = ['Perry Street Software']
   spec.summary       = 'Architectural linter for Ruby — write lint rules as RSpec tests'
@@ -14,11 +14,11 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 3.1'
 
-  spec.files = Dir.glob(%w[lib/**/*.rb rubyzen.gemspec LICENSE README.md])
+  spec.files = Dir.glob(%w[lib/**/*.rb rubyzen-lint.gemspec LICENSE README.md])
   spec.require_paths = ['lib']
 
   spec.add_dependency 'rubocop-ast', '~> 1.26'
-  spec.add_dependency 'zeitwerk', '>= 2.6', '< 2.7'
+  spec.add_dependency 'zeitwerk', '~> 2.6'
   spec.add_dependency 'rspec', '~> 3.12'
 
   spec.metadata = {

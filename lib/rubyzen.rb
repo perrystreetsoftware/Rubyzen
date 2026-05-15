@@ -5,6 +5,8 @@ require 'zeitwerk'
 loader = Zeitwerk::Loader.for_gem
 loader.ignore("#{__dir__}/rubyzen/matchers")
 loader.ignore("#{__dir__}/rubyzen/rspec")
+loader.ignore("#{__dir__}/rubyzen/lint.rb")
+loader.ignore("#{__dir__}/rubyzen-lint.rb")
 loader.setup
 
 require_relative 'rubyzen/matchers/matcher_helpers'

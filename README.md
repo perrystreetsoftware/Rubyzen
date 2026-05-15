@@ -27,7 +27,7 @@ Traditional linters such as [RuboCop](https://github.com/rubocop/rubocop) requir
 Add Rubyzen to your Gemfile:
 
 ```ruby
-gem 'rubyzen', group: :test
+gem 'rubyzen-lint', group: :test
 ```
 
 Then run `bundle install`.
