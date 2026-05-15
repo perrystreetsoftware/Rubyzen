@@ -32,7 +32,7 @@ gem 'rubyzen-lint', group: :test
 
 Then run `bundle install`.
 
-That's it. Rubyzen auto-discovers your project structure (`app/`, `lib/`, `src/`, `spec/`) from your project root. No environment variables or configuration needed.
+That's it. Rubyzen auto-discovers your project structure (`app/`, `lib/`, `src/`, `spec/`) from your project root. If you need to lint other directories (e.g., `config/`, `db/`), see [Custom Paths](#custom-paths) below.
 
 ## Write your first set of lint rules
 
@@ -70,9 +70,9 @@ You can find more sample lint rules in the [`sample_project/spec/`](sample_proje
 bundle exec rspec spec/architecture/
 ```
 
-## Custom Paths (Optional)
+## Custom Paths
 
-By default, `Rubyzen::Project.new` scans standard directories (`app/`, `lib/`, `src/`, `spec/`) from your project root. You can override this:
+By default, `Rubyzen::Project.new` scans `app/`, `lib/`, `src/`, and `spec/`. If you need to lint other directories (e.g., `config/`, `db/`), add them explicitly, otherwise those files won't be scanned and queries against them will return empty results.
 
 ```ruby
 # In your spec file — scope to specific directories
@@ -80,7 +80,7 @@ project = Rubyzen::Project.new(['app/models', 'app/controllers'])
 
 # Or in spec/spec_helper.rb — configure globally for all specs
 Rubyzen.configure do |config|
-  config.paths = ['app', 'lib']
+  config.paths = ['app', 'lib', 'config']
 end
 ```
 
