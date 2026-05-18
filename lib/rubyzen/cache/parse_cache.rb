@@ -1,6 +1,7 @@
 require 'digest'
 
 module Rubyzen
+  # Caching utilities for parsed AST results.
   module Cache
     # In-memory cache for parsed AST results, keyed by file path and SHA256 checksum.
     # Automatically invalidates entries when file contents change.

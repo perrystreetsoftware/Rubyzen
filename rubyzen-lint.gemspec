@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.metadata = {
     'source_code_uri' => 'https://github.com/perrystreetsoftware/Rubyzen',
-    'bug_tracker_uri' => 'https://github.com/perrystreetsoftware/Rubyzen/issues'
+    'bug_tracker_uri' => 'https://github.com/perrystreetsoftware/Rubyzen/issues',
+    'documentation_uri' => 'https://perrystreetsoftware.github.io/Rubyzen'
   }
 end

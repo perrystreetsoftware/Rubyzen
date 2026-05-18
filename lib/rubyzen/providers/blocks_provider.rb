@@ -1,4 +1,5 @@
 module Rubyzen
+  # Mixins that add capabilities (call sites, blocks, attributes, etc.) to declarations.
   module Providers
     # Provides access to block expressions (do..end / {..}) within a declaration.
     module BlocksProvider

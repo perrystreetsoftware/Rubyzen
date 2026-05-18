@@ -1,5 +1,9 @@
 # Rubyzen
 
+[![Gem Version](https://badge.fury.io/rb/rubyzen-lint.svg)](https://badge.fury.io/rb/rubyzen-lint)
+[![CI](https://github.com/perrystreetsoftware/Rubyzen/actions/workflows/tests.yml/badge.svg)](https://github.com/perrystreetsoftware/Rubyzen/actions/workflows/tests.yml)
+[![Docs](https://img.shields.io/badge/docs-yard-blue)](https://perrystreetsoftware.github.io/Rubyzen)
+
 Rubyzen is an architectural linter for Ruby that lets you write architectural lint rules as unit tests, inspired by [Konsist](https://github.com/LemonAppDev/konsist) (for Kotlin) and [Harmonize](https://github.com/perrystreetsoftware/Harmonize) (for Swift).
 
 ## Architectural linters in the era of AI-generated code

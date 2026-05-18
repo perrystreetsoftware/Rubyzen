@@ -6,4 +6,5 @@ group :development do
   gem 'pry', '~> 0.14.1'
   gem 'ostruct', '~> 0.6.2'
   gem 'yard', '~> 0.9'
+  gem 'webrick', '~> 1.8'
 end

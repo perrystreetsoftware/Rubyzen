@@ -1,4 +1,5 @@
 module Rubyzen
+  # Typed collections that wrap arrays of declarations with filtering and aggregation.
   module Collections
     # Base collection class for all Rubyzen collections.
     # Extends Array and replaces +select+/+reject+ with a single +filter+ method

@@ -1,0 +1,9 @@
+--output-dir doc
+--markup markdown
+--no-private
+--protected
+lib/**/*.rb
+-
+README.md
+CONTRIBUTING.md
+LICENSE
