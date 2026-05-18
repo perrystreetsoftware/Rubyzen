@@ -1,13 +1,23 @@
-# Custom RSpec matcher that asserts a Rubyzen collection is empty.
-#
-# Used in architectural lint rules to verify that no items match
-# a forbidden pattern (e.g., no controllers call +.where+ directly).
-#
-# @example Ensure no controllers use .where
-#   expect(controllers.all_methods.call_sites.with_name('where')).to zen_empty
-#
-# @example With a custom failure message
-#   expect(violations).to zen_empty("Controllers should not call .where directly")
+# @!parse
+#   module Rubyzen
+#     module Matchers
+#       # Asserts that a Rubyzen collection is empty.
+#       #
+#       # Used in architectural lint rules to verify that no items match
+#       # a forbidden pattern (e.g., no controllers call +.where+ directly).
+#       #
+#       # @param custom_message [String, nil] optional failure message
+#       # @param allowlist [Array<String>, nil] items to permanently ignore
+#       # @param baseline [Array<String>, nil] known violations for gradual adoption
+#       #
+#       # @example Ensure no controllers use .where
+#       #   expect(controllers.all_methods.call_sites.with_name('where')).to zen_empty
+#       #
+#       # @example With baseline for gradual adoption
+#       #   expect(violations).to zen_empty(baseline: ['LegacyController'])
+#       def zen_empty(custom_message = nil, allowlist: nil, baseline: nil); end
+#     end
+#   end
 RSpec::Matchers.define :zen_empty do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 

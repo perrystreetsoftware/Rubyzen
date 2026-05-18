@@ -1,4 +1,5 @@
 module Rubyzen
+  # Custom RSpec matchers for asserting on Rubyzen collections.
   module Matchers
     # Shared helper methods used by Rubyzen's custom RSpec matchers.
     #
@@ -152,6 +153,12 @@ module Rubyzen
         sections.join("\n")
       end
 
+      # @!method message_for_failure(base_message)
+      #   Formats the failure message by combining the base message with
+      #   custom messages and classified item details (violations, stale entries).
+      #
+      #   @param base_message [String] the default failure message
+      #   @return [String] formatted failure message
       def self.included(base)
         base.define_method(:message_for_failure) do |base_message|
           return @failure_message if @failure_message

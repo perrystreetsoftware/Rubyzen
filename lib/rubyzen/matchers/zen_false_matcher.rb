@@ -1,16 +1,24 @@
-# Custom RSpec matcher that asserts a block returns false for every item in a collection.
-#
-# Supports +allowlist:+ and +baseline:+ for gradual adoption, matching items
-# where the block returns true against exception lists.
-#
-# @example Ensure no methods have more than 5 parameters
-#   expect(methods).to zen_false { |m| m.parameters.size > 5 }
-#
-# @example With a custom failure message
-#   expect(controllers.all_methods.call_sites).to zen_false("Controllers must not call .where directly") { |cs| cs.name == 'where' }
-#
-# @example With a baseline for gradual adoption
-#   expect(classes).to zen_false(baseline: ['LegacyModel']) { |k| k.lines_of_code > 200 }
+# @!parse
+#   module Rubyzen
+#     module Matchers
+#       # Asserts that a block returns false for every item in a collection.
+#       #
+#       # Supports +allowlist:+ and +baseline:+ for gradual adoption, matching items
+#       # where the block returns true against exception lists.
+#       #
+#       # @param custom_message [String, nil] optional failure message
+#       # @param allowlist [Array<String>, nil] items to permanently ignore
+#       # @param baseline [Array<String>, nil] known violations for gradual adoption
+#       # @yield [item] block that should return false for each item
+#       #
+#       # @example Ensure no methods have more than 5 parameters
+#       #   expect(methods).to zen_false { |m| m.parameters.size > 5 }
+#       #
+#       # @example With a baseline for gradual adoption
+#       #   expect(classes).to zen_false(baseline: ['LegacyModel']) { |k| k.lines_of_code > 200 }
+#       def zen_false(custom_message = nil, allowlist: nil, baseline: nil, &block); end
+#     end
+#   end
 RSpec::Matchers.define :zen_false do |custom_message=nil, allowlist: nil, baseline: nil|
   include Rubyzen::Matchers::MatcherHelpers
 

@@ -1,6 +1,7 @@
 require 'rubocop-ast'
 
 module Rubyzen
+  # Ruby source file parsing utilities.
   module Parsers
     # Singleton parser that converts Ruby source files into Rubyzen declarations
     # using RuboCop's AST processing. Results are cached via {Cache::ParseCache}.

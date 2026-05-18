@@ -1,4 +1,5 @@
 module Rubyzen
+  # Domain objects wrapping AST nodes with high-level accessors.
   module Declarations
     # Represents a parsed Ruby source file. This is the root of the declaration
     # hierarchy — all other declarations are accessed through a FileDeclaration.
