@@ -115,4 +115,4 @@ Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for instructio
 
 ## Perry Street Software is hiring
 
-If you are a ruby or devops engineer excited about [application architecture](https://itnext.io/a-visual-history-of-web-api-architecture-c36044df2ac7) on a platform running at very large scale, check out our [careers](https://www.perrystreet.com/careers) page! Our company has written extensively about our technical approach on the [Perry Street Software Engineering Blog](https://medium.com/perry-street-software-engineering).
+If you are a Ruby or DevOps engineer excited about [application architecture](https://itnext.io/a-visual-history-of-web-api-architecture-c36044df2ac7) on a platform running at very large scale, check out our [careers](https://www.perrystreet.com/careers) page! Our company has written extensively about our technical approach on the [Perry Street Software Engineering Blog](https://medium.com/perry-street-software-engineering).
