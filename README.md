@@ -112,3 +112,7 @@ Rubyzen includes agent skills in `.claude/skills/` (also symlinked at `.github/s
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions on setting up the project, enhancing the API, and adding tests.
+
+## Perry Street Software is hiring
+
+If you are a ruby or devops engineer excited about [application architecture](https://itnext.io/a-visual-history-of-web-api-architecture-c36044df2ac7) on a platform running at very large scale, check out our [careers](https://www.perrystreet.com/careers) page! Our company has written extensively about our technical approach on the [Perry Street Software Engineering Blog](https://medium.com/perry-street-software-engineering).
