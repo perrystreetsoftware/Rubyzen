@@ -1,5 +1,6 @@
 # @!parse
 #   module Rubyzen
+#     # Custom RSpec matchers for asserting on Rubyzen collections.
 #     module Matchers
 #       # Asserts that a Rubyzen collection is empty.
 #       #
@@ -19,7 +20,7 @@
 #     end
 #   end
 RSpec::Matchers.define :zen_empty do |custom_message=nil, allowlist: nil, baseline: nil|
-  include Rubyzen::Matchers::MatcherHelpers
+  include Rubyzen::ExpectationHelpers
 
   match do |subject_collection|
     options = custom_message.is_a?(Hash) ? custom_message : {}

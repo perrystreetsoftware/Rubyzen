@@ -1,4 +1,4 @@
-require 'rubyzen'
+require 'rubyzen/rspec'
 require_relative 'support/parse_helper'
 
 RSpec.configure do |config|

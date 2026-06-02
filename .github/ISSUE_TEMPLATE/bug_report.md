@@ -23,6 +23,6 @@ What actually happened. Include error messages or test output if applicable.
 
 ## Environment
 
-- Ruby version: 
 - Rubyzen version: 
-- RSpec version: 
+- Ruby version: 
+- Test framework & version (RSpec or Minitest): 

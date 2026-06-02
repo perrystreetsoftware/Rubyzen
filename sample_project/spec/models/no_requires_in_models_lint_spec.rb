@@ -1,5 +1,3 @@
-require 'rspec'
-require 'rubyzen'
 require_relative '../spec_helper'
 
 RSpec.describe 'No requires in model files' do

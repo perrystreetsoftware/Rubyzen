@@ -5,12 +5,19 @@ description: Run Rubyzen's unit test suite. Use this skill when the user wants t
 
 # Running Rubyzen Unit Tests
 
-Unit tests verify the correctness of Rubyzen's own API — declarations, providers, collections, and matchers.
+Unit tests verify the correctness of Rubyzen's own API — declarations, providers, collections, RSpec matchers, and Minitest assertions. Rubyzen has two test suites: RSpec specs in `spec/` and Minitest tests in `test/`.
 
 ## Run All Tests
 
 ```bash
-bundle exec rspec spec/
+# Both suites (RSpec then Minitest)
+bundle exec rake
+
+# RSpec only
+bundle exec rspec spec
+
+# Minitest only
+bundle exec rake test
 ```
 
 ## Run a Specific File
@@ -49,6 +56,12 @@ spec/
 ├── project_spec.rb             # Project class tests
 └── cache/
     └── parse_cache_spec.rb     # Caching behavior tests
+
+test/
+├── test_helper.rb              # Loads rubyzen/minitest + parse helper
+├── assertions/
+│   └── zen_assertions_test.rb  # assert_zen_empty / _true / _false
+└── minitest_adapter_test.rb    # Entry-point contract test
 ```
 
 ## Interpreting Failures

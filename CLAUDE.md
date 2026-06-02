@@ -2,13 +2,23 @@
 
 ## What is Rubyzen
 
-Rubyzen is a Ruby architectural linter that lets you write lint rules as RSpec tests. Inspired by Konsist (Kotlin) and Harmonize (Swift), it wraps RuboCop AST to provide a high-level, easy-to-use API for enforcing architectural rules across a codebase.
+Rubyzen is a Ruby architectural linter that lets you write lint rules as RSpec or Minitest tests. Inspired by Konsist (Kotlin) and Harmonize (Swift), it wraps RuboCop AST to provide a high-level, easy-to-use API for enforcing architectural rules across a codebase.
 
-Instead of configuring YAML rules, you write standard RSpec tests:
+Instead of configuring YAML rules, you write standard unit tests.
+
+Using RSpec (`require 'rubyzen/rspec'`):
 
 ```ruby
 it 'controllers do not call ActiveRecord directly' do
   expect(controllers.all_methods.call_sites.with_name('where')).to zen_empty
+end
+```
+
+Or using Minitest (`require 'rubyzen/minitest'`):
+
+```ruby
+def test_controllers_do_not_call_active_record_directly
+  assert_zen_empty(controllers.all_methods.call_sites.with_name('where'))
 end
 ```
 
@@ -21,7 +31,7 @@ Rubyzen has four main building blocks:
 | **Declarations** | Domain objects wrapping AST nodes | `ClassDeclaration`, `MethodDeclaration`, `CallSiteDeclaration` |
 | **Collections** | Typed arrays of declarations with filtering/aggregation | `ClassesCollection`, `MethodsCollection` |
 | **Providers** | Mixins that add capabilities to declarations | `CallSiteProvider`, `BlocksProvider` |
-| **Matchers** | RSpec matchers for asserting on collections | `zen_empty`, `zen_true { }`, `zen_false { }` |
+| **Matchers / Assertions** | RSpec matchers and Minitest assertions for asserting on collections | `zen_empty` / `assert_zen_empty`, `zen_true { }` / `assert_zen_true { }`, `zen_false { }` / `assert_zen_false { }` |
 
 ## Data Flow
 
@@ -53,7 +63,11 @@ Every arrow is a method that returns a typed collection. Collections support cha
 
 ```
 lib/rubyzen/
-├── rubyzen.rb                    # Entry point, Zeitwerk loader, configuration, matchers
+├── rubyzen.rb                    # Entry point — loads core only (require 'rubyzen')
+├── core.rb                       # Framework-agnostic core: Zeitwerk loader + Rubyzen module/Configuration
+├── rspec.rb                      # RSpec adapter (require 'rubyzen/rspec'): core + matchers
+├── minitest.rb                   # Minitest adapter (require 'rubyzen/minitest'): core + assertions
+├── expectation_helpers.rb        # Rubyzen::ExpectationHelpers — shared engine for matchers + assertions
 ├── project.rb                    # Parses all .rb files, returns FileCollection
 ├── declarations/                 # Domain objects wrapping AST nodes
 │   ├── file_declaration.rb
@@ -103,11 +117,15 @@ lib/rubyzen/
 │   ├── rescues_provider.rb
 │   ├── visibility_provider.rb
 │   └── collection_filter_provider.rb
-├── matchers/                     # RSpec custom matchers
-│   ├── matcher_helpers.rb
+├── matchers/                     # RSpec matchers (loaded by rubyzen/rspec)
 │   ├── zen_empty_matcher.rb
 │   ├── zen_true_matcher.rb
 │   └── zen_false_matcher.rb
+├── assertions/                   # Minitest assertions (loaded by rubyzen/minitest)
+│   ├── zen_assertions.rb
+│   ├── assert_zen_empty.rb
+│   ├── assert_zen_true.rb
+│   └── assert_zen_false.rb
 ├── parsers/
 │   └── a_s_t_parser.rb          # Wraps RuboCop AST ProcessedSource
 ├── cache/
@@ -124,13 +142,19 @@ sample_project/
 │   ├── requests/
 │   ├── tests/
 │   └── config.rb
-└── spec/                         # Lint rules as RSpec tests
-    ├── spec_helper.rb            # Shared context with common collections
+├── spec/                         # Lint rules as RSpec tests
+│   ├── spec_helper.rb            # Shared context with common collections (require 'rubyzen/rspec')
+│   ├── controllers/
+│   ├── models/
+│   ├── presenters/
+│   ├── tests/
+│   └── ...
+└── test/                         # Lint rules as Minitest tests (parallel subset)
+    ├── test_helper.rb            # LintTestCase base class (require 'rubyzen/minitest')
     ├── controllers/
     ├── models/
-    ├── presenters/
-    ├── tests/
-    └── ...
+    ├── repos/
+    └── database/
 ```
 
 ## How the Pieces Connect
@@ -209,17 +233,35 @@ Each declaration wraps an AST node and exposes domain-specific methods:
 | `RaiseDeclaration` | `exception_types`, `with_string?`, `message` | FilePathProvider, LineNumberProvider, ClassNameProvider, SourceCodeProvider |
 | `RescueDeclaration` | `exception_types` | FilePathProvider, LineNumberProvider, ClassNameProvider |
 
-## Matchers
+## Matchers (RSpec) and Assertions (Minitest)
 
-All matchers use `MatcherHelpers` for formatting failure messages with element name, class, and file location.
+Rubyzen exposes the same three checks for both frameworks. The RSpec matchers (`lib/rubyzen/matchers/`) and the Minitest assertions (`lib/rubyzen/assertions/`) both delegate to the shared `Rubyzen::ExpectationHelpers` (`lib/rubyzen/expectation_helpers.rb`) for allowlist/baseline classification and for formatting failure messages with element name, class, and file location.
 
-| Matcher | Purpose | Usage |
+| RSpec matcher | Minitest assertion | Purpose |
 |---|---|---|
-| `zen_empty` | Collection has no elements. Supports `allowlist:` and `baseline:` for gradual adoption. | `expect(violations).to zen_empty` or `expect(violations).to zen_empty(baseline: [...])` |
-| `zen_true { \|item\| }` | Block returns true for ALL elements. Supports `allowlist:` and `baseline:`. | `expect(methods).to zen_true { \|m\| m.parameters.any? }` |
-| `zen_false { \|item\| }` | Block returns false for ALL elements. Supports `allowlist:` and `baseline:`. | `expect(methods).to zen_false { \|m\| m.name == :biz }` |
+| `zen_empty` | `assert_zen_empty(collection)` | Collection has no elements. Supports `allowlist:` / `baseline:` for gradual adoption. |
+| `zen_true { \|item\| }` | `assert_zen_true(collection) { \|item\| }` | Block returns true for ALL elements. Supports `allowlist:` / `baseline:`. |
+| `zen_false { \|item\| }` | `assert_zen_false(collection) { \|item\| }` | Block returns false for ALL elements. Supports `allowlist:` / `baseline:`. |
 
-**Important:** Use `{ }` braces (not `do...end`) with `zen_true`/`zen_false` — `do...end` binds to `expect()` instead of the matcher due to Ruby precedence.
+### Examples
+
+RSpec:
+
+```ruby
+expect(violations).to zen_empty(baseline: [...])
+expect(methods).to zen_true { |m| m.parameters.any? }
+expect(methods).to zen_false { |m| m.name == :biz }
+```
+
+Minitest:
+
+```ruby
+assert_zen_empty(violations, baseline: [...])
+assert_zen_true(methods) { |m| m.parameters.any? }
+assert_zen_false(methods) { |m| m.name == :biz }
+```
+
+**Important (RSpec only):** Use `{ }` braces (not `do...end`) with `zen_true`/`zen_false` — `do...end` binds to `expect()` instead of the matcher due to Ruby precedence. This caveat does not apply to the Minitest assertions (the block binds to the assertion method either way).
 
 ## Configuration
 

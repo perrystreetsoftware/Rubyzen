@@ -4,7 +4,7 @@
 [![CI](https://github.com/perrystreetsoftware/Rubyzen/actions/workflows/tests.yml/badge.svg)](https://github.com/perrystreetsoftware/Rubyzen/actions/workflows/tests.yml)
 [![Docs](https://img.shields.io/badge/docs-yard-blue)](https://perrystreetsoftware.github.io/Rubyzen)
 
-Rubyzen is an architectural linter for Ruby that lets you write architectural lint rules as unit tests, inspired by [Konsist](https://github.com/LemonAppDev/konsist) (for Kotlin) and [Harmonize](https://github.com/perrystreetsoftware/Harmonize) (for Swift).
+Rubyzen is an architectural linter for Ruby that allows you to write architectural lint rules as unit tests, inspired by [Konsist](https://github.com/LemonAppDev/konsist) (for Kotlin) and [Harmonize](https://github.com/perrystreetsoftware/Harmonize) (for Swift).
 
 ## Architectural linters in the era of AI-generated code
 
@@ -28,22 +28,26 @@ Traditional linters such as [RuboCop](https://github.com/rubocop/rubocop) requir
 
 ## Setup
 
-Add Rubyzen to your Gemfile:
+Add Rubyzen to your Gemfile's test group, alongside your test framework.
 
 ```ruby
-gem 'rubyzen-lint', group: :test
+group :test do
+  gem 'rubyzen-lint'
+  # gem 'rspec'      # if you use RSpec (or rspec-rails)
+  # gem 'minitest'   # if you use Minitest
+end
 ```
 
 Then run `bundle install`.
 
-That's it. Rubyzen auto-discovers your project structure (`app/`, `lib/`, `src/`, `spec/`) from your project root. If you need to lint other directories (e.g., `config/`, `db/`), see [Custom Paths](#custom-paths) below.
+Rubyzen auto-discovers your project structure (`app/`, `lib/`, `src/`, `spec/`) from your project root. If you need to lint other directories (e.g., `config/`, `db/`), see [Custom Paths](#custom-paths) below.
 
 ## Write your first set of lint rules
 
 Create a spec file anywhere in your project (e.g., `spec/architecture/sample_spec.rb`) and start enforcing your architecture:
 
 ```ruby
-require 'rubyzen'
+require 'rubyzen/rspec'
 
 RSpec.describe 'Architecture rules' do
   let(:project) { Rubyzen::Project.new }
@@ -68,10 +72,43 @@ end
 
 You can find more sample lint rules in the [`sample_project/spec/`](sample_project/spec/) directory.
 
+## Using Minitest
+
+If you use Minitest instead of RSpec, replace `require 'rubyzen/rspec'` with `require 'rubyzen/minitest'` and use the equivalent Minitest assertions:
+
+```ruby
+require 'rubyzen/minitest'
+
+class ArchitectureTest < Minitest::Test
+  def controllers = Rubyzen::Project.new.files.with_paths('app/controllers/').classes
+
+  def test_controllers_do_not_call_active_record_directly
+    assert_zen_empty(controllers.all_methods.call_sites.with_name('where'))
+  end
+end
+```
+
+## Matchers and assertions
+
+Rubyzen provides three checks for your architectural lint rules:
+
+| Using RSpec | Using Minitest | Checks that |
+|---|---|---|
+| `zen_empty` | `assert_zen_empty(collection)` | the collection is empty |
+| `zen_true { \|item\| }` | `assert_zen_true(collection) { \|item\| }` | the block returns true for every element |
+| `zen_false { \|item\| }` | `assert_zen_false(collection) { \|item\| }` | the block returns false for every element |
+
+All three accept an `allowlist:` of exceptions that are permanently exempt from the rule, a `baseline:` of known existing violations (technical debt) to fix over time, and a custom failure message.
+
 ## Run your lint rules
 
 ```bash
+# If you use RSpec:
 bundle exec rspec spec/architecture/
+
+# If you use Minitest:
+bundle exec rake lint              # via a Rake task
+bin/rails test test/architecture   # via the Rails test runner
 ```
 
 ## Custom Paths
@@ -94,7 +131,11 @@ Add a step to your existing CI workflow to run your lint rules automatically whe
 
 ```yaml
 - name: Run architecture lint rules
+  # If you use RSpec:
   run: bundle exec rspec spec/architecture/
+  
+  # If you use Minitest:
+  # run: bundle exec rake lint
 ```
 
 ## AI Agent Skills

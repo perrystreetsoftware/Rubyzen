@@ -1,5 +1,3 @@
-require 'rspec'
-require 'rubyzen'
 require_relative '../spec_helper'
 
 RSpec.describe 'No public attr_writer in domain models' do

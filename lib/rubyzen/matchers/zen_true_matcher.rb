@@ -17,7 +17,7 @@
 #     end
 #   end
 RSpec::Matchers.define :zen_true do |custom_message=nil, allowlist: nil, baseline: nil|
-  include Rubyzen::Matchers::MatcherHelpers
+  include Rubyzen::ExpectationHelpers
 
   match do |subject_collection|
     options = custom_message.is_a?(Hash) ? custom_message : {}

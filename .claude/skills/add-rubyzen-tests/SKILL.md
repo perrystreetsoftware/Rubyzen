@@ -1,13 +1,15 @@
 ---
 name: add-rubyzen-tests
-description: Write unit tests for Rubyzen's own API components — declarations, providers, collections, or matchers. Use this skill when the user wants to add tests for an existing or newly added Rubyzen component, increase test coverage, or write specs for untested methods. Also trigger when the user says "test this declaration", "add specs for", or "write tests for the X collection".
+description: Write unit tests for Rubyzen's own API components — declarations, providers, collections, RSpec matchers, or Minitest assertions. Use this skill when the user wants to add tests for an existing or newly added Rubyzen component, increase test coverage, or write specs for untested methods. Also trigger when the user says "test this declaration", "add specs for", or "write tests for the X collection".
 ---
 
 # Writing Unit Tests for Rubyzen
 
-You are writing unit tests for Rubyzen's internal API — the declarations, providers, collections, and matchers that make up the library. These tests verify that Rubyzen's own code works correctly.
+You are writing unit tests for Rubyzen's internal API — the declarations, providers, collections, RSpec matchers, and Minitest assertions that make up the library. These tests verify that Rubyzen's own code works correctly.
 
 **This is NOT about writing lint rules.** Lint rules test user codebases; unit tests test Rubyzen itself. Use the `write-lint-rule` skill for lint rules.
+
+Rubyzen has **two unit-test suites**: RSpec specs in `spec/` cover the core API (declarations, collections, providers) and the RSpec matchers; Minitest tests in `test/` cover the Minitest assertions (`assert_zen_*`).
 
 ## Step 0: Understand the Test Infrastructure
 
@@ -225,6 +227,34 @@ end
 
 **Note:** Do NOT use `fail_with` — it's not available. Use `raise_error(RSpec::Expectations::ExpectationNotMetError, /pattern/)` to test failure messages.
 
+## Writing Minitest Assertion Tests
+
+The Minitest assertions (`assert_zen_empty` / `assert_zen_true` / `assert_zen_false`) live in `lib/rubyzen/assertions/` and are tested with **Minitest**, not RSpec, under `test/` — the counterpart of the matcher specs above.
+
+Files: `test/assertions/assert_<assertion_name>_test.rb`
+
+You need to require `test/test_helper.rb` (which requires `rubyzen/minitest` and provides the same `parse_ruby` helper via the `ParseHelper` module), subclass `Minitest::Test`, and use `assert_raises(Minitest::Assertion)` to test failures:
+
+```ruby
+require_relative '../test_helper'
+
+class AssertZenEmptyTest < Minitest::Test
+  include ParseHelper
+
+  def test_zen_empty_passes_when_collection_is_empty
+    assert_zen_empty(Rubyzen::Collections::ClassesCollection.new)
+  end
+
+  def test_zen_empty_fails_when_collection_is_not_empty
+    collection = parse_ruby('class Foo; end').classes
+    error = assert_raises(Minitest::Assertion) { assert_zen_empty(collection) }
+    assert_match(/Expected to be empty/, error.message)
+  end
+end
+```
+
+Run with `bundle exec rake test` (or `bundle exec ruby -Itest test/assertions/assert_zen_empty_test.rb`). The assertion tests cover the same cases as the matcher specs — pass/fail, `allowlist:`, `baseline:`, stale entries, custom `message:` — plus a missing block raising `ArgumentError` for `assert_zen_true` / `assert_zen_false`.
+
 ## When to Use Fixture Files
 
 Use `spec/fixtures/` with real `.rb` files only when testing:
@@ -251,4 +281,5 @@ For everything else, use inline `parse_ruby` snippets.
 - [ ] Tests type preservation for collection `filter`
 - [ ] Snippets have 2+ statements when testing file-level providers
 - [ ] Does NOT use `fail_with` (uses `raise_error` instead)
-- [ ] `bundle exec rspec spec/` passes
+- [ ] Minitest assertion tests live in `test/`, require `test_helper`, and use `assert_raises(Minitest::Assertion)`
+- [ ] `bundle exec rake` passes (RSpec `spec/` + Minitest `test/`)

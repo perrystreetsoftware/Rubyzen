@@ -1,6 +1,6 @@
 ---
 name: write-lint-rule
-description: Write an architectural lint rule for a Ruby project using the Rubyzen API. Use this skill when the user wants to create a new lint rule, enforce an architectural constraint, add a code quality check, or write an RSpec test that validates code structure. Also trigger when the user says things like "controllers shouldn't do X", "models must always Y", "enforce that Z", or "add a rule for".
+description: Write an architectural lint rule for a Ruby project using the Rubyzen API. Use this skill when the user wants to create a new lint rule, enforce an architectural constraint, add a code quality check, or write an RSpec or Minitest test that validates code structure. Also trigger when the user says things like "controllers shouldn't do X", "models must always Y", "enforce that Z", or "add a rule for".
 ---
 
 # Writing a Lint Rule with Rubyzen
@@ -45,7 +45,7 @@ SCOPE → FILTER → EXTRACT → ASSERT
 Lint rules use a shared context in `spec_helper.rb` that provides pre-built collections. Read the existing `spec_helper.rb` in the target project's spec directory. If it doesn't exist, create one:
 
 ```ruby
-require 'rubyzen'
+require 'rubyzen/rspec'
 
 RSpec.configure do |config|
   RSpec.shared_context 'project_config' do
@@ -135,6 +135,59 @@ expect(models).to zen_false { |m| m.name.end_with?('Helper') }
 # With baseline for gradual adoption
 expect(models).to zen_false(baseline: ['OldHelper']) { |m| m.name.end_with?('Helper') }
 ```
+
+## Minitest variant
+
+Rubyzen includes a Minitest adapter alongside the RSpec matchers. The `SCOPE → FILTER → EXTRACT → ASSERT` model is identical — only the assertion call changes. The assertions mirror the matchers one-to-one, including the same `allowlist:` / `baseline:` support and the same rich failure messages.
+
+**Shared context** — define a `test/test_helper.rb` that requires the Minitest adapter and provides a base class with pre-built collections (the Minitest counterpart of the RSpec shared context):
+
+```ruby
+# test/test_helper.rb
+require 'rubyzen/minitest'
+require 'minitest/autorun'
+
+class LintTestCase < Minitest::Test
+  def project = @project ||= Rubyzen::Project.new
+
+  # Scope collections by directory
+  def controllers = @controllers ||= project.files.with_paths('src/controllers/').classes
+  def models      = @models      ||= project.files.with_paths('src/models/').classes
+  def services    = @services    ||= project.files.with_paths('src/services/').classes
+  # Add more as needed...
+end
+```
+
+**Assertion equivalents:**
+
+| RSpec matcher | Minitest assertion |
+|---|---|
+| `expect(c).to zen_empty` | `assert_zen_empty(c)` |
+| `expect(c).to zen_empty("msg")` | `assert_zen_empty(c, message: "msg")` |
+| `expect(c).to zen_empty(allowlist: [...], baseline: [...])` | `assert_zen_empty(c, allowlist: [...], baseline: [...])` |
+| `expect(c).to zen_true { \|x\| ... }` | `assert_zen_true(c) { \|x\| ... }` |
+| `expect(c).to zen_false { \|x\| ... }` | `assert_zen_false(c) { \|x\| ... }` |
+
+Note the custom message is a positional arg in RSpec but the `message:` keyword in Minitest.
+
+**Example:**
+
+```ruby
+require 'test_helper'
+
+# `controllers`, `models`, etc. are available from the LintTestCase base class
+class ControllersTest < LintTestCase
+  def test_controllers_do_not_use_where
+    assert_zen_empty(controllers.all_methods.call_sites.with_name('where'))
+  end
+
+  def test_controllers_inherit_from_application_controller
+    assert_zen_true(controllers) { |c| c.superclass_name == 'ApplicationController' }
+  end
+end
+```
+
+The `{ }`-vs-`do...end` precedence caveat does **not** apply here (the block binds to the assertion method call either way), but `{ }` is still recommended for consistency.
 
 ## Common API Patterns
 

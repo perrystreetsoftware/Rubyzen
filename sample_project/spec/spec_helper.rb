@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rubyzen'
+require 'rubyzen/rspec'
 
 sample_src = File.expand_path('../src', __dir__)
 
