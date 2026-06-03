@@ -5,4 +5,5 @@
 ### Checklist
 
 - [ ] Tests are added or updated for the changes
-- [ ] `bundle exec rspec spec/` passes locally
+- [ ] YARD docs are added or updated for the changes
+- [ ] `bundle exec rake` passes locally (runs both the RSpec and Minitest suites)

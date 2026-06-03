@@ -47,7 +47,7 @@ module Rubyzen
     #   decl.name #=> "example"
     #
     class <Concept>Declaration
-      # Always include these three for matcher output:
+      # Always include these three for matcher/assertion failure output:
       include Rubyzen::Providers::FilePathProvider
       include Rubyzen::Providers::LineNumberProvider
       include Rubyzen::Providers::ClassNameProvider
@@ -82,7 +82,7 @@ module Rubyzen
       # so if you use a custom name, add `alias :parent :<custom_name>` to ensure
       # FilePathProvider can walk the tree.
 
-      # REQUIRED: Used by matchers for failure messages.
+      # REQUIRED: Used by the RSpec matchers and Minitest assertions for failure messages.
       # @return [String]
       def name
         # Return a meaningful identifier for this declaration
@@ -97,8 +97,8 @@ end
 
 **Rules:**
 - `node` and `parent` are always `attr_reader` — providers depend on them
-- `FilePathProvider`, `LineNumberProvider`, `ClassNameProvider` are **required** — matchers use `file_path`, `line`, and `class_name` for failure messages
-- A `name` method is **required** — matchers call it via `element_name`
+- `FilePathProvider`, `LineNumberProvider`, `ClassNameProvider` are **required** — the RSpec matchers and Minitest assertions use `file_path`, `line`, and `class_name` (via the shared `ExpectationHelpers`) for failure messages
+- A `name` method is **required** — both frameworks call it via `element_name`
 - Zeitwerk autoloads — no `require` statements needed (exception: if the file is loaded before Zeitwerk, add explicit `require_relative`)
 
 ## Step 3: Create the Provider
@@ -289,7 +289,7 @@ This affects any provider that uses `each_descendant` on file-level nodes.
 
 1. Add the new declaration to the **Declaration Reference** table in `CLAUDE.md`
 2. Add the new collection to the **Data Flow** tree in `CLAUDE.md`
-3. Run `bundle exec rspec spec/` to verify all tests pass
+3. Run `bundle exec rake` to verify all tests pass (RSpec `spec/` + Minitest `test/`)
 
 ## Checklist
 
@@ -308,4 +308,4 @@ Before considering the work complete, verify:
 - [ ] Collection spec tests `CollectionFilterProvider` methods and domain-specific filters
 - [ ] Test snippets have 2+ statements (single-statement gotcha)
 - [ ] `CLAUDE.md` updated
-- [ ] `bundle exec rspec spec/` passes
+- [ ] `bundle exec rake` passes (RSpec `spec/` + Minitest `test/`)

@@ -5,7 +5,7 @@ RSpec.describe 'Do not call ActiveRecord methods on non-repo classes' do
   let(:baseline) { [] }
   let(:active_record_models) do
     models.with_parent_prefix('ActiveRecord::BaseAurora')
-      .without_name(baseline)
+      .without_name(*baseline)
   end
 
   context "given a class that is not a repo" do
