@@ -106,10 +106,11 @@ All three accept an `allowlist:` of exceptions that are permanently exempt from 
 # If you use RSpec:
 bundle exec rspec spec/architecture/
 
-# If you use Minitest:
-bundle exec rake lint              # via a Rake task
-bin/rails test test/architecture   # via the Rails test runner
+# If you use Minitest in Rails:
+bin/rails test test/architecture
 ```
+
+If you use Minitest outside of Rails, you can use a `Rake::TestTask` to run all lint rules in `test/architecture/`.
 
 ## Custom Paths
 
@@ -131,12 +132,10 @@ Add a step to your existing CI workflow to run your lint rules automatically whe
 
 ```yaml
 - name: Run architecture lint rules
-  # If you use RSpec:
   run: bundle exec rspec spec/architecture/
-  
-  # If you use Minitest:
-  # run: bundle exec rake lint
 ```
+
+If you use Minitest in Rails, run `bin/rails test test/architecture` instead. For plain Ruby apps, use the `Rake::TestTask` described above.
 
 ## AI Agent Skills
 

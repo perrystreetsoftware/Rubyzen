@@ -15,7 +15,7 @@ class DoNotCallActiveRecordModelsOutsideReposTest < LintTestCase
   end
 
   def active_record_models
-    models.with_parent_prefix('ActiveRecord::BaseAurora').without_name(baseline)
+    models.with_parent_prefix('ActiveRecord::BaseAurora').without_name(*baseline)
   end
 
   def non_repo_classes

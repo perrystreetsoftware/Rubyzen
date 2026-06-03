@@ -20,7 +20,7 @@ begin
   require 'rspec'
 rescue LoadError
   raise LoadError, "Rubyzen's RSpec matchers require the 'rspec' gem. " \
-                   "Add `gem 'rspec'` to your Gemfile, or use the Minitest matchers via `require 'rubyzen/minitest'`."
+                   "Add `gem 'rspec'` to your Gemfile, or use the Minitest assertions via `require 'rubyzen/minitest'`."
 end
 
 require_relative 'expectation_helpers'
