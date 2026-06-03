@@ -32,12 +32,14 @@ loader.setup
 # It wraps RuboCop AST to provide a high-level, easy-to-use API for enforcing architectural
 # rules across a codebase.
 #
-# @example Basic usage
+# `require 'rubyzen'` loads this framework-agnostic core API only. To make an assertion on a
+# collection in a test, require the respective adapter: +rubyzen/rspec+ (the +zen_*+ matchers) or
+# +rubyzen/minitest+ (the +assert_zen_*+ assertions).
+#
+# @example Querying the project
 #   project = Rubyzen::Project.new(["/path/to/src", "/path/to/spec"])
 #   controllers = project.files.with_paths("controllers/").classes
-#
-#   # Assert controllers don't call ActiveRecord directly
-#   expect(controllers.all_methods.call_sites.with_name("where")).to zen_empty
+#   controllers.all_methods.call_sites.with_name("where") # => CallSiteCollection
 #
 # @example Using auto-discovery (from project root)
 #   project = Rubyzen::Project.new  # scans app/, lib/, src/, spec/ automatically

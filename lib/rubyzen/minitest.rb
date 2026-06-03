@@ -16,7 +16,14 @@
 # mixed into +Minitest::Assertions+, so they are available in every Minitest test
 # class and spec-style block automatically.
 require_relative 'core'
-require 'minitest'
+
+begin
+  require 'minitest'
+rescue LoadError
+  raise LoadError, "Rubyzen's Minitest assertions require the 'minitest' gem. " \
+                   "Add `gem 'minitest'` to your Gemfile, or use the RSpec matchers via `require 'rubyzen/rspec'`."
+end
+
 require_relative 'assertions/zen_assertions'
 
 # Call +include+ via +send+ so YARD's static parser doesn't try to document a
