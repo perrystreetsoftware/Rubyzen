@@ -9,10 +9,13 @@ require_relative '../../lib/rubyzen/version'
 tag = ENV.fetch('RELEASE_TAG', '').strip
 version = Rubyzen::VERSION
 
-if version == tag
+if tag.empty?
+  puts '::error::RELEASE_TAG is not set.'
+  exit 1
+elsif version == tag
   puts "version.rb (#{version}) matches the release tag (#{tag})"
 else
   puts "::error::version.rb (#{version}) does not match the release tag (#{tag.inspect}). " \
-       'Bump the lib/rubyzen/version.rb before releasing.'
+       'Update lib/rubyzen/version.rb and recreate the release.'
   exit 1
 end
