@@ -1,0 +1,43 @@
+name: Release
+
+# Publishes rubyzen-lint to RubyGems when a GitHub Release is published.
+# Uses RubyGems Trusted Publishing (OIDC).
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Build and push to RubyGems
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: refs/tags/${{ github.event.release.tag_name }}
+          persist-credentials: false
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Run tests
+        run: bundle exec rake
+
+      - name: Verify version.rb matches the release tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: ruby .github/scripts/verify_release_version.rb
+
+      - name: Configure RubyGems trusted publishing
+        uses: rubygems/configure-rubygems-credentials@v2.0.0
+
+      - name: Build and push
+        run: |
+          gem build rubyzen-lint.gemspec
+          gem push rubyzen-lint-*.gem
