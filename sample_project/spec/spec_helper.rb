@@ -16,6 +16,7 @@ RSpec.configure do |config|
     let(:services) { project.files.with_paths('src/services/').classes }
     let(:jobs) { project.files.with_paths('src/jobs/').classes }
     let(:requests) { project.files.with_paths('src/requests/').classes }
+    let(:questions) { project.files.with_paths('src/questions/').classes }
 
     let(:models_files) { project.files.with_paths('src/models/') }
     let(:models) { models_files.classes }

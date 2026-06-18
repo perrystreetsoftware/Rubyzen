@@ -62,6 +62,28 @@ module Rubyzen
           end
         )
       end
+
+      # Returns all return expressions across every method.
+      #
+      # @return [ExpressionsCollection]
+      def return_expressions
+        ExpressionsCollection.new(
+          flat_map do |method|
+            method.return_expressions
+          end
+        )
+      end
+
+      # Returns all local-variable assignments across every method.
+      #
+      # @return [AssignmentsCollection]
+      def assignments
+        AssignmentsCollection.new(
+          flat_map do |method|
+            method.assignments
+          end
+        )
+      end
     end
   end
 end

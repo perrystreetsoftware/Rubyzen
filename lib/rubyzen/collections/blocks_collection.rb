@@ -22,6 +22,20 @@ module Rubyzen
         all_call_sites = flat_map(&:call_sites)
         CallSiteCollection.new(all_call_sites)
       end
+
+      # Returns all return expressions across every block.
+      #
+      # @return [ExpressionsCollection]
+      def return_expressions
+        ExpressionsCollection.new(flat_map(&:return_expressions))
+      end
+
+      # Returns all local-variable assignments across every block.
+      #
+      # @return [AssignmentsCollection]
+      def assignments
+        AssignmentsCollection.new(flat_map(&:assignments))
+      end
     end
   end
 end

@@ -104,4 +104,37 @@ RSpec.describe Rubyzen::Declarations::CallSiteDeclaration do
       expect(site.class_name).to eq('Foo')
     end
   end
+
+  describe '#receiver_expression' do
+    it 'models a constructor receiver and resolves its constant' do
+      site = call_sites_from('Repos::Foo.new.create(1)').with_name('create').first
+      expect(site.receiver_expression.constructor?).to be(true)
+      expect(site.receiver_expression.constant_name).to eq('Repos::Foo')
+    end
+
+    it 'is nil for a receiverless call' do
+      site = call_sites_from('save').with_name('save').first
+      expect(site.receiver_expression).to be_nil
+    end
+  end
+
+  describe '#arguments' do
+    it 'exposes a constant first argument' do
+      site = call_sites_from('allow(Repos::Foo)').with_name('allow').first
+      expect(site.arguments.first.constant_name).to eq('Repos::Foo')
+    end
+  end
+
+  describe '#enclosing_blocks' do
+    it 'finds an enclosing block by name' do
+      sites = call_sites_from("with_admin_context do\n        get '/admin/x'\n      end")
+      site = sites.with_name('get').first
+      expect(site.enclosing_blocks.with_name('with_admin_context')).not_to be_empty
+    end
+
+    it 'is empty when not nested in a matching block' do
+      site = call_sites_from("get '/admin/x'").with_name('get').first
+      expect(site.enclosing_blocks.with_name('with_admin_context')).to be_empty
+    end
+  end
 end
