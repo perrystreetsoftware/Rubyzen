@@ -17,7 +17,7 @@ module Rubyzen
       include Rubyzen::Providers::RaisesProvider
       include Rubyzen::Providers::SourceCodeProvider
       include Rubyzen::Providers::CallSiteProvider
-      include Rubyzen::Providers::ReturnExpressionsProvider
+      include Rubyzen::Providers::ReturnsProvider
       include Rubyzen::Providers::AssignmentsProvider
 
       # @return [RuboCop::AST::Node]

@@ -9,7 +9,7 @@ RSpec.describe 'Admin API calls must use with_admin_context' do
     let(:admin_calls) do
       test_source_files.call_sites
         .with_name('get')
-        .filter { |cs| cs.source_code.match?(%r{['"]/admin/}) }
+        .filter { |cs| cs.strings.any? { |path| path.start_with?('/admin/') } }
     end
 
     it 'wraps admin calls in a with_admin_context block' do

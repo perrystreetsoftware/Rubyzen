@@ -15,11 +15,12 @@ module Rubyzen
         filter(&:hash_literal?)
       end
 
-      # Filters to only constant (or constructor-of-constant) expressions.
+      # Filters to only constant expressions, including constructors of a constant
+      # (e.g. both +Repos::Foo+ and +Repos::Foo.new+).
       #
       # @return [ExpressionsCollection]
       def constants
-        filter(&:constant?)
+        filter(&:constant_name)
       end
     end
   end

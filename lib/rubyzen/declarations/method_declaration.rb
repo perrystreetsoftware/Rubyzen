@@ -21,7 +21,7 @@ module Rubyzen
       include Rubyzen::Providers::VisibilityProvider
       include Rubyzen::Providers::RescuesProvider
       include Rubyzen::Providers::RaisesProvider
-      include Rubyzen::Providers::ReturnExpressionsProvider
+      include Rubyzen::Providers::ReturnsProvider
       include Rubyzen::Providers::AssignmentsProvider
 
       # @return [RuboCop::AST::Node]

@@ -18,10 +18,14 @@ RSpec.describe Rubyzen::Collections::ExpressionsCollection do
     expect(expressions.hash_literals).to all(satisfy(&:hash_literal?))
   end
 
-  it '#constants keeps only constant expressions' do
+  it '#constants keeps bare-constant expressions' do
     expressions = return_expressions_of('SomeConstant')
-    expect(expressions.constants).not_to be_empty
-    expect(expressions.constants).to all(satisfy(&:constant?))
+    expect(expressions.constants.map(&:constant_name)).to eq(['SomeConstant'])
+  end
+
+  it '#constants also keeps constructor-of-constant expressions (e.g. Repos::Foo.new)' do
+    expressions = return_expressions_of('Repos::Foo.new')
+    expect(expressions.constants.map(&:constant_name)).to eq(['Repos::Foo'])
   end
 
   it 'filter methods return the same collection type' do

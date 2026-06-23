@@ -23,11 +23,18 @@ module Rubyzen
         CallSiteCollection.new(all_call_sites)
       end
 
+      # Returns all return points across every block.
+      #
+      # @return [ReturnsCollection]
+      def returns
+        ReturnsCollection.new(flat_map(&:returns))
+      end
+
       # Returns all return expressions across every block.
       #
       # @return [ExpressionsCollection]
       def return_expressions
-        ExpressionsCollection.new(flat_map(&:return_expressions))
+        returns.expressions
       end
 
       # Returns all local-variable assignments across every block.
