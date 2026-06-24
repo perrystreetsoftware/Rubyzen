@@ -13,6 +13,8 @@ module Rubyzen
       include Rubyzen::Providers::LineNumberProvider
       include Rubyzen::Providers::ClassNameProvider
       include Rubyzen::Providers::SourceCodeProvider
+      include Rubyzen::Providers::ArgumentsProvider
+      include Rubyzen::Providers::EnclosingBlocksProvider
 
       # @return [RuboCop::AST::Node]
       attr_reader :node
@@ -39,6 +41,18 @@ module Rubyzen
       # @return [String, nil] e.g. +"User"+ for +User.find(1)+, +nil+ for +save+
       def receiver
         node.receiver&.type == :const ? node.receiver.const_name : nil
+      end
+
+      # Returns the receiver as an expression, or +nil+ for a receiverless call (e.g. +save+).
+      #
+      # Unlike {#receiver} (which returns a constant-name String), this models the receiver
+      # structurally — constant, constructor, or local variable.
+      #
+      # @return [Rubyzen::Declarations::ExpressionDeclaration, nil]
+      def receiver_expression
+        return nil if node.receiver.nil?
+
+        ExpressionDeclaration.new(node.receiver, self)
       end
 
       # Returns the called method name.

@@ -61,6 +61,15 @@ RSpec.describe Rubyzen::Collections::MethodsCollection do
     end
   end
 
+  describe '#returns' do
+    it 'returns all return points across methods' do
+      returns = methods.returns
+      expect(returns).to be_a(Rubyzen::Collections::ReturnsCollection)
+      expect(returns).not_to be_empty
+      expect(returns).to all(be_a(Rubyzen::Declarations::ReturnDeclaration))
+    end
+  end
+
   describe 'CollectionFilterProvider' do
     it 'supports with_name' do
       result = methods.with_name('bar')

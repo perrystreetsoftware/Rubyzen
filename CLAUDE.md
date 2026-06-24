@@ -42,6 +42,12 @@ Project
         │     ├── .all_methods → MethodsCollection
         │     │     ├── .parameters → ParametersCollection
         │     │     ├── .call_sites → CallSiteCollection
+        │     │     │     └── (each) .arguments → ArgumentsCollection
+        │     │     │         .receiver_expression → ExpressionDeclaration
+        │     │     │         .enclosing_blocks → BlocksCollection
+        │     │     ├── .returns → ReturnsCollection
+        │     │     │     └── .expressions → ExpressionsCollection (also via .return_expressions)
+        │     │     ├── .assignments → AssignmentsCollection
         │     │     ├── .if_statements → DeclarationCollection
         │     │     ├── .rescues → RescuesCollection
         │     │     └── .raises → RaisesCollection
@@ -52,7 +58,10 @@ Project
         ├── .modules → ModulesCollection
         ├── .call_sites → CallSiteCollection
         ├── .blocks → BlocksCollection
-        │     └── .call_sites → CallSiteCollection
+        │     ├── .call_sites → CallSiteCollection
+        │     ├── .returns → ReturnsCollection
+        │     │     └── .expressions → ExpressionsCollection (also via .return_expressions)
+        │     └── .assignments → AssignmentsCollection
         ├── .constants → ConstantsCollection
         └── .requires → RequiresCollection
 ```
@@ -221,9 +230,12 @@ Each declaration wraps an AST node and exposes domain-specific methods:
 |---|---|---|
 | `FileDeclaration` | `name`, `classes`, `modules` | FilePathProvider, LinesOfCodeProvider, ConstantsProvider, RequiresProvider, CallSiteProvider, BlocksProvider |
 | `ClassDeclaration` | `name`, `superclass_name`, `instance_methods`, `class_methods`, `top_level_module` | FilePathProvider, ClassNameProvider, LinesOfCodeProvider, ConstantsProvider, AttributesProvider, MacrosProvider, BlocksProvider, IfStatementsProvider, RescuesProvider, RaisesProvider |
-| `MethodDeclaration` | `name`, `parameters`, `parameters?` | FilePathProvider, ClassNameProvider, LinesOfCodeProvider, CallSiteProvider, BlocksProvider, IfStatementsProvider, ConstantsProvider, VisibilityProvider, RescuesProvider, RaisesProvider |
-| `CallSiteDeclaration` | `name`, `receiver`, `method_name`, `keyword_args`, `keyword_arg_value_pairs`, `symbols`, `strings` | FilePathProvider, LineNumberProvider, ClassNameProvider, SourceCodeProvider |
-| `BlockDeclaration` | `name`, `method_name` | FilePathProvider, LineNumberProvider, ClassNameProvider, LinesOfCodeProvider, SourceCodeProvider, CallSiteProvider, RescuesProvider, RaisesProvider |
+| `MethodDeclaration` | `name`, `parameters`, `parameters?`, `returns`, `return_expressions`, `assignments` | FilePathProvider, ClassNameProvider, LinesOfCodeProvider, CallSiteProvider, BlocksProvider, IfStatementsProvider, ConstantsProvider, VisibilityProvider, RescuesProvider, RaisesProvider, ReturnsProvider, AssignmentsProvider |
+| `CallSiteDeclaration` | `name`, `receiver`, `receiver_expression`, `method_name`, `arguments`, `enclosing_blocks`, `keyword_args`, `keyword_arg_value_pairs`, `symbols`, `strings` | FilePathProvider, LineNumberProvider, ClassNameProvider, SourceCodeProvider, ArgumentsProvider, EnclosingBlocksProvider |
+| `ExpressionDeclaration` | `name`, `constant?`, `local_variable?`, `method_call?`, `constructor?`, `hash_literal?`, `symbol?`, `string?`, `constant_name`, `method_name` | FilePathProvider, LineNumberProvider, ClassNameProvider, SourceCodeProvider |
+| `AssignmentDeclaration` | `name`, `value` | FilePathProvider, LineNumberProvider, ClassNameProvider, SourceCodeProvider |
+| `ReturnDeclaration` | `explicit?`, `implicit?`, `expression` | FilePathProvider, LineNumberProvider, ClassNameProvider, SourceCodeProvider |
+| `BlockDeclaration` | `name`, `method_name`, `returns`, `return_expressions`, `assignments` | FilePathProvider, LineNumberProvider, ClassNameProvider, LinesOfCodeProvider, SourceCodeProvider, CallSiteProvider, RescuesProvider, RaisesProvider, ReturnsProvider, AssignmentsProvider |
 | `ParameterDeclaration` | `name`, `default_value` | FilePathProvider, LineNumberProvider, ClassNameProvider |
 | `ConstantDeclaration` | `name`, `value`, `assignment?`, `reference?`, `top_level?` | FilePathProvider, LineNumberProvider, ClassNameProvider, SourceCodeProvider |
 | `AttributeDeclaration` | `name`, `symbols`, `reader?`, `writer?`, `accessor?` | FilePathProvider, ClassNameProvider, LineNumberProvider, VisibilityProvider |
