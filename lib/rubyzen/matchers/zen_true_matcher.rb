@@ -6,6 +6,7 @@
 #       # @param custom_message [String, nil] optional failure message
 #       # @param allowlist [Array<String>, nil] items to permanently ignore
 #       # @param baseline [Array<String>, nil] known violations for gradual adoption
+#       # @param one_per_file [Boolean] if true, displays only the first violation per file (default: false)
 #       # @yield [item] block that should return true for each item
 #       #
 #       # @example Ensure all methods have parameters
@@ -13,29 +14,34 @@
 #       #
 #       # @example With a custom failure message
 #       #   expect(services).to zen_true("All services must inherit from BaseService") { |s| s.superclass_name == 'BaseService' }
-#       def zen_true(custom_message = nil, allowlist: nil, baseline: nil, &block); end
+#       #
+#       # @example Compact output to one per file
+#       #   expect(items).to zen_true(one_per_file: true) { |m| m.valid? }
+#       def zen_true(custom_message = nil, allowlist: nil, baseline: nil, one_per_file: false, &block); end
 #     end
 #   end
-RSpec::Matchers.define :zen_true do |custom_message=nil, allowlist: nil, baseline: nil|
+RSpec::Matchers.define :zen_true do |custom_message=nil, allowlist: nil, baseline: nil, one_per_file: false|
   include Rubyzen::ExpectationHelpers
 
   match do |subject_collection|
     options = custom_message.is_a?(Hash) ? custom_message : {}
     resolved_allowlist = allowlist || options[:allowlist] || options['allowlist']
     resolved_baseline = baseline || options[:baseline] || options['baseline']
+    resolved_one_per_file = one_per_file || options[:one_per_file] || options['one_per_file'] || false
     @custom_message = options[:message] || options['message'] || (custom_message unless custom_message.is_a?(Hash))
     @offenders = []
 
     if block_arg != nil
-      items = Array(subject_collection) # to handle one or multiple subjects
+      items = Array(subject_collection)
 
       failing_items = items.filter { |item| !block_arg.call(item) }
       @classified_items = classify_items(
         failing_items,
         allowlist: resolved_allowlist,
-        baseline: resolved_baseline
+        baseline: resolved_baseline,
+        one_per_file: resolved_one_per_file
       )
-      @offenders = @classified_items[:violations]
+      @offenders = @classified_items[:violations_raw]
 
       stale_exception_groups = []
       stale_baseline = @classified_items[:stale_baseline]

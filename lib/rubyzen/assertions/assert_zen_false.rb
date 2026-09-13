@@ -7,6 +7,7 @@ module Rubyzen
     # @param message [String, nil] optional custom failure message
     # @param allowlist [Array<String>, nil] items to permanently ignore
     # @param baseline [Array<String>, nil] known violations for gradual adoption
+    # @param one_per_file [Boolean] if true, displays only the first violation per file (default: false)
     # @yield [item] block that should return false for each item
     # @return [true] when the assertion passes
     # @raise [ArgumentError] when no block is given
@@ -17,15 +18,18 @@ module Rubyzen
     #
     # @example With a baseline for gradual adoption
     #   assert_zen_false(classes, baseline: ['LegacyModel']) { |k| k.lines_of_code > 200 }
-    def assert_zen_false(collection, message: nil, allowlist: nil, baseline: nil, &block)
+    #
+    # @example Compact output to one per file
+    #   assert_zen_false(items, one_per_file: true) { |x| x.bad_condition? }
+    def assert_zen_false(collection, message: nil, allowlist: nil, baseline: nil, one_per_file: false, &block)
       raise ArgumentError, 'assert_zen_false requires a block' unless block
 
       @failure_message = nil
       @custom_message = message
       failing_items = Array(collection).filter { |item| block.call(item) }
-      @classified_items = classify_items(failing_items, allowlist: allowlist, baseline: baseline)
+      @classified_items = classify_items(failing_items, allowlist: allowlist, baseline: baseline, one_per_file: one_per_file)
 
-      violations = @classified_items[:violations]
+      violations = @classified_items[:violations_raw]
       stale_baseline = @classified_items[:stale_baseline]
       stale_allowlist = @classified_items[:stale_allowlist]
 

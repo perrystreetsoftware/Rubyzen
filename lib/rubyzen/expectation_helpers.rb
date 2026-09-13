@@ -66,9 +66,10 @@ module Rubyzen
     # @param subject_collection [Array, Object] items to classify
     # @param allowlist [Array<String>, nil] allowed exception entries
     # @param baseline [Array<String>, nil] baseline exception entries
+    # @param one_per_file [Boolean] if true, displays only the first violation per file (default: false)
     # @return [Hash{Symbol => Array<String>}] keys: :violations, :baseline, :allowlist,
-    #   :stale_baseline, :stale_allowlist
-    def classify_items(subject_collection, allowlist: nil, baseline: nil)
+    #   :stale_baseline, :stale_allowlist, :violations_raw
+    def classify_items(subject_collection, allowlist: nil, baseline: nil, one_per_file: false)
       items = Array(subject_collection).compact
       normalized_allowlist = normalize_exception_entries(allowlist)
       normalized_baseline = normalize_exception_entries(baseline)
@@ -97,16 +98,33 @@ module Rubyzen
         end
       end
 
+      raw_violations = Array(grouped_items[:violations])
+      violations_to_display = one_per_file ? filter_one_per_file(raw_violations) : raw_violations
+
       classifications = {
         baseline: Array(grouped_items[:baseline]).map { |item| element_name(item) },
         allowlist: Array(grouped_items[:allowlist]).map { |item| element_name(item) },
-        violations: Array(grouped_items[:violations]).map { |item| element_name(item) }
+        violations: violations_to_display.map { |item| element_name(item) },
+        violations_raw: raw_violations
       }
 
       classifications.merge(
         stale_baseline: normalized_baseline - matched_baseline_entries.uniq,
         stale_allowlist: normalized_allowlist - matched_allowlist_entries.uniq
       )
+    end
+
+    private
+
+    # Filters violations to keep only the first violation per file.
+    #
+    # @param violations [Array<Object>] raw violation declaration objects
+    # @return [Array<Object>] violations with at most one per file_path
+    def filter_one_per_file(violations)
+      violations
+        .group_by { |item| item_details(item)[:file_path] }
+        .transform_values(&:first)
+        .values
     end
 
     # Formats a human-readable description of an item for failure messages.

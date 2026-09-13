@@ -10,6 +10,7 @@ module Rubyzen
     # @param message [String, nil] optional custom failure message
     # @param allowlist [Array<String>, nil] items to permanently ignore
     # @param baseline [Array<String>, nil] known violations for gradual adoption
+    # @param one_per_file [Boolean] if true, displays only the first violation per file (default: false)
     # @return [true] when the assertion passes
     # @raise [Minitest::Assertion] when there are live violations or stale entries
     #
@@ -18,12 +19,15 @@ module Rubyzen
     #
     # @example With a baseline for gradual adoption
     #   assert_zen_empty(violations, baseline: ['LegacyController'])
-    def assert_zen_empty(collection, message: nil, allowlist: nil, baseline: nil)
+    #
+    # @example Compact output to one per file
+    #   assert_zen_empty(violations, one_per_file: true)
+    def assert_zen_empty(collection, message: nil, allowlist: nil, baseline: nil, one_per_file: false)
       @failure_message = nil
       @custom_message = message
-      @classified_items = classify_items(collection, allowlist: allowlist, baseline: baseline)
+      @classified_items = classify_items(collection, allowlist: allowlist, baseline: baseline, one_per_file: one_per_file)
 
-      violations = @classified_items[:violations]
+      violations = @classified_items[:violations_raw]
       stale_baseline = @classified_items[:stale_baseline]
       stale_allowlist = @classified_items[:stale_allowlist]
 

@@ -27,6 +27,25 @@ RSpec.describe 'zen_empty matcher' do
     expect(non_empty_collection).not_to zen_empty
   end
 
+  describe 'with one_per_file' do
+    let(:classes) do
+      file = parse_ruby(<<~RUBY, file_path: '/app/controllers/foo_controller.rb')
+        class FooController; end
+        class BarController; end
+      RUBY
+      Rubyzen::Collections::ClassesCollection.new(file.classes)
+    end
+
+    it 'displays only the first violation from each file' do
+      expect {
+        expect(classes).to zen_empty(one_per_file: true)
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError) { |error|
+        expect(error.message).to include('FooController')
+        expect(error.message).not_to include('BarController')
+      }
+    end
+  end
+
   describe 'with allowlist' do
     let(:classes) do
       file = parse_ruby(<<~RUBY, file_path: '/app/controllers/foo_controller.rb')
