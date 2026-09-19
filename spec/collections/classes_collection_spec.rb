@@ -4,6 +4,7 @@ RSpec.describe Rubyzen::Collections::ClassesCollection do
   let(:file) do
     parse_ruby(<<~RUBY)
       class Foo < ApplicationController
+        DEFAULT_NAME = 'name'
         attr_reader :name
         validates_required :name
 
@@ -34,6 +35,14 @@ RSpec.describe Rubyzen::Collections::ClassesCollection do
       attrs = classes.attributes
       expect(attrs).to be_a(Rubyzen::Collections::AttributesCollection)
       expect(attrs.first.symbols).to eq(['name'])
+    end
+  end
+
+  describe '#constants' do
+    it 'returns all constants across classes' do
+      constants = classes.constants
+      expect(constants).to be_a(Rubyzen::Collections::ConstantsCollection)
+      expect(constants.map(&:name)).to include('DEFAULT_NAME')
     end
   end
 

@@ -24,6 +24,14 @@ module Rubyzen
         AttributesCollection.new(all_attributes)
       end
 
+      # Returns all constant references and assignments across every class.
+      #
+      # @return [ConstantsCollection]
+      def constants
+        all_constants = flat_map(&:constants)
+        ConstantsCollection.new(all_constants)
+      end
+
       # Returns all macro invocations across every class.
       #
       # @return [MacrosCollection]
