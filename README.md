@@ -98,7 +98,29 @@ Rubyzen provides three checks for your architectural lint rules:
 | `zen_true { \|item\| }` | `assert_zen_true(collection) { \|item\| }` | the block returns true for every element |
 | `zen_false { \|item\| }` | `assert_zen_false(collection) { \|item\| }` | the block returns false for every element |
 
-All three accept an `allowlist:` of exceptions that are permanently exempt from the rule, a `baseline:` of known existing violations (technical debt) to fix over time, and a custom failure message.
+All three accept:
+- `allowlist:` of exceptions that are permanently exempt from the rule
+- `baseline:` of known existing violations (technical debt) to fix over time
+- `one_per_file:` (Boolean) to display only the first violation per file, useful when generating an initial baseline from many violations
+- A custom failure message
+
+### Compact failure output with `one_per_file`
+
+When a rule has many violations across many files, the default output can be overwhelming. Use `one_per_file: true` to show only the first violation from each file, making it easier to generate a baseline:
+
+```ruby
+# RSpec
+it 'does not assign local variables in it blocks' do
+  expect(violations).to zen_empty(one_per_file: true)
+end
+
+# Minitest
+def test_does_not_assign_local_variables_in_it_blocks
+  assert_zen_empty(violations, one_per_file: true)
+end
+```
+
+The rule still **fails** when there are multiple violations in a file; the option only limits the diagnostic output for readability. All violations are considered when evaluating baseline and allowlist entries.
 
 ## Run your lint rules
 
