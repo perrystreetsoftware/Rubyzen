@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.4.0]
+
+### Added
+
+- **`Rubyzen::Rule`** — a structured explanation of a lint rule (`description`, plus optional
+  `rationale`, `fix_hint`, `bad_example`, `good_example`), defined with a block DSL
+  (`Rubyzen::Rule.new do description '...' end`) or keywords. Pass it as `rule:` to any RSpec
+  matcher (`zen_empty(rule:)`, `zen_true(rule:) { }`, `zen_false(rule:) { }`) or Minitest assertion
+  (`assert_zen_empty(collection, rule:)`, …). The failure message then shows `RULE:`, `WHY:`,
+  `HOW TO FIX:`, `BAD:` and `GOOD:` sections ahead of the violations, giving developers and
+  AI agents the context needed to fix a violation.
+- **`ClassesCollection#constants`** — the constant references and assignments across every class,
+  as a `ConstantsCollection` (e.g. `repos.constants.with_name('Singleton')`).
+
+All additions are backward-compatible: plain string messages still work and take precedence over `rule:`.
+
 ## [0.3.0]
 
 ### Added

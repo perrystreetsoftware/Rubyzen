@@ -72,4 +72,71 @@ RSpec.describe 'zen_empty matcher' do
       }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /stale/i)
     end
   end
+
+  describe 'with a rule' do
+    let(:rule) do
+      Rubyzen::Rule.new(
+        description: 'No Foo classes.',
+        rationale: 'Foo is deprecated.',
+        fix_hint: 'Rename Foo to Bar.'
+      )
+    end
+
+    it 'shows the rule sections followed by the violations' do
+      expect {
+        expect(non_empty_collection).to zen_empty(rule:)
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError) { |error|
+        expect(error.message).to eq(<<~MESSAGE.chomp)
+          RULE: No Foo classes.
+
+          WHY: Foo is deprecated.
+
+          HOW TO FIX: Rename Foo to Bar.
+
+          Violations:
+            - element: Foo
+            - class: Foo
+            - file: test.rb:1
+        MESSAGE
+      }
+    end
+
+    it 'shows stale baseline entries after the rule' do
+      expect {
+        expect(empty_collection).to zen_empty(rule:, baseline: ['OldClass'])
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /No Foo classes\.\n\n.*Stale baseline entries:\n  - OldClass/m)
+    end
+
+    it 'passes when the collection is empty' do
+      expect(empty_collection).to zen_empty(rule:)
+    end
+
+    it 'accepts the rule as the positional argument' do
+      expect {
+        expect(non_empty_collection).to zen_empty(rule)
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /\ARULE: No Foo classes\./)
+    end
+
+    it 'prefers a custom message over the rule' do
+      expect {
+        expect(non_empty_collection).to zen_empty('Custom message', rule:)
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError) { |error|
+        expect(error.message).to start_with('Custom message')
+        expect(error.message).not_to include('RULE:')
+      }
+    end
+
+    it 'keeps the negation reason after the rule' do
+      expect {
+        expect(empty_collection).not_to zen_empty(rule:)
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError,
+                       /\ARULE: No Foo classes\..*\n\nExpected not to be empty, but had no elements\.\z/m)
+    end
+
+    it 'rejects a rule that is not a Rubyzen::Rule' do
+      expect {
+        expect(non_empty_collection).to zen_empty(rule: 'No Foo classes.')
+      }.to raise_error(ArgumentError, /Expected rule: to be a Rubyzen::Rule, got String/)
+    end
+  end
 end

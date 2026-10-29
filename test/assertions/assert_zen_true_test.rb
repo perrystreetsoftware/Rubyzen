@@ -37,4 +37,35 @@ class AssertZenTrueTest < Minitest::Test
     end
     assert_match(/All must be Foo/, error.message)
   end
+
+  def rule
+    Rubyzen::Rule.new(description: 'Only FooController is allowed.', fix_hint: 'Rename it to FooController.')
+  end
+
+  def test_zen_true_shows_the_rule_followed_by_the_violations
+    error = assert_raises(Minitest::Assertion) do
+      assert_zen_true(two_controllers, rule: rule) { |c| c.name == 'FooController' }
+    end
+    assert_equal(<<~MESSAGE.chomp, error.message)
+      RULE: Only FooController is allowed.
+
+      HOW TO FIX: Rename it to FooController.
+
+      Violations:
+        - element: BarController
+        - class: BarController
+        - file: /app/controllers/foo_controller.rb:2
+    MESSAGE
+  end
+
+  def test_zen_true_supports_a_rule_with_a_baseline
+    assert_zen_true(two_controllers, rule: rule, baseline: %w[BarController]) { |c| c.name == 'FooController' }
+  end
+
+  def test_zen_true_prefers_a_custom_message_over_the_rule
+    error = assert_raises(Minitest::Assertion) do
+      assert_zen_true(two_controllers, message: 'Custom message', rule: rule) { |c| c.name == 'FooController' }
+    end
+    assert_match(/\ACustom message\n/, error.message)
+  end
 end

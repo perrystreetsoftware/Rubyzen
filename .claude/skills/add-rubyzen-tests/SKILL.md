@@ -253,7 +253,7 @@ class AssertZenEmptyTest < Minitest::Test
 end
 ```
 
-Run with `bundle exec rake test` (or `bundle exec ruby -Itest test/assertions/assert_zen_empty_test.rb`). The assertion tests cover the same cases as the matcher specs — pass/fail, `allowlist:`, `baseline:`, stale entries, custom `message:` — plus a missing block raising `ArgumentError` for `assert_zen_true` / `assert_zen_false`.
+Run with `bundle exec rake test` (or `bundle exec ruby -Itest test/assertions/assert_zen_empty_test.rb`). The assertion tests cover the same cases as the matcher specs — pass/fail, `allowlist:`, `baseline:`, stale entries, custom `message:`, a `rule:` (`Rubyzen::Rule`, rendered ahead of the violations and overridden by `message:`) — plus a missing block raising `ArgumentError` for `assert_zen_true` / `assert_zen_false`.
 
 ## When to Use Fixture Files
 

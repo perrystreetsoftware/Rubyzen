@@ -154,12 +154,36 @@ module Rubyzen
       sections.join("\n")
     end
 
+    # Sets the +@custom_message+ and +@rule+ read by {#message_for_failure}.
+    # A {Rubyzen::Rule} passed as the message is treated as the rule.
+    #
+    # @param message [String, Rubyzen::Rule, nil] the custom failure message
+    # @param rule [Rubyzen::Rule, nil] the rule explaining the failure
+    # @raise [ArgumentError] if the rule is neither +nil+ nor a {Rubyzen::Rule}
+    # @return [void]
+    def assign_failure_explanation(message, rule)
+      message_rule = message if message.is_a?(Rubyzen::Rule)
+      rule ||= message_rule
+      unless rule.nil? || rule.is_a?(Rubyzen::Rule)
+        raise ArgumentError, "Expected rule: to be a Rubyzen::Rule, got #{rule.class}. " \
+                             'Pass a plain String as the message instead.'
+      end
+
+      @custom_message = message_rule ? nil : message
+      @rule = rule
+    end
+
     # Formats the failure message by combining the base message with
-    # custom messages and classified item details (violations, stale entries).
+    # custom messages, the rule, and classified item details (violations, stale entries).
+    #
+    # Precedence: a custom message replaces the base message; otherwise a rule's
+    # {Rubyzen::Rule#message} does. The details are appended in every case. When
+    # there are no details (e.g. a missing block or a failed negation), the base
+    # message follows the rule so the reason for the failure is not lost.
     #
     # Works unchanged in both RSpec matchers and Minitest assertions, since it
     # only reads instance variables set by the caller (+@failure_message+,
-    # +@custom_message+, +@classified_items+).
+    # +@custom_message+, +@rule+, +@classified_items+).
     #
     # @param base_message [String] the default failure message
     # @return [String] formatted failure message
@@ -168,7 +192,10 @@ module Rubyzen
 
       details = formatted_matcher_groups
 
-      if @custom_message
+      if !@custom_message && @rule
+        reason = details.nil? || details.empty? ? base_message : details
+        "#{@rule.message}\n\n#{reason}"
+      elsif @custom_message
         if details && !details.empty?
           "#{@custom_message}\n#{details}"
         else
