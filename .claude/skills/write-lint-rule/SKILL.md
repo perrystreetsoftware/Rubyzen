@@ -103,7 +103,7 @@ Asserts the collection has no elements. Use for "must not" / "should never" rule
 
 ```ruby
 expect(violations).to zen_empty
-expect(violations).to zen_empty("Custom failure message explaining the rule")
+expect(violations).to zen_empty(rule:)  # a Rubyzen::Rule — see "Explaining the Rule" below
 
 # Allowlist: permanently accepted exceptions
 expect(violations).to zen_empty(allowlist: ['LegacyController'])
@@ -163,6 +163,7 @@ end
 | RSpec matcher | Minitest assertion |
 |---|---|
 | `expect(c).to zen_empty` | `assert_zen_empty(c)` |
+| `expect(c).to zen_empty(rule:)` | `assert_zen_empty(c, rule: RULE)` |
 | `expect(c).to zen_empty("msg")` | `assert_zen_empty(c, message: "msg")` |
 | `expect(c).to zen_empty(allowlist: [...], baseline: [...])` | `assert_zen_empty(c, allowlist: [...], baseline: [...])` |
 | `expect(c).to zen_true { \|x\| ... }` | `assert_zen_true(c) { \|x\| ... }` |
@@ -276,14 +277,83 @@ file.blocks.with_method_name('describe')   # RSpec describe blocks
 block.call_sites                           # calls within the block
 ```
 
+## Explaining the Rule
+
+Every lint rule should explain itself with a `Rubyzen::Rule`, passed as `rule:` to any matcher or assertion. When the rule fails, the reader (often an AI agent fixing the code) sees what the rule requires, why it exists, and how to fix it — not just a list of violations. Without that context the "fix" is often to work around the rule instead of fixing the actual production violation.
+
+```ruby
+RSpec.describe 'No if statements in controllers' do
+  it 'has no if statements in methods' do
+    expect(controllers.all_methods.if_statements).to zen_empty(rule:, baseline:)
+  end
+
+  let(:rule) do
+    Rubyzen::Rule.new do
+      description 'Controllers do not contain if statements.'
+      rationale <<~TEXT
+        Controllers only orchestrate a request. Branching in them hides business logic
+        where it cannot be reused or unit-tested.
+      TEXT
+      fix_hint 'Move the condition into a Service and call it from the controller.'
+      bad_example <<~RUBY
+        def call
+          return error(:forbidden) if profile.banned?
+        end
+      RUBY
+      good_example <<~RUBY
+        def call
+          Services::Profiles::Update.new.call(profile:)
+        end
+      RUBY
+    end
+  end
+
+  let(:baseline) { %w[LegacyController] }
+end
+```
+
+| Section | Write it as |
+|---|---|
+| `description` | One sentence stating what the code must (not) do. |
+| `rationale` | The architectural reason — *why*, not a restatement of the description. |
+| `fix_hint` | The concrete change that brings a violation into compliance. |
+| `bad_example` / `good_example` | Short snippets; heredocs keep their indentation. |
+
+- Use the block DSL. Write prose as a plain string, or as a `<<~TEXT` heredoc when it spans lines. Write examples as `<<~RUBY` heredocs, or another delimiter such as `<<~TREE` when an example isn't Ruby. Examples are strings on purpose: Rubyzen parses spec files too, so example code written as real Ruby would show up as real call sites in rules that scan specs.
+- For a one-line rule, keywords are fine: `Rubyzen::Rule.new(description: '...', fix_hint: '...')`. Don't mix keywords with a block.
+- Inside the block, `self` is the builder. To use a helper from the surrounding scope, take the builder as a parameter instead: `Rubyzen::Rule.new { |r| r.description summary }`.
+- In RSpec, define the rule as `let(:rule)` (a constant inside a `describe` block leaks into the global namespace). In Minitest, define it as a constant on the test class: `RULE = Rubyzen::Rule.new do ... end`.
+- When one file has several `it` blocks that check different things, give each its own rule (`let(:ifs_rule)`, `let(:size_rule)`).
+- A plain string message still works and takes precedence if both are passed, but prefer `rule:`.
+
 ## Failure Messages
 
-Rubyzen matchers automatically format failure messages with:
-- Element name (method name, class name, etc.)
-- Class name (parent class)
-- File path and line number
+With a rule, the failure message is the rule followed by the violations. Every violation lists its element name, class, and `file:line`, so it is immediately actionable:
 
-This makes violations immediately actionable — developers see exactly where the violation is.
+```
+RULE: Controllers do not contain if statements.
+
+WHY: Controllers only orchestrate a request. ...
+
+HOW TO FIX: Move the condition into a Service and call it from the controller.
+
+BAD:
+def call
+  return error(:forbidden) if profile.banned?
+end
+
+GOOD:
+...
+
+Violations:
+  - element: call
+  - class: Controllers::Profiles::Update
+  - file: app/controllers/profiles/update.rb:5
+Stale baseline entries:
+  - LegacyController
+```
+
+`Stale baseline entries` / `Stale allowlist entries` are entries that no longer match any violation. Remove them from the list.
 
 ## Checklist
 
@@ -291,5 +361,5 @@ This makes violations immediately actionable — developers see exactly where th
 - [ ] Shared context is available (auto-included or via `include_context 'project_config'`)
 - [ ] Uses `zen_empty` for "must not" rules, `zen_true { }` for "must always" rules
 - [ ] Uses `{ }` braces (not `do...end`) with `zen_true`/`zen_false`
-- [ ] Custom failure message explains *why* the rule exists (optional but recommended)
+- [ ] Passes a `Rubyzen::Rule` via `rule:` with a description, rationale, fix hint, and bad/good examples
 - [ ] `bundle exec rspec path/to/spec` runs successfully

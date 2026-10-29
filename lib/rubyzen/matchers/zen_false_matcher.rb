@@ -6,7 +6,9 @@
 #       # Supports +allowlist:+ and +baseline:+ for gradual adoption, matching items
 #       # where the block returns true against exception lists.
 #       #
-#       # @param custom_message [String, nil] optional failure message
+#       # @param custom_message [String, nil] optional failure message (takes precedence over +rule:+)
+#       # @param rule [Rubyzen::Rule, nil] rule whose description, rationale, fix hint and examples
+#       #   are shown in the failure message
 #       # @param allowlist [Array<String>, nil] items to permanently ignore
 #       # @param baseline [Array<String>, nil] known violations for gradual adoption
 #       # @yield [item] block that should return false for each item
@@ -16,17 +18,24 @@
 #       #
 #       # @example With a baseline for gradual adoption
 #       #   expect(classes).to zen_false(baseline: ['LegacyModel']) { |k| k.lines_of_code > 200 }
-#       def zen_false(custom_message = nil, allowlist: nil, baseline: nil, &block); end
+#       #
+#       # @example With a rule that explains the failure (see {Rubyzen::Rule})
+#       #   expect(models).to zen_false(rule: NO_STATIC_MODEL_METHODS) { |m| m.class_methods.any? }
+#       def zen_false(custom_message = nil, rule: nil, allowlist: nil, baseline: nil, &block); end
 #     end
 #   end
-RSpec::Matchers.define :zen_false do |custom_message=nil, allowlist: nil, baseline: nil|
+RSpec::Matchers.define :zen_false do |custom_message=nil, rule: nil, allowlist: nil, baseline: nil|
   include Rubyzen::ExpectationHelpers
 
   match do |subject_collection|
     options = custom_message.is_a?(Hash) ? custom_message : {}
     resolved_allowlist = allowlist || options[:allowlist] || options['allowlist']
     resolved_baseline = baseline || options[:baseline] || options['baseline']
-    @custom_message = options[:message] || options['message'] || (custom_message unless custom_message.is_a?(Hash))
+    positional_message = custom_message unless custom_message.is_a?(Hash)
+    assign_failure_explanation(
+      options[:message] || options['message'] || positional_message,
+      rule || options[:rule] || options['rule']
+    )
     @offenders = []
 
     if block_arg != nil

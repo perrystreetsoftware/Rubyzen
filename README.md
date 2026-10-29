@@ -98,7 +98,33 @@ Rubyzen provides three checks for your architectural lint rules:
 | `zen_true { \|item\| }` | `assert_zen_true(collection) { \|item\| }` | the block returns true for every element |
 | `zen_false { \|item\| }` | `assert_zen_false(collection) { \|item\| }` | the block returns false for every element |
 
-All three accept an `allowlist:` of exceptions that are permanently exempt from the rule, a `baseline:` of known existing violations (technical debt) to fix over time, and a custom failure message.
+All three accept an `allowlist:` of exceptions that are permanently exempt from the rule, a `baseline:` of known existing violations (technical debt) to fix over time, and a `rule:` that contains the description of the rule, why it is enforced, and how to fix the violations.
+
+## Adding context to failure messages
+
+Instead of a plain string in the failure message of a lint rule, you can pass a `Rubyzen::Rule`. The failure then tells the reader what the rule requires, why it exists, and how to fix the violation. This helps AI agents understand and fix the violations more reliably:
+
+```ruby
+let(:rule) do
+  Rubyzen::Rule.new do
+    description 'Controllers do not contain if statements.'
+    rationale <<~TEXT
+      Controllers only orchestrate; business logic belongs in a Service.
+    TEXT
+    fix_hint 'Move the condition into a Service and call it from the controller.'
+    bad_example <<~RUBY
+      return error(:forbidden) if profile.banned?
+    RUBY
+    good_example <<~RUBY
+      Services::Profiles::Update.new.call(profile:)
+    RUBY
+  end
+end
+
+it 'controllers have no if statements' do
+  expect(controllers.all_methods.if_statements).to zen_empty(rule:, baseline: ['LegacyController'])
+end
+```
 
 ## Run your lint rules
 

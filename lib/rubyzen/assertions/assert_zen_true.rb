@@ -4,7 +4,9 @@ module Rubyzen
     # Minitest counterpart of the +zen_true+ matcher).
     #
     # @param collection [Enumerable] a Rubyzen collection of declarations
-    # @param message [String, nil] optional custom failure message
+    # @param message [String, nil] optional custom failure message (takes precedence over +rule:+)
+    # @param rule [Rubyzen::Rule, nil] rule whose description, rationale, fix hint and examples
+    #   are shown in the failure message
     # @param allowlist [Array<String>, nil] items to permanently ignore
     # @param baseline [Array<String>, nil] known violations for gradual adoption
     # @yield [item] block that should return true for each item
@@ -17,11 +19,14 @@ module Rubyzen
     #
     # @example With a custom failure message
     #   assert_zen_true(services, message: 'All services must inherit from BaseService') { |s| s.superclass_name == 'BaseService' }
-    def assert_zen_true(collection, message: nil, allowlist: nil, baseline: nil, &block)
+    #
+    # @example With a rule that explains the failure (see {Rubyzen::Rule})
+    #   assert_zen_true(repos, rule: REPOS_IN_REPOS_MODULE) { |r| r.top_level_module == 'Repos' }
+    def assert_zen_true(collection, message: nil, rule: nil, allowlist: nil, baseline: nil, &block)
       raise ArgumentError, 'assert_zen_true requires a block' unless block
 
       @failure_message = nil
-      @custom_message = message
+      assign_failure_explanation(message, rule)
       failing_items = Array(collection).filter { |item| !block.call(item) }
       @classified_items = classify_items(failing_items, allowlist: allowlist, baseline: baseline)
 

@@ -104,4 +104,45 @@ RSpec.describe 'zen_true matcher' do
       }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /stale/i)
     end
   end
+
+  describe 'with a rule' do
+    let(:rule) { Rubyzen::Rule.new(description: 'Methods take parameters.', fix_hint: 'Add a parameter.') }
+    let(:methods) do
+      parse_ruby(<<~SOURCE).classes.first.instance_methods
+        class Foo
+          def bar(x); end
+          def baz; end
+        end
+      SOURCE
+    end
+
+    it 'shows the rule sections followed by the violations' do
+      failing = methods.with_name('baz')
+
+      expect {
+        expect(failing).to zen_true(rule:) { |m| m.parameters? }
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError) { |error|
+        expect(error.message).to eq(<<~MESSAGE.chomp)
+          RULE: Methods take parameters.
+
+          HOW TO FIX: Add a parameter.
+
+          Violations:
+            - element: baz
+            - class: Foo
+            - file: test.rb:3
+        MESSAGE
+      }
+    end
+
+    it 'baselines violations like any other message' do
+      expect(methods).to zen_true(rule:, baseline: ['baz']) { |m| m.parameters? }
+    end
+
+    it 'prefers a custom message over the rule' do
+      expect {
+        expect(methods).to zen_true('Custom message', rule:) { |m| m.parameters? }
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /\ACustom message\n/)
+    end
+  end
 end
