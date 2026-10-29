@@ -144,5 +144,12 @@ RSpec.describe 'zen_false matcher' do
         expect(methods).to zen_false('Custom message', rule:) { |m| m.parameters? }
       }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /\ACustom message\n/)
     end
+
+    it 'keeps the missing block reason after the rule' do
+      expect {
+        expect(methods).to zen_false(rule:)
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError,
+                       /\ARULE: Methods take parameters\..*\n\nExpected a block, but got nil\.\z/m)
+    end
   end
 end

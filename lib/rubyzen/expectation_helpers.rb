@@ -177,7 +177,9 @@ module Rubyzen
     # custom messages, the rule, and classified item details (violations, stale entries).
     #
     # Precedence: a custom message replaces the base message; otherwise a rule's
-    # {Rubyzen::Rule#message} does. The details are appended in every case.
+    # {Rubyzen::Rule#message} does. The details are appended in every case. When
+    # there are no details (e.g. a missing block or a failed negation), the base
+    # message follows the rule so the reason for the failure is not lost.
     #
     # Works unchanged in both RSpec matchers and Minitest assertions, since it
     # only reads instance variables set by the caller (+@failure_message+,
@@ -191,7 +193,8 @@ module Rubyzen
       details = formatted_matcher_groups
 
       if !@custom_message && @rule
-        [@rule.message, details].compact.reject(&:empty?).join("\n\n")
+        reason = details.nil? || details.empty? ? base_message : details
+        "#{@rule.message}\n\n#{reason}"
       elsif @custom_message
         if details && !details.empty?
           "#{@custom_message}\n#{details}"

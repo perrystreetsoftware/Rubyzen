@@ -144,5 +144,21 @@ RSpec.describe 'zen_true matcher' do
         expect(methods).to zen_true('Custom message', rule:) { |m| m.parameters? }
       }.to raise_error(RSpec::Expectations::ExpectationNotMetError, /\ACustom message\n/)
     end
+
+    it 'keeps the missing block reason after the rule' do
+      expect {
+        expect(methods).to zen_true(rule:)
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError,
+                       /\ARULE: Methods take parameters\..*\n\nExpected a block, but got nil\.\z/m)
+    end
+
+    it 'keeps the negation reason after the rule' do
+      passing = methods.with_name('bar')
+
+      expect {
+        expect(passing).not_to zen_true(rule:) { |m| m.parameters? }
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError,
+                       /\ARULE: Methods take parameters\..*\n\nExpected to return false for at least one element/m)
+    end
   end
 end

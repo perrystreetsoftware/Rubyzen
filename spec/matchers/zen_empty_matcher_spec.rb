@@ -126,6 +126,13 @@ RSpec.describe 'zen_empty matcher' do
       }
     end
 
+    it 'keeps the negation reason after the rule' do
+      expect {
+        expect(empty_collection).not_to zen_empty(rule:)
+      }.to raise_error(RSpec::Expectations::ExpectationNotMetError,
+                       /\ARULE: No Foo classes\..*\n\nExpected not to be empty, but had no elements\.\z/m)
+    end
+
     it 'rejects a rule that is not a Rubyzen::Rule' do
       expect {
         expect(non_empty_collection).to zen_empty(rule: 'No Foo classes.')
