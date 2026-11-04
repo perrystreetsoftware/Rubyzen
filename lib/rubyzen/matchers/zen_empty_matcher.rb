@@ -7,7 +7,9 @@
 #       # Used in architectural lint rules to verify that no items match
 #       # a forbidden pattern (e.g., no controllers call +.where+ directly).
 #       #
-#       # @param custom_message [String, nil] optional failure message
+#       # @param custom_message [String, nil] optional failure message (takes precedence over +rule:+)
+#       # @param rule [Rubyzen::Rule, nil] rule whose description, rationale, fix hint and examples
+#       #   are shown in the failure message
 #       # @param allowlist [Array<String>, nil] items to permanently ignore
 #       # @param baseline [Array<String>, nil] known violations for gradual adoption
 #       #
@@ -16,17 +18,24 @@
 #       #
 #       # @example With baseline for gradual adoption
 #       #   expect(violations).to zen_empty(baseline: ['LegacyController'])
-#       def zen_empty(custom_message = nil, allowlist: nil, baseline: nil); end
+#       #
+#       # @example With a rule that explains the failure (see {Rubyzen::Rule})
+#       #   expect(controllers.all_methods.if_statements).to zen_empty(rule: NO_IFS_IN_CONTROLLERS)
+#       def zen_empty(custom_message = nil, rule: nil, allowlist: nil, baseline: nil); end
 #     end
 #   end
-RSpec::Matchers.define :zen_empty do |custom_message=nil, allowlist: nil, baseline: nil|
+RSpec::Matchers.define :zen_empty do |custom_message=nil, rule: nil, allowlist: nil, baseline: nil|
   include Rubyzen::ExpectationHelpers
 
   match do |subject_collection|
     options = custom_message.is_a?(Hash) ? custom_message : {}
     resolved_allowlist = allowlist || options[:allowlist] || options['allowlist']
     resolved_baseline = baseline || options[:baseline] || options['baseline']
-    @custom_message = options[:message] || options['message'] || (custom_message unless custom_message.is_a?(Hash))
+    positional_message = custom_message unless custom_message.is_a?(Hash)
+    assign_failure_explanation(
+      options[:message] || options['message'] || positional_message,
+      rule || options[:rule] || options['rule']
+    )
 
     @classified_items = classify_items(
       subject_collection,

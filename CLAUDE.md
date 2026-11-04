@@ -52,6 +52,7 @@ Project
         │     │     ├── .rescues → RescuesCollection
         │     │     └── .raises → RaisesCollection
         │     ├── .attributes → AttributesCollection
+        │     ├── .constants → ConstantsCollection
         │     ├── .macros → MacrosCollection
         │     ├── .rescues → RescuesCollection
         │     └── .raises → RaisesCollection
@@ -77,6 +78,7 @@ lib/rubyzen/
 ├── rspec.rb                      # RSpec adapter (require 'rubyzen/rspec'): core + matchers
 ├── minitest.rb                   # Minitest adapter (require 'rubyzen/minitest'): core + assertions
 ├── expectation_helpers.rb        # Rubyzen::ExpectationHelpers — shared engine for matchers + assertions
+├── rule.rb                       # Rubyzen::Rule — structured explanation passed as `rule:` to matchers + assertions
 ├── project.rb                    # Parses all .rb files, returns FileCollection
 ├── declarations/                 # Domain objects wrapping AST nodes
 │   ├── file_declaration.rb
@@ -251,9 +253,9 @@ Rubyzen exposes the same three checks for both frameworks. The RSpec matchers (`
 
 | RSpec matcher | Minitest assertion | Purpose |
 |---|---|---|
-| `zen_empty` | `assert_zen_empty(collection)` | Collection has no elements. Supports `allowlist:` / `baseline:` for gradual adoption. |
-| `zen_true { \|item\| }` | `assert_zen_true(collection) { \|item\| }` | Block returns true for ALL elements. Supports `allowlist:` / `baseline:`. |
-| `zen_false { \|item\| }` | `assert_zen_false(collection) { \|item\| }` | Block returns false for ALL elements. Supports `allowlist:` / `baseline:`. |
+| `zen_empty` | `assert_zen_empty(collection)` | Collection has no elements. Supports `rule:`, `allowlist:` / `baseline:` for gradual adoption. |
+| `zen_true { \|item\| }` | `assert_zen_true(collection) { \|item\| }` | Block returns true for ALL elements. Supports `rule:`, `allowlist:` / `baseline:`. |
+| `zen_false { \|item\| }` | `assert_zen_false(collection) { \|item\| }` | Block returns false for ALL elements. Supports `rule:`, `allowlist:` / `baseline:`. |
 
 ### Examples
 
@@ -271,6 +273,29 @@ Minitest:
 assert_zen_empty(violations, baseline: [...])
 assert_zen_true(methods) { |m| m.parameters.any? }
 assert_zen_false(methods) { |m| m.name == :biz }
+```
+
+### Rules
+
+Every matcher and assertion also accepts `rule:`, a `Rubyzen::Rule` (`lib/rubyzen/rule.rb`) that explains the lint rule. `Rule#message` renders the `RULE:` / `WHY:` / `HOW TO FIX:` / `BAD:` / `GOOD:` sections, and `ExpectationHelpers#message_for_failure` prints them ahead of the violations. Only `description` is required. A plain message still works and takes precedence over the rule, so the API is backward-compatible.
+
+Define the sections with the block DSL (evaluated by `Rubyzen::Rule::Builder`), using `<<~TEXT` heredocs for prose and `<<~RUBY` heredocs for code. Keywords (`Rubyzen::Rule.new(description: '...')`) also work and suit one-line rules.
+
+```ruby
+rule = Rubyzen::Rule.new do
+  description 'Controllers do not contain if statements.'
+  rationale 'Controllers only orchestrate; branching belongs in a Service.'
+  fix_hint 'Move the condition into a Service.'
+  bad_example <<~RUBY
+    return error if banned?
+  RUBY
+  good_example <<~RUBY
+    Services::Update.new.call
+  RUBY
+end
+
+expect(violations).to zen_empty(rule:, baseline: [...])  # RSpec
+assert_zen_empty(violations, rule: rule, baseline: [...]) # Minitest
 ```
 
 **Important (RSpec only):** Use `{ }` braces (not `do...end`) with `zen_true`/`zen_false` — `do...end` binds to `expect()` instead of the matcher due to Ruby precedence. This caveat does not apply to the Minitest assertions (the block binds to the assertion method either way).

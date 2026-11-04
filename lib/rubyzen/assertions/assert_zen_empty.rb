@@ -7,7 +7,9 @@ module Rubyzen
     # pattern (e.g., no controllers call +.where+ directly).
     #
     # @param collection [Enumerable] a Rubyzen collection of declarations
-    # @param message [String, nil] optional custom failure message
+    # @param message [String, nil] optional custom failure message (takes precedence over +rule:+)
+    # @param rule [Rubyzen::Rule, nil] rule whose description, rationale, fix hint and examples
+    #   are shown in the failure message
     # @param allowlist [Array<String>, nil] items to permanently ignore
     # @param baseline [Array<String>, nil] known violations for gradual adoption
     # @return [true] when the assertion passes
@@ -18,9 +20,12 @@ module Rubyzen
     #
     # @example With a baseline for gradual adoption
     #   assert_zen_empty(violations, baseline: ['LegacyController'])
-    def assert_zen_empty(collection, message: nil, allowlist: nil, baseline: nil)
+    #
+    # @example With a rule that explains the failure (see {Rubyzen::Rule})
+    #   assert_zen_empty(controllers.all_methods.if_statements, rule: NO_IFS_IN_CONTROLLERS)
+    def assert_zen_empty(collection, message: nil, rule: nil, allowlist: nil, baseline: nil)
       @failure_message = nil
-      @custom_message = message
+      assign_failure_explanation(message, rule)
       @classified_items = classify_items(collection, allowlist: allowlist, baseline: baseline)
 
       violations = @classified_items[:violations]

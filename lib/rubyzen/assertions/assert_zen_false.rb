@@ -4,7 +4,9 @@ module Rubyzen
     # Minitest counterpart of the +zen_false+ matcher).
     #
     # @param collection [Enumerable] a Rubyzen collection of declarations
-    # @param message [String, nil] optional custom failure message
+    # @param message [String, nil] optional custom failure message (takes precedence over +rule:+)
+    # @param rule [Rubyzen::Rule, nil] rule whose description, rationale, fix hint and examples
+    #   are shown in the failure message
     # @param allowlist [Array<String>, nil] items to permanently ignore
     # @param baseline [Array<String>, nil] known violations for gradual adoption
     # @yield [item] block that should return false for each item
@@ -17,11 +19,14 @@ module Rubyzen
     #
     # @example With a baseline for gradual adoption
     #   assert_zen_false(classes, baseline: ['LegacyModel']) { |k| k.lines_of_code > 200 }
-    def assert_zen_false(collection, message: nil, allowlist: nil, baseline: nil, &block)
+    #
+    # @example With a rule that explains the failure (see {Rubyzen::Rule})
+    #   assert_zen_false(models, rule: NO_STATIC_MODEL_METHODS) { |m| m.class_methods.any? }
+    def assert_zen_false(collection, message: nil, rule: nil, allowlist: nil, baseline: nil, &block)
       raise ArgumentError, 'assert_zen_false requires a block' unless block
 
       @failure_message = nil
-      @custom_message = message
+      assign_failure_explanation(message, rule)
       failing_items = Array(collection).filter { |item| block.call(item) }
       @classified_items = classify_items(failing_items, allowlist: allowlist, baseline: baseline)
 
